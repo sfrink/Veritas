@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS `elections`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `elections` (
   `usernames` varchar(20) DEFAULT NULL,
+  `usertype` varchar(1) DEFAULT NULL,
   `elec1` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -34,7 +35,7 @@ CREATE TABLE `elections` (
 
 LOCK TABLES `elections` WRITE;
 /*!40000 ALTER TABLE `elections` DISABLE KEYS */;
-INSERT INTO `elections` VALUES ('sfrink','cred1'),('test','cred2');
+INSERT INTO `elections` VALUES ('sfrink','1','1'),('test','0','NULL');
 /*!40000 ALTER TABLE `elections` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -47,4 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-17 15:07:38
+-- Dump completed on 2013-10-17 15:26:09
