@@ -41,7 +41,7 @@ public class Vote {
 			BigInteger one=new BigInteger("1");
 			do{
 				rand.nextBytes(random);
-				r=new BigInteger(random);
+				r=new BigInteger(1,random);
 				gcd=r.gcd(n);
 			}
 			while(!gcd.equals(one) || r.compareTo(n)>=0 || r.compareTo(one)<=0);
@@ -49,7 +49,13 @@ public class Vote {
 			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
 			byte[] blindBytes=blind.toByteArray();
 			//Send blind to Administrator to be signed
-			//Receive signature for c
+			//Receive blind signature for c
+			//Need to unblind the returned signature
+			/*
+			 * BigInteger s=r.modInverse(n).multiply(blindsignature).mod(n);
+			 * s will be the signature of c, the encrypted vote with no blind.  Convert it to bytes.
+			 * byte[] signed=s.toByteArray();
+			 */
 			
 			//Sign c.  Here we DO need to set up a new pk and sk.
 			KeyPairGenerator genRSA2=KeyPairGenerator.getInstance("RSA");
@@ -62,9 +68,11 @@ public class Vote {
 			sign.update(blindBytes);
 			byte[] signedVote=sign.sign();
 			
-			/*Send signedVote to Counting Principal along with public key.
+			/*Send signedVote to Counting Principal along with public key.  
 			 * OR: We could create a table in the database of public and private signing keys.
-			 * Whenever a user creates an account, we add a key pair.
+			 * Whenever a user creates an account, we add a key pair.  This is probably necessary:
+			 * if we just send the public key along with the signature, what,s to stop someone from just
+			 * replacing it with their own signed vote and public key?
 			 */
 			
 		}
