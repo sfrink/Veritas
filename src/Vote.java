@@ -24,7 +24,8 @@ public class Vote {
 			byte[] c=enc.doFinal(vote);
 			//Blinding key setup
 			
-			/*****We actually need to get the public key from the Administrator*****/
+			/*****We actually need to get the public key from the Administrator****
+			 * Maybe store it in another table*/
 			KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
 			genRSA.initialize(3072);
 			KeyPair keypair=genRSA.genKeyPair();

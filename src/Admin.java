@@ -15,7 +15,7 @@ public class Admin {
 			genRSA.initialize(3072);
 			KeyPair keypair=genRSA.genKeyPair();
 			pkAdmin=(RSAPublicKey)keypair.getPublic();
-			skAdmin=(RSAPrivateKey)keypair.getPrivate();
+			skAdmin=(RSAPrivateKey)keypair.getPrivate();			
 			//Get pk to voters
 			//The key generation actually needs to take place before here, and the keys should be stored somewhere
 			//This is because keys for the admin need to be the same for all voters in an election.
@@ -24,6 +24,7 @@ public class Admin {
 			//check that user has not already asked for signature
 			//Check signature of the blinded message
 			/*
+			 * This is just for signing the blinded vote.  Checking signatures and eligibility needs to be added.
 			 * Signature sign=Signature.getInstance("SHA256WITHRSA");
 			 * sign.init(sk);
 			 * sign.update(m);
