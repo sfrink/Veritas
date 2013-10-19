@@ -41,9 +41,46 @@ public class VeritasLogin {
             } else {
                 System.out.println("Incorrect Username or Password!\n----");
             }
+            rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
+            while(rs.next()){
+            	if(rs.getString("usertype").equals("1")){
+            		//use voter code
+            		rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
+        			System.out.println("You are eligible for the following elections:");
+        			int numelections=0;
+        			while(rs.next()){
+        				ResultSetMetaData metadata = rs.getMetaData();
+        				int columnCount = metadata.getColumnCount();
+        				for(int i=3;i<=columnCount;i++){
+        					if(rs.getString(i).equals("1")){
+        						System.out.print((i-2)+"."+metadata.getColumnName(i));
+        						numelections++;
+        					}
+        				}
+        			}
+        			if(numelections==0)
+        				System.out.println("You are not currently eligible for any elections.");
+        			else{
+        				System.out.println("\nPlease type the election name you would like to vote in:");
+        				String election=sc.next();
+        				rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+election+"'");
+        				if(rs.next()){
+        					System.out.println("Here are the candidates:");
+        					String candidates=rs.getString(1);
+        					System.out.println(candidates);
+        				}
+        				System.out.println("Please enter the candidate of your choice:");
+        				String choice=sc.next();
+        				//vote(choice);
+        			}
+            	}
+            	else{
+            		//Ruinian's supervisor code should go here (in some form)
+            	}
+            }
             
         }catch (Exception e){
-            System.out.println("Authentication failed");
+            System.out.println(e+"  Authentication failed");
         }
     }       //end main
 }       //end class
