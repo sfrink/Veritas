@@ -4,15 +4,37 @@ import javax.crypto.*;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.sql.*;
+import java.io.*;
+import java.security.spec.*;
 
 public class Vote {
 
 	
-	public static void vote(String b){
+	public static void vote(String b, String username, String electionname){
+		Connection con=null;
+		Statement st=null;
+		ResultSet rs=null;
+		String url="jdbc:mysql://localhost:3306/elections";
+		String user="root";
+		String pw="";
 		try{
-			Socket MyClient=new Socket("localhost", 6545);
+			Class.forName("com.mysql.jdbc.Driver");
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		try{
+			con=DriverManager.getConnection(url, user, pw);
+			st=con.createStatement();
+			Socket client=new Socket("localhost", 6545);
+			OutputStream out=client.getOutputStream();
+			BufferedReader in=new BufferedReader(new InputStreamReader(client.getInputStream()));
 			RSAPublicKey pkAdmin;
-			RSAPrivateKey skAdmin;
+			RSAPrivateKey skVoter;
+			
+			
+			//Encrypting vote
 			KeyGenerator gen=KeyGenerator.getInstance("AES256");
 			gen.init(256);
 			SecretKey k=gen.generateKey();
@@ -24,16 +46,13 @@ public class Vote {
 			byte[] c=enc.doFinal(vote);
 			//Blinding key setup
 			
-			/*****We actually need to get the public key from the Administrator****
-			 * Maybe store it in another table*/
-			KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
-			genRSA.initialize(3072);
-			KeyPair keypair=genRSA.genKeyPair();
-			pkAdmin=(RSAPublicKey)keypair.getPublic();
-			skAdmin=(RSAPrivateKey)keypair.getPrivate();
+			/*****We actually need to get the public key from the Administrator*****/
+			rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
+			byte[] adminpk=rs.getBytes("pk");
+			PublicKey pubkey=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
+			pkAdmin=(RSAPublicKey)pubkey;
 			BigInteger n=pkAdmin.getModulus();
 			BigInteger e=pkAdmin.getPublicExponent();
-			BigInteger d=skAdmin.getPrivateExponent();
 			BigInteger ct=new BigInteger(c);
 			SecureRandom rand=new SecureRandom();
 			byte[] random=new byte[10];
@@ -50,17 +69,24 @@ public class Vote {
 			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
 			byte[] blindBytes=blind.toByteArray();
 			//Sign blind
-			KeyPairGenerator genRSA2=KeyPairGenerator.getInstance("RSA");
-			genRSA.initialize(3072);
-			KeyPair kp=genRSA2.genKeyPair();
-			PublicKey pk=kp.getPublic();
-			PrivateKey sk=kp.getPrivate();
+			
+			//These keys should be stored in the database in same way as admin keys
+			
+			rs=st.executeQuery("SELECT sk FROM voterkeys WHERE username='"+username+"'");
+			byte[] votersk=rs.getBytes("sk");
+			PrivateKey sk=KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(votersk));
+			
+			
+			
 			Signature sign=Signature.getInstance("SHA256WITHRSA");
 			sign.initSign(sk);
 			sign.update(blindBytes);
 			byte[] signedBlind=sign.sign();
-			
 			//Send username, signedBlind and blindBytes to Administrator to be signed
+			byte[] usernameBytes=username.getBytes();
+			out.write(usernameBytes);
+			out.write(blindBytes);
+			out.write(signedBlind);
 			//username may need to be signed, not sure.
 			//Receive blind signature for c
 			//Need to unblind the returned signature
@@ -69,6 +95,13 @@ public class Vote {
 			 * s will be the signature of c, the encrypted vote with no blind.  Convert it to bytes.
 			 * byte[] signedVote=s.toByteArray();
 			 * Check that signedVote is a valid signature of c
+			 * Will need to get adminPK from a database
+			 * Signature ver=Signature.getInstance("SHA256WITHRSA");
+			 * ver.initVerify(adminPK);
+			 * ver.update(c);
+			 * boolean good=ver.verify(signedVote);
+			 * if(good)
+			 * 		Continue
 			 * if not valid then need to raise some alarms, but don't need that implemented yet
 			 */
 						

@@ -4,29 +4,52 @@ import javax.crypto.*;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.sql.Connection;
+import java.security.spec.*;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import javax.crypto.spec.IvParameterSpec;
 
 
 public class Counter {
 
 	public static void main(String[] args){
+		Connection con=null;
+		Statement st=null;
+		ResultSet rs=null;
+		String url="jdbc:mysql://localhost:3306/elections";
+		String user="root";
+		String pw="";
 		try{
+			Class.forName("com.mysql.jdbc.Driver");
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+		try{
+			con=DriverManager.getConnection(url, user, pw);
+			st=con.createStatement();
 			//Network stuff to get (encVote, signedVote) from voter
 			byte[] encVote; //=initialized to whatever is sent from voter;
 			byte[] signedVote; //=whatever is sent from voter
 			//Check signature
 			Signature ver=Signature.getInstance("SHA256WITHRSA");
-			//We need to get the pk from a database table probably
+			//We need to get the pk from a database table
+			//rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
+			//byte[] voterpk=rs.getBytes("pk");
+			//PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
 			//ver.initVerify(pk);
-			ver.update(encVote);
-			boolean goodSign=ver.verify(signedVote);
-			if(goodSign){
+			//ver.update(encVote);
+			//boolean goodSign=ver.verify(signedVote);
+			//if(goodSign){
 				SecureRandom rand=new SecureRandom();
 				byte[] nonce=new byte[20];
 				rand.nextBytes(nonce);
 				//Store nonce along with encVote somewhere
 				//Add one to totalVotesCollected
-			}
+			//}
 			//Do some waiting for all votes
 			//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
 			
