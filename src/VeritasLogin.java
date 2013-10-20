@@ -76,6 +76,32 @@ public class VeritasLogin {
             	}
             	else{
             		//Ruinian's supervisor code should go here (in some form)
+        			Connection con2=DriverManager.getConnection(url, user, pw);
+        			Statement st2=con2.createStatement();
+        			
+        			String authorize;
+        			String userName;
+        			
+        			//	String create=scan.next();
+            		//if (create.equals("yes")){
+            			System.out.println("Please give a name for this election");
+            			String elec=sc.next();
+            			System.out.println("Please enter the names of the candidates");
+            			String cand=sc.next();
+            			stmt.execute("INSERT into candidates (election, candidateSet) VALUES ('" + elec +"','" + cand+"')");
+            			stmt.execute("ALTER TABLE elections ADD "+elec+" varchar(1)");
+            		//}  
+            		
+            		rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
+
+
+        			while(rs.next()) { 
+        				userName = rs.getString("usernames");
+        				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
+        				System.out.println(userName+":");
+        				authorize = sc.next();
+        				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
+        			} 
             	}
             }
             
