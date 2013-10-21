@@ -101,7 +101,8 @@ public class VeritasLogin {
         				System.out.println("Please enter the candidate of your choice:");
         				String choice=sc.next();
         				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserID: "+name+"; Password: "+password+"; Description: Vote cast for "+choice+"\n");
-        				//vote(choice);
+        				Vote voter=new Vote();
+        				voter.vote(choice, name, election);
         			}
             	}
             	else{
@@ -163,14 +164,17 @@ public class VeritasLogin {
             		
             		rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
 
-
+            		int numVoters=0;
         			while(rs.next()) { 
         				userName = rs.getString("usernames");
         				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
         				System.out.println(userName+":");
         				authorize = sc.next();
-        				if(authorize.equals("1"))
+        				if(authorize.equals("1")){
+        					numVoters++;
         					out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
+        					st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
+        				}
         				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
         			} 
             	}
