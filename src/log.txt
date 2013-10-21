@@ -1,0 +1,4 @@
+Time: 10/20/2013 9:56:52 PM; Event Type: Login; UserID: sfrink; Password: pw; Description: Successful Login
+
+Time: 10/21/2013 2:35:27 PM; Event Type: Login; UserID: nope; Password: nope; Description: Failed Login
+
