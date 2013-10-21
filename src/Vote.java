@@ -4,7 +4,6 @@ import java.net.*;
 import javax.crypto.*;
 
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
@@ -14,7 +13,9 @@ import java.util.ArrayList;
 
 public class Vote {
 
-	
+	public Vote(){
+		
+	}
 	public static void vote(String b, String username, String electionname){
 		Connection con=null;
 		Statement st=null;
@@ -111,7 +112,7 @@ public class Vote {
 			System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 			bufArray.add(tmp);
 			//System.out.println( bufArray.get(0));
-			byte[] blindedSignedVote=bufArray.get(0); //need to unblind
+			byte[] blindedSignedVote=bufArray.get(0); 
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
@@ -127,7 +128,7 @@ public class Vote {
 			ver.update(c);
 			boolean good=ver.verify(signedVote);
 			if(good){
-				/*Send signedVote along with c to Counting Principal.*/
+				/*Send signedVote along with c and username to Counting Principal.*/
 				
 				/*Once Counter publishes list, voter must:
 				 * check the number of votes corresponds to list provided by admin
