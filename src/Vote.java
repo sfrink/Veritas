@@ -90,6 +90,7 @@ public class Vote {
 			
 			//Send username, signedBlind and blindBytes, ******AND ELECTIONNAME****** to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
+			byte[] electionnameBytes=electionname.getBytes();
 			Socket socket=new Socket("localhost",33333);
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
@@ -99,6 +100,8 @@ public class Vote {
 			out.write(blindBytes);
 			Thread.sleep(100);
 			out.write(signedBlind);
+			Thread.sleep(100);
+			out.write(electionnameBytes);
 			Thread.sleep(100);
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			
@@ -127,6 +130,21 @@ public class Vote {
 			ver.update(c);
 			boolean good=ver.verify(signedVote);
 			if(good){
+				
+				
+				Socket socket2=new Socket("localhost",8000);
+				System.out.println("Connected to server of the counter");
+				InputStream in2=socket.getInputStream();
+				OutputStream out2=socket.getOutputStream();
+				out2.write(c);
+				Thread.sleep(100);
+				out2.write(signedVote);
+				Thread.sleep(100);
+				out2.write(usernameBytes);
+				Thread.sleep(100);
+				socket2.close();
+				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent signed vote to the counter\n");
+
 				/*Send signedVote along with c to Counting Principal.*/
 				
 				/*Once Counter publishes list, voter must:
