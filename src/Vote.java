@@ -140,10 +140,10 @@ public class Vote {
 				Thread.sleep(100);
 				out2.write(signedVote);
 				Thread.sleep(100);
-				out2.write(usernameBytes);
+				out2.write(electionnameBytes);
 				Thread.sleep(100);
 				socket2.close();
-				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent signed vote to the counter\n");
+				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 
 				/*Send signedVote along with c to Counting Principal.*/
 				
