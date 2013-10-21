@@ -176,7 +176,44 @@ public class Vote {
 			Thread.sleep(100);
 			socket3.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
+			
+			
+			rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
+			int numVoters=Integer.parseInt(rs.getString("numVoters"));
+			rs=st.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"';");
+			String cand=rs.getString("candidateSet");
+			String[] candidates=cand.split(",");
+			int[] tally=new int[candidates.length];
 			logwrite.close();
+
+			while(true){
+				rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
+				int count=0;
+				while(rs.next()){
+					count++;
+				}
+				if(count==numVoters){
+					rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
+					while(rs.next()){
+						for(int i=0;i<candidates.length;i++){
+							if(rs.getString("vote").equals(candidates[i]))
+								tally[i]++;
+						}
+					}
+					int maxindex=0;
+					int max=0;
+					String tie="";
+					for(int i=0;i<tally.length;i++){
+						if(tally[i]>max){
+							maxindex=i;
+							max=tally[i];
+						}
+					}
+					System.out.println("The winner was "+tally[maxindex]);
+				}
+			}
+			
+			
 		}
 		catch(Exception e){
 			System.out.println(e);

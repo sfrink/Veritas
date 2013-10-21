@@ -38,7 +38,6 @@ public class Counter2 {
 			
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
-				
 			
 			System.out.println("start");
 			int servPort=7000;
@@ -65,7 +64,6 @@ public class Counter2 {
 				}
 				
 				
-				// get the value of enVote, signedVote and electionname 
 				byte[] nonce=bufArray.get(0);
 				byte[] key=bufArray.get(1);
 				String electionname = new String(bufArray.get(2), "UTF-8");
@@ -73,7 +71,7 @@ public class Counter2 {
 				
                 
                 SecretKeySpec sk=new SecretKeySpec(key, "AES");
-				byte[] iv;// = whatever iv the voter sends
+				byte[] iv={(byte)0};// = whatever iv the voter sends
 				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
 				dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
 				pst=con.prepareStatement("SELECT encVote FROM "+electionname+"votes WHERE nonce=?");
@@ -82,10 +80,8 @@ public class Counter2 {
 				byte[] encVote=rs.getBytes("encVote");
 				byte[] byteVote=dec.doFinal(encVote);
 				String decVote=new String(byteVote);
-				//Store the vote somewhere
+				st.execute("INSERT INTO "+electionname+"results vote values '"+decVote+"';");
 			
-			//Network stuff to get encVote, signedVote and username from voter
-			//Check signature
 			
 			logwrite.close();
 

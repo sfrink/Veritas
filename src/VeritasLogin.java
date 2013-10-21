@@ -163,7 +163,7 @@ public class VeritasLogin {
             			//add admin key to table
             			*/
             		//}  
-            		
+            		stmt.execute("create table "+elec+"results (vote varchar(50));");
             		rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
 
             		int numVoters=0;
@@ -175,10 +175,11 @@ public class VeritasLogin {
         				if(authorize.equals("1")){
         					numVoters++;
         					out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
-        					st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
         				}
         				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
-        			} 
+        			}
+					st.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
+
             	}
             	out.close();
             }

@@ -97,19 +97,6 @@ public class Counter {
 				//Do some waiting for all votes
 				//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
 				
-				
-				//Wait for voters to check the published list
-				//If all goes well they'll send their AES keys and the IV they used
-				//get sk from voter
-				/*SecretKey sk;// =whatever sk the voter sends
-				byte[] iv;// = whatever iv the voter sends
-				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
-				dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
-				byte[] byteVote=dec.doFinal(encVote);
-				String decVote=new String(byteVote);
-				//Store the vote somewhere
-				*/
-				
 				//Once all votes are decrypted, count them up
 				logwrite.close();
 
