@@ -22,6 +22,7 @@ public class Vote {
 		String url="jdbc:mysql://localhost:3306/elections";
 		String user="root";
 		String pw="";
+		PreparedStatement pst=null;
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}
@@ -156,6 +157,25 @@ public class Vote {
 			else{
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
+			
+			pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote=?");
+			pst.setBytes(1,c);
+			rs=pst.executeQuery();
+			byte[] nonce=rs.getBytes("nonce");
+			byte[] key=k.getEncoded();
+
+			Socket socket3=new Socket("localhost",7000);
+			System.out.println("Connected to server of the counter");
+			InputStream in3=socket3.getInputStream();
+			OutputStream out3=socket3.getOutputStream();
+			out3.write(nonce);
+			Thread.sleep(100);
+			out3.write(key);
+			Thread.sleep(100);
+			out3.write(electionnameBytes);
+			Thread.sleep(100);
+			socket3.close();
+			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 			logwrite.close();
 		}
 		catch(Exception e){
