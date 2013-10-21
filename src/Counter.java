@@ -68,6 +68,9 @@ public class Counter {
 			//Store the vote somewhere
 			
 			//Once all votes are decrypted, count them up
+			
+			
+			logwrite.close();
 		}
 		catch(Exception e){
 			System.out.println(e);

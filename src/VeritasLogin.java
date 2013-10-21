@@ -67,7 +67,8 @@ public class VeritasLogin {
             } else {
                 System.out.println("Incorrect Username or Password!\n----");
                 out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
-
+                out.close();
+                System.exit(0);
             }
             rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
             while(rs.next()){

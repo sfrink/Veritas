@@ -68,7 +68,7 @@ public class Admin {
 				String username = new String(bufArray.get(0), "UTF-8");
 				byte[] blindBytes=bufArray.get(1);
 				byte[] signedBlind=bufArray.get(2);
-                //logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
+                logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 				RSAPrivateKey skAdmin;
 				
 		
@@ -96,15 +96,18 @@ public class Admin {
 				ver.initVerify(pk);
 				ver.update(blindBytes);
 				boolean goodSig=ver.verify(signedBlind);
-				
+				boolean eligible=false;
+				rs=st.executeQuery("SELECT "+electionname+"FROM elections WHERE username='"+username+"'");
+				if(rs.getString(electionname).equals("1"))
+					eligible=true;
 				//Still need to check election eligibility
-				if(goodSig){
+				if(eligible && goodSig){
 					Signature sign=Signature.getInstance("SHA256WITHRSA");
 					sign.initSign(skAdmin);
 					sign.update(blindBytes);
 					byte[] signed=sign.sign();
 					out.write(signed);
-					//logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
+					logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 				}
 				
 				//Keep track of how many voters have requested signatures
@@ -114,6 +117,7 @@ public class Admin {
 	
 			
 			}
+			logwrite.close();
 			
 		}
 		catch(Exception e){

@@ -138,7 +138,7 @@ public class Vote {
 			else{
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
-			
+			logwrite.close();
 		}
 		catch(Exception e){
 			System.out.println(e);
