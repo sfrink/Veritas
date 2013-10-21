@@ -4,6 +4,7 @@ import java.net.*;
 import javax.crypto.*;
 
 import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
@@ -13,9 +14,7 @@ import java.util.ArrayList;
 
 public class Vote {
 
-	public Vote(){
-		
-	}
+	
 	public static void vote(String b, String username, String electionname){
 		Connection con=null;
 		Statement st=null;
@@ -91,6 +90,7 @@ public class Vote {
 			
 			//Send username, signedBlind and blindBytes, ******AND ELECTIONNAME****** to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
+			byte[] electionnameBytes=electionname.getBytes();
 			Socket socket=new Socket("localhost",33333);
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
@@ -100,6 +100,8 @@ public class Vote {
 			out.write(blindBytes);
 			Thread.sleep(100);
 			out.write(signedBlind);
+			Thread.sleep(100);
+			out.write(electionnameBytes);
 			Thread.sleep(100);
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			
@@ -112,7 +114,7 @@ public class Vote {
 			System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 			bufArray.add(tmp);
 			//System.out.println( bufArray.get(0));
-			byte[] blindedSignedVote=bufArray.get(0); 
+			byte[] blindedSignedVote=bufArray.get(0); //need to unblind
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
@@ -128,7 +130,22 @@ public class Vote {
 			ver.update(c);
 			boolean good=ver.verify(signedVote);
 			if(good){
-				/*Send signedVote along with c and username to Counting Principal.*/
+				
+				
+				Socket socket2=new Socket("localhost",8000);
+				System.out.println("Connected to server of the counter");
+				InputStream in2=socket.getInputStream();
+				OutputStream out2=socket.getOutputStream();
+				out2.write(c);
+				Thread.sleep(100);
+				out2.write(signedVote);
+				Thread.sleep(100);
+				out2.write(electionnameBytes);
+				Thread.sleep(100);
+				socket2.close();
+				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
+
+				/*Send signedVote along with c to Counting Principal.*/
 				
 				/*Once Counter publishes list, voter must:
 				 * check the number of votes corresponds to list provided by admin
