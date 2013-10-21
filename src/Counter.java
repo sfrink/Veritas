@@ -38,6 +38,7 @@ public class Counter {
 			PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
+            PreparedStatement pstmt=null;
 				
 			
 			System.out.println("start");
@@ -69,42 +70,49 @@ public class Counter {
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
 				
 			
-			//Network stuff to get encVote, signedVote and username from voter
-			//Check signature
-			Signature ver=Signature.getInstance("SHA256WITHRSA");
-			//We need to get the pk from a database table
-			rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
-			byte[] adminpk=rs.getBytes("pk");
-			PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
-			ver.initVerify(pk);
-			ver.update(encVote);
-			boolean goodSign=ver.verify(signedVote);
-			if(goodSign){
-				SecureRandom rand=new SecureRandom();
-				byte[] nonce=new byte[20];
-				rand.nextBytes(nonce);
-				//Store nonce along with encVote somewhere
-				//Add one to totalVotesCollected
+				//Network stuff to get encVote, signedVote and username from voter
+				//Check signature
+				Signature ver=Signature.getInstance("SHA256WITHRSA");
+				//We need to get the pk from a database table
+				rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
+				byte[] adminpk=rs.getBytes("pk");
+				PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
+				ver.initVerify(pk);
+				ver.update(encVote);
+				boolean goodSign=ver.verify(signedVote);
+				if(goodSign){
+					SecureRandom rand=new SecureRandom();
+					byte[] nonce=new byte[20];
+					rand.nextBytes(nonce);
+					pstmt=con.prepareStatement("INSERT INTO "+electionname+"votes (nonce, encVote , signedVote) values (?,?,?);");
+        			pstmt.setBytes(1,nonce);
+        			pstmt.setBytes(2, encVote);
+        			pstmt.setBytes(3, signedVote);
+        			pstmt.execute();
+					
+					//Store nonce along with encVote somewhere
+					//Add one to totalVotesCollected
+				}
+				//Do some waiting for all votes
+				//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
+				
+				
+				//Wait for voters to check the published list
+				//If all goes well they'll send their AES keys and the IV they used
+				//get sk from voter
+				/*SecretKey sk;// =whatever sk the voter sends
+				byte[] iv;// = whatever iv the voter sends
+				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
+				dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
+				byte[] byteVote=dec.doFinal(encVote);
+				String decVote=new String(byteVote);
+				//Store the vote somewhere
+				*/
+				
+				//Once all votes are decrypted, count them up
+				logwrite.close();
+
 			}
-			//Do some waiting for all votes
-			//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
-			
-			
-			//Wait for voters to check the published list
-			//If all goes well they'll send their AES keys and the IV they used
-			//get sk from voter
-			SecretKey sk;// =whatever sk the voter sends
-			byte[] iv;// = whatever iv the voter sends
-			Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
-			dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
-			byte[] byteVote=dec.doFinal(encVote);
-			String decVote=new String(byteVote);
-			//Store the vote somewhere
-			
-			//Once all votes are decrypted, count them up
-			
-			}
-			logwrite.close();
 		}
 		catch(Exception e){
 			System.out.println(e);

@@ -142,6 +142,8 @@ public class VeritasLogin {
             			pstmt.setBytes(2, pkAdminBytes);
             			pstmt.setBytes(3, skAdminBytes);
             			pstmt.execute();
+            			stmt.execute("create table "+elec+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));")
+            			stmt.execute("create table "+elec+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));")
             			//This was some stuff to test key storage worked correctly
             			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
             			rs=stmt.executeQuery("SELECT pk FROM adminkeys WHERE election='"+elec+"'");

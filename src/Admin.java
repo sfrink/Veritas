@@ -9,6 +9,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -109,10 +110,20 @@ public class Admin {
 					logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 				}
 				//Keep track of how many voters have requested signatures
+				//rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"'");
+				/*int numVoters=Integer.parseInt(rs.getString("numVoters"));
 				count++;
-				//When everyone has voted, publish list of usernames, encrypted votes, 
-				//and signatures of encrypted votes (all data sent from voters)
+				if(numVoters==count){
+					//When everyone has voted, publish list of usernames, encrypted votes, 
+					//and signatures of encrypted votes (all data sent from voters)
+					
+				}*/
 				
+	            PreparedStatement pstmt=null;
+	            pstmt=con.prepareStatement("INSERT INTO "+electionname+" (username, encVote, signedVote) values (?,?,?);");
+	            pstmt.setString(1, username);
+	            pstmt.setBytes(2, blindBytes);
+	            pstmt.setBytes(3, signedBlind);
 				clntSock.close();
 	
 				logwrite.close();
