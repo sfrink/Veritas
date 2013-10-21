@@ -31,14 +31,9 @@ public class Admin {
 			System.out.println(e);
 		}
 		try{
-			File log=new File("log.txt");
-            java.util.Date date = new java.util.Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-			PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
-		
-		
+			int count=0;
 			System.out.println("start");
 			int servPort=33333;
 			ServerSocket servSock=new ServerSocket(servPort);	
@@ -51,8 +46,11 @@ public class Admin {
 				System.out.println("receiving requests from client at "+clientAddress);
 				InputStream in=clntSock.getInputStream();
 				OutputStream out=clntSock.getOutputStream();
-
-				for(int j=0;j<=2;j++){	
+				File log=new File("log.txt");
+	            java.util.Date date = new java.util.Date();
+	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+				PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
+				for(int j=0;j<=3;j++){	
 					recvMsgSize=in.read(receiveBuf);
 					byte[] tmp = new byte[recvMsgSize];
 					System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
@@ -68,6 +66,7 @@ public class Admin {
 				String username = new String(bufArray.get(0), "UTF-8");
 				byte[] blindBytes=bufArray.get(1);
 				byte[] signedBlind=bufArray.get(2);
+				String electionname=new String(bufArray.get(3), "UTF-8");
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 				RSAPrivateKey skAdmin;
 				
@@ -78,7 +77,7 @@ public class Admin {
 				//KeyPair keypair=genRSA.genKeyPair();
 				
 				
-				rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionName+"'");
+				rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"'");
 				byte[] adminsk=rs.getBytes("sk");
 				skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(adminsk)));
 				
@@ -109,15 +108,15 @@ public class Admin {
 					out.write(signed);
 					logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 				}
-				
 				//Keep track of how many voters have requested signatures
+				count++;
 				//When everyone has voted, publish list of usernames, encrypted votes, 
 				//and signatures of encrypted votes (all data sent from voters)
+				
 				clntSock.close();
 	
-			
+				logwrite.close();
 			}
-			logwrite.close();
 			
 		}
 		catch(Exception e){
