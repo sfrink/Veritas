@@ -9,6 +9,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
 import java.security.spec.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class Vote {
@@ -28,12 +29,15 @@ public class Vote {
 			System.out.println(e);
 		}
 		try{
+			File log=new File("log.txt");
+            java.util.Date date = new java.util.Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+			PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 		
 			//BufferedReader in=new BufferedReader(new InputStreamReader(client.getInputStream()));
 			RSAPublicKey pkAdmin;
-			RSAPrivateKey skVoter;
 			
 			
 			//Encrypting vote
@@ -48,7 +52,6 @@ public class Vote {
 			byte[] c=enc.doFinal(vote);
 			//Blinding key setup
 			
-			/*****We actually need to get the public key from the Administrator*****/
 			rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
 			byte[] adminpk=rs.getBytes("pk");
 			PublicKey pubkey=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
@@ -85,7 +88,7 @@ public class Vote {
 			sign.update(blindBytes);
 			byte[] signedBlind=sign.sign();
 			
-			//Send username, signedBlind and blindBytes, AND ELECTIONNAME to Administrator to be signed
+			//Send username, signedBlind and blindBytes, ******AND ELECTIONNAME****** to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
 			Socket socket=new Socket("localhost",33333);
 			System.out.println("Connected to server");
@@ -97,6 +100,7 @@ public class Vote {
 			Thread.sleep(100);
 			out.write(signedBlind);
 			Thread.sleep(100);
+			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			
 			// receive the signedVote from the admin
 			int recvMsgSize;
@@ -109,18 +113,15 @@ public class Vote {
 			//System.out.println( bufArray.get(0));
 			byte[] blindedSignedVote=bufArray.get(0); //need to unblind
 			socket.close();
+			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
-
 			
-			//username may need to be signed, not sure.
-			//Receive blind signature for c
 			//Need to unblind the returned signature
 			BigInteger blindsignature=new BigInteger(blindedSignedVote);
 			BigInteger s=r.modInverse(n).multiply(blindsignature).mod(n);
 			//s will be the signature of c, the encrypted vote with no blind.  Convert it to bytes.
 			byte[] signedVote=s.toByteArray();
 			//Check that signedVote is a valid signature of c
-			//Will need to get adminPK from a database
 			Signature ver=Signature.getInstance("SHA256WITHRSA");
 			ver.initVerify(pkAdmin);
 			ver.update(c);

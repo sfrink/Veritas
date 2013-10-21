@@ -1,14 +1,12 @@
-import java.math.BigInteger;
 import java.net.*;
 import javax.crypto.*;
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.sql.Connection;
-import java.security.spec.*;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.io.*;
 
 import javax.crypto.spec.IvParameterSpec;
 
@@ -29,6 +27,10 @@ public class Counter {
 			System.out.println(e);
 		}
 		try{
+			File log=new File("log.txt");
+            java.util.Date date = new java.util.Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+			PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 			//Network stuff to get encVote, signedVote and username from voter

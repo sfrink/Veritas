@@ -129,6 +129,7 @@ public class VeritasLogin {
             			RSAPublicKey pkAdmin=(RSAPublicKey)keypair.getPublic();
             			byte[] skAdminBytes=skAdmin.getEncoded();
             			byte[] pkAdminBytes=pkAdmin.getEncoded();
+            			//testing stuff
             			/*Signature sign=Signature.getInstance("SHA256WITHRSA");
             			sign.initSign(skAdmin);
             			byte[] tester= {(byte)0, (byte)1, (byte)2};
@@ -139,6 +140,7 @@ public class VeritasLogin {
             			pstmt.setBytes(2, pkAdminBytes);
             			pstmt.setBytes(3, skAdminBytes);
             			pstmt.execute();
+            			//This was some stuff to test key storage worked correctly
             			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
             			rs=stmt.executeQuery("SELECT pk FROM adminkeys WHERE election='"+elec+"'");
             			if(rs.next()){

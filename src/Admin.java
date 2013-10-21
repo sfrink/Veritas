@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.io.*;
 
@@ -30,6 +31,10 @@ public class Admin {
 			System.out.println(e);
 		}
 		try{
+			File log=new File("log.txt");
+            java.util.Date date = new java.util.Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+			PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 		
@@ -63,7 +68,7 @@ public class Admin {
 				String username = new String(bufArray.get(0), "UTF-8");
 				byte[] blindBytes=bufArray.get(1);
 				byte[] signedBlind=bufArray.get(2);
-
+                //logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 				RSAPrivateKey skAdmin;
 				
 		
@@ -73,7 +78,6 @@ public class Admin {
 				//KeyPair keypair=genRSA.genKeyPair();
 				
 				
-				//skAdmin=get from database			
 				rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionName+"'");
 				byte[] adminsk=rs.getBytes("sk");
 				skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(adminsk)));
@@ -100,6 +104,7 @@ public class Admin {
 					sign.update(blindBytes);
 					byte[] signed=sign.sign();
 					out.write(signed);
+					//logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 				}
 				
 				//Keep track of how many voters have requested signatures
