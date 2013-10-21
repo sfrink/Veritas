@@ -5,12 +5,14 @@
  */
 import java.security.spec.*;
 import javax.crypto.*;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class VeritasLogin {
 
@@ -19,7 +21,11 @@ public class VeritasLogin {
      */
     public static void main(String[] args) {           
         try{
-        	//When a user creates an account it should create an RSA signing key pair for that user
+        	//When a user creates an account it should create an RSA signing key pair for that user /****Done****/
+			File log=new File("log.txt");
+            java.util.Date date = new java.util.Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+			PrintWriter out =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
             Scanner sc = new Scanner(System.in);
             String databaseUsername = "";
             String databasePassword = "";
@@ -34,7 +40,6 @@ public class VeritasLogin {
             Connection conn = DriverManager.getConnection(url, user, pw);          /*  Steven, please help me fill in this line  */
             Statement stmt = conn.createStatement();
             PreparedStatement pstmt=null;
-            
             String query = "SELECT * from users WHERE username='"+name+"'";
             ResultSet rs = stmt.executeQuery(query);
             while(rs.next()){                           //Read username & password from database
@@ -58,8 +63,11 @@ public class VeritasLogin {
 			
 			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
                 System.out.println("Successful Login!\n----");
+                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Successful Login\n");
             } else {
                 System.out.println("Incorrect Username or Password!\n----");
+                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
+
             }
             rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
             while(rs.next()){
@@ -91,6 +99,7 @@ public class VeritasLogin {
         				}
         				System.out.println("Please enter the candidate of your choice:");
         				String choice=sc.next();
+        				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserID: "+name+"; Password: "+password+"; Description: Vote cast for "+choice+"\n");
         				//vote(choice);
         			}
             	}
@@ -104,12 +113,15 @@ public class VeritasLogin {
         			
         			//	String create=scan.next();
             		//if (create.equals("yes")){
-            			System.out.println("Please give a name for this election");
+            			System.out.println("Please give a name for this election:");
             			String elec=sc.next();
-            			System.out.println("Please enter the names of the candidates");
+            			System.out.println("Please enter the names of the candidates in form c1,c2,...,cN:");
+            			//If candidates are input in a form other than c1,c2,c3 (for example, as c1, c2, c3) it breaks the code --
+            			//either specify the input form and let it break if it doesn't match, or modify how we get candidates
             			String cand=sc.next();
             			stmt.execute("INSERT into candidates (election, candidateSet) VALUES ('" + elec +"','" + cand+"')");
             			stmt.execute("ALTER TABLE elections ADD "+elec+" varchar(1)");
+            			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; UserID: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
             			KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
             			genRSA.initialize(3072);
             			KeyPair keypair=genRSA.genKeyPair();
@@ -154,9 +166,12 @@ public class VeritasLogin {
         				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
         				System.out.println(userName+":");
         				authorize = sc.next();
+        				if(authorize.equals("1"))
+        					out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
         				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
         			} 
             	}
+            	out.close();
             }
             
         }catch (Exception e){

@@ -31,7 +31,7 @@ public class Counter {
 		try{
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
-			//Network stuff to get (encVote, signedVote) from voter
+			//Network stuff to get encVote, signedVote and username from voter
 			byte[] encVote; //=initialized to whatever is sent from voter;
 			byte[] signedVote; //=whatever is sent from voter
 			//Check signature
