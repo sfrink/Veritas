@@ -7,6 +7,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.io.*;
 
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 
 public class Counter2 {
@@ -22,6 +24,7 @@ public class Counter2 {
 		Connection con=null;
 		Statement st=null;
 		ResultSet rs=null;
+		PreparedStatement pst=null;
 		String url="jdbc:mysql://localhost:3306/elections";
 		String user="root";
 		String pw="";
@@ -63,11 +66,23 @@ public class Counter2 {
 				
 				
 				// get the value of enVote, signedVote and electionname 
-				byte[] nounce=bufArray.get(0);
+				byte[] nonce=bufArray.get(0);
 				byte[] key=bufArray.get(1);
 				String electionname = new String(bufArray.get(2), "UTF-8");
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
 				
+                
+                SecretKeySpec sk=new SecretKeySpec(key, "AES");
+				byte[] iv;// = whatever iv the voter sends
+				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
+				dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
+				pst=con.prepareStatement("SELECT encVote FROM "+electionname+"votes WHERE nonce=?");
+				pst.setBytes(1, nonce);
+				rs=pst.executeQuery();
+				byte[] encVote=rs.getBytes("encVote");
+				byte[] byteVote=dec.doFinal(encVote);
+				String decVote=new String(byteVote);
+				//Store the vote somewhere
 			
 			//Network stuff to get encVote, signedVote and username from voter
 			//Check signature
