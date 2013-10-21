@@ -37,10 +37,7 @@ public class Counter {
 			PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
-			
-			
-			
-			
+				
 			
 			System.out.println("start");
 			int servPort=8000;
@@ -64,11 +61,11 @@ public class Counter {
 				}
 		
 			
-				// get the value of enVote, signedVote and username 
+				// get the value of enVote, signedVote and electionname 
 				byte[] encVote=bufArray.get(0);
 				byte[] signedVote=bufArray.get(1);
-				String username = new String(bufArray.get(2), "UTF-8");
-                logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Username: "+username+"; Description: Counter received signed vote from "+username+"\n");
+				String electionname = new String(bufArray.get(2), "UTF-8");
+                logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
 				
 			
 			//Network stuff to get encVote, signedVote and username from voter
