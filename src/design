@@ -1,0 +1,32 @@
+Confidentiality:
+
+In our project, blind technique is used to protect the confidentiality. 
+•	The voter uses AES to encrypt the vote. The key size is 256 bits.
+•	Blind the encrypted votes.
+•	Send (blind, sig, username) to admin.
+•	Admin verifies the signature, and sends (blind, admin_sig) back to voter.
+•	Voter checks the admin’s signature, and send encrypted vote and admin’s signature to the counter
+•	The counter generates a random 20-byte nonce to the vote and update (nonce, encVote, signedVote) to database electionname
+•	The voter checks the database and verifies the signature. If it is good, the voter sends the nonce, encrypted vote and the AES key to the server counter2.
+•	The counter2 then decrypts the vote and update to the database.
+•	The vote server counts the number of votes. 
+
+
+Integrity:
+
+
+
+Audit:
+
+1.	Time: The time that an operation is being performing.
+
+2.	Event Type: The types of different operations
+➢	Login: The voter logs into the system
+➢	Vote: The voter makes his/her vote
+➢	Election Creation: The administrator creates elections for the voting
+➢	Voter Send Info: The voter sends information to the server
+➢	Counter Receive Info: The administrator receives data from the voter
+➢	Counter Receive Info: The counter server receives data from the voter
+➢	Admin Send Info: The administrator sends information to the voter
+
+3.	Description: Detail about each operation.
