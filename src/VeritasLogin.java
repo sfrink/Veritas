@@ -37,13 +37,13 @@ public class VeritasLogin {
             String url="jdbc:mysql://localhost:3306/elections";
     		String user="root";
     		String pw="";
-            Connection conn = DriverManager.getConnection(url, user, pw);          /*  Steven, please help me fill in this line  */
+            Connection conn = DriverManager.getConnection(url, user, pw);
             Statement stmt = conn.createStatement();
             PreparedStatement pstmt=null;
-            String query = "SELECT * from users WHERE userID='"+name+"'";
+            String query = "SELECT * from users WHERE username='"+name+"'";
             ResultSet rs = stmt.executeQuery(query);
             while(rs.next()){                           //Read username & password from database
-                databaseUsername = rs.getString("userID");
+                databaseUsername = rs.getString("username");
                 databasePassword = rs.getString("password");
             }
             
@@ -178,8 +178,7 @@ public class VeritasLogin {
         				}
         				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
         			}
-					stmt.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
-
+					st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
             	}
             	out.close();
             }

@@ -59,7 +59,7 @@ CREATE TABLE `candidates` (
 
 LOCK TABLES `candidates` WRITE;
 /*!40000 ALTER TABLE `candidates` DISABLE KEYS */;
-INSERT INTO `candidates` VALUES ('test1','a,b,c','1');
+INSERT INTO `candidates` VALUES ('test1','a,b,c','3'),('test2','a,b,c','3');
 /*!40000 ALTER TABLE `candidates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,7 +83,7 @@ CREATE TABLE `elections` (
 
 LOCK TABLES `elections` WRITE;
 /*!40000 ALTER TABLE `elections` DISABLE KEYS */;
-INSERT INTO `elections` VALUES ('sfrink','1','1'),('test','0',NULL),('calvin','1','1');
+INSERT INTO `elections` VALUES ('sfrink','1','1'),('test','0',NULL),('calvin','1','1'),('user','1','1');
 /*!40000 ALTER TABLE `elections` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -107,6 +107,7 @@ CREATE TABLE `test1` (
 
 LOCK TABLES `test1` WRITE;
 /*!40000 ALTER TABLE `test1` DISABLE KEYS */;
+INSERT INTO `test1` VALUES ('sfrink','%„•¸Rê;sÓ…Iîe†c#Ø9N>k_½2`Ûà¯!_Ü¯Ì¢’[×iw1ÁÅRÛu\r„|ý2ÔÁßCvËjò•ÏŸÒàÖ¬™$JeiŠ°Õ@Tì`™vÌÝ­Ðk*³5§¼Y´>Û‡7^Â§À;\rìâï	…ä¯FfY^O@þ·%”Oá©Öy²t”6»Šð#4š‚\0e;÷«”\"¢³\ZZïAâíÄd¥î¤@ÿ[ë—„\0a£‹É:UTuñgŸOù‡E¹,f_¦^¹/¸k¾3]LGGö¢PãœûuÑ* Ý_~žðÇ¯U±Q«&È¤ŸžK\Zg°Ÿî9”Î¦/vÌÒ%©+€lo\'Û®,Þ³X\Zd_F™!Ñ²}ò0Ù…yL¡RäðkêQÂÌè qt ÕÑðƒ¾ü¿\nUšFñ`ÜÂ‹•%Uvœ¥@Åá™U+y(í¯‡2ÿÝÇ†úc<j<‹…I','S{heá&ñQ‡wªxÄ×æìÏÑ-)‚ëîxÊ.âŠW•\\X;´E@|Ÿ±	‰oVNÆ+VUZµŒ~c±\'ÅèüCî[áë¨JÊ÷á²è²ALÿûÒø²	ÏžñŒ0šw”µ^\'ˆ\n0(yóO”ØÀ|%f¤³f3,Ã¯½‚“*õv•aÎß°Úøæeëí,\ró5ijwûëŸ¸uÃzD1³Äÿ*~ØJúfè¤%€+[RÐ\n>õÇàX	2ßBÏ’ÉVAËùÎ6 þæf$±£7gy±%›ÏW)††¨TI0ñ/D8š±mWÑítWPãMß½¢¾vN\nP	æ[)R$´íc	Ìk!rR±{j•Àß–x$OÌ?5qB}qÓµ§LQÍ4-[?ô5Ë…²ÇÒz`Q]ü®žR.G_2‹ª«õÛ^ÆïO\Zýì‹ãøuä%à€¤\0ï÷Ë‰½¦iØâíåDp–òüìëP¼d‚Ó0¢Ó>g£|@èˆ~£nžƒ¬');
 /*!40000 ALTER TABLE `test1` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,6 +129,7 @@ CREATE TABLE `test1results` (
 
 LOCK TABLES `test1results` WRITE;
 /*!40000 ALTER TABLE `test1results` DISABLE KEYS */;
+INSERT INTO `test1results` VALUES ('a');
 /*!40000 ALTER TABLE `test1results` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -151,6 +153,7 @@ CREATE TABLE `test1votes` (
 
 LOCK TABLES `test1votes` WRITE;
 /*!40000 ALTER TABLE `test1votes` DISABLE KEYS */;
+INSERT INTO `test1votes` VALUES ('z=°\n’ãåL2oÆ^å&8r¡','Fiìw—@qàÃMÙF$','v—ë€ë±Ò¤¡>¾M;@ÞÜ}¡¾¿üÅÚ9†9Ùf¼rž\0Á¤‘0}Ã=sE0¸u;ä÷df×,’K·¾»â3mŒR»ZÍ†¥Å¢<C©wC½X‘ú{Mc5nÉhFl¬k´hèä…Ô¥ì&#» ÖäøÂ´­ŽQ7\0Ë\\mø–)ÆÒ5ŠœÓâ¨ú*Èbç ÄËbçjk<}ÿ?èÅ*GËHeÉú¡hYìï fé¤ø\\­\\à˜iâÈidGnÜÆ»‘+c.Ä7\r³JpüE@³dq^ÛzÎµ5EÏxnäp:çbKÞÿh·:Y_ÚÊ˜BömäM[Ø~ÇµË4ã8þ9ñ÷”Þ\\î-­äÞ‡ÿ¾Ift0ñìB=øp‹Ûê!qø>ÃƒWÔ·çM?l³™n’[2ÎjÎµ8é‹‹¸D†%ßv> zƒ»‰\\bë‰]¡-Ø3­.tÚ6ÖÕC·‚~	nÔFCb·@WˆæeÄÿ\Z');
 /*!40000 ALTER TABLE `test1votes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -174,7 +177,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('stevefrink','pw','sfrink'),('test','pw','test'),('spiff','hobbes','calvin');
+INSERT INTO `users` VALUES ('stevefrink','pw','sfrink'),('test','pw','test'),('spiff','hobbes','calvin'),('user','pw','user');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -198,7 +201,7 @@ CREATE TABLE `voterkeys` (
 
 LOCK TABLES `voterkeys` WRITE;
 /*!40000 ALTER TABLE `voterkeys` DISABLE KEYS */;
-INSERT INTO `voterkeys` VALUES ('sfrink','0‚¢0\r	*†H†÷\r\0‚\00‚Š‚\06ž·æê\r´‘Ÿàë‡âª¸MÓÌº‘À×mG‚fP-QùªÑÐ^Gv¶Cš‘û‘Ôï\n*é¥oøí<b3#ú;XÚŒ~oÁdì·tÜmþ¢g‰Ã¶¥w÷£0ÌIÒïÙµ™îÄšŒ¼ÜÿÜw@ÛÜ2íyäëé]þürá4ÿ6nÕœúÁ3ÉTÚ³ûFK©Ggu\Z •–#õµÃ{epèæ¹cÚQ±²¿ËÒi½`À@ƒäÕ\n>Ùl¼|‹4B.°%¨ÔO?#¢™ç}9ÒâÎÅTá4Â´ü™æzÿž+±ÆÿÕT >v!ú—0³(Ž¦À,‡y[,>_ç¼×G`SucÎ¯Êy<°ŸßééD\n}™ˆ*zÓ39ˆ†Å©OeYc^_Õ™º¢·ð†^;Ž±ò•Ç\Zƒ\'“&ÞÅ‹.Ç¼þ¨pÏ•	/œì‚Ã‰K¸Õ)õ©ø´\'»â$·=³Ö…e‰U„®cº†Í`»®ue›z†Ç’3Ï\0³¢G\0','0‚ÿ\00\r	*†H†÷\r\0‚é0‚å\0‚\06ž·æê\r´‘Ÿàë‡âª¸MÓÌº‘À×mG‚fP-QùªÑÐ^Gv¶Cš‘û‘Ôï\n*é¥oøí<b3#ú;XÚŒ~oÁdì·tÜmþ¢g‰Ã¶¥w÷£0ÌIÒïÙµ™îÄšŒ¼ÜÿÜw@ÛÜ2íyäëé]þürá4ÿ6nÕœúÁ3ÉTÚ³ûFK©Ggu\Z •–#õµÃ{epèæ¹cÚQ±²¿ËÒi½`À@ƒäÕ\n>Ùl¼|‹4B.°%¨ÔO?#¢™ç}9ÒâÎÅTá4Â´ü™æzÿž+±ÆÿÕT >v!ú—0³(Ž¦À,‡y[,>_ç¼×G`SucÎ¯Êy<°ŸßééD\n}™ˆ*zÓ39ˆ†Å©OeYc^_Õ™º¢·ð†^;Ž±ò•Ç\Zƒ\'“&ÞÅ‹.Ç¼þ¨pÏ•	/œì‚Ã‰K¸Õ)õ©ø´\'»â$·=³Ö…e‰U„®cº†Í`»®ue›z†Ç’3Ï\0³¢G\0‚\0‡^¸]ûp7ð:³Ž“p)ë\'’9h©o™ª;.©H¿õ(<~¤3\0u½îL¨ô[¶äqÆÀ²näÙª…\r¥Á1Ç©“éüO2Öhév>~Š–L;£üDLhA¸Î²ùL\\X€äJYÍ±Zç\'Ê”äÉ=Ü±ÔÒî;CºÝßèLì:Šõõ=@‰„óÙÊ)÷\0#l”“2…eÕ‘è&ý›W~·®sºOv˜Î*žýAƒž€µ«Eg°z>‰™åúó_\\>äíUåä „fñþVJMÅ s¥ëW­¡C(°ÑX¶°•{XÍµ‰÷ãt,R­éŽ\'àï‹Ié¿e‰èÁ*ðÊŠn³´#ÎÏ«t™Ð\'„b5›ª-â•†/8\\Z¶à+Ð¹¶-(vÊy¥\ZÉ^¾Ü±‰ß\"\ZM¬m<Q•fHƒ@ä/7J#n.Ç»/ƒÄ]3Q‰kbzœpÉ*÷0ëÝv’M\\ïØ¹…ŠÆå7]›à¯\0NÆhÊW»ßiAÁ\0Å¾¾…zs‹Æ\Zçæ\\béÀ¨ú7:¨‰ûB,	¥LKˆñ²ò¶è´nQ+\r—l|U£«¢–ªVoÿcC–_ÆæYu©ëkœª‹î°­ @7“›A2Á(x\0+QÎ³4¡Þ÷£–Ï¾¼ž¢…à	““Ô™©€d=M‰b§¿ÚÙ)(Ÿ«+¿Œ\r’á+w ÄuÆ•”Òäv¹ÿ*–Gy6y•Ù)|\"»7–oô/à—æmvùS—ÕÁ\0¶Ñ\ZZ¤!zíæ€zÆí¨>Úp—æ¥»š}ò#}W‡¾Hð‹©èO´I°ä$h!«°Û[[~ðÇ‘iöœt[Nû†2áÆÍ\'[„Ÿ¦”åÁ¹\'[\"{,\0ßJb’]®jbYÓ£Û0ÉÖ\"yçƒF?‘ò\'°×*Å†s|3uUZjéUß4t„ÂWw>ö—b7çK¯U{&Op$8á`9À\ZpbCl”cÝŽ+‰ÎÎCvÉ(•Er³p.Û«Á\0ŒD8¿¬¿\'§Fg_ˆ0\0yRµ%L\n±jÕÎoÒ#&IÑOEefÍ¡\rÎ¦ÇzØ€É«Wðú­Åªb2­±’Ð~\0ßa«žÓW1÷ÎGÎaË:!îTL@@È|XÂ!ò1¤…º4Õ‚˜²ì]~cûNÇm}¹P²F1„Õ A?Ó+G°õ8ûSWÚçÊ“4§ðÊâÅ„û;í#[Ÿo1w)öÀ^êªŽ	êÎ²»hkæ·œÂ1 ÌU’$Œ uxJ¼Ò\Z\Z	áÀkdjs÷/Å.‰Î›´XKÏÜŽº¤™r°;¶IW´NÈ5;Ÿ\'‚=Gr	°Ûv\"—2m›ÐFE]v\"s:ý¢¥äo:ÿØÄ6pBï´Ô\"QÛþE6í£¢ÚÌÀ}§ÈÔe&ÔO…pŒ¯?Ç­NSç¹p¸Ä\'Íè\04ÙEz¨*7^	|£ïÒœˆ‹yþÖ¹¡cN•ûæ‘P™²÷æ­çaì;caŒ%®Vuæß.îž¹Žžéžó©[±»eÁ\0†DôjþºÍ]gñ¨v®iºk]Õkä@yŽê.7+dþìãÜœ>(ìÔR‚SÕ+#nõbk)öä½ÿp<û£xÀ¿ÝU€<Æ&üÌ*ÎøÎ/0èÓDNð˜”}éÜy½Î ªž71Ufü&7,*¢yF&Ã€vn™cçö†õé6TÌŽ”ˆ•q?/ðè9 WÑ±\nGg¥kÄbª(ZÌHx9»éæôÜž6`¿5tÄo´ˆC>LZ'),('calvin','0‚¢0\r	*†H†÷\r\0‚\00‚Š‚\0¥¤]1kA°ÃSÊý{&»0M@˜œ€&l	÷?¹D_ÞõQsð&dD@3äðÆ~’¦VFµ£ŸvMSƒó×P„Ã[Cë®iÎ:MÖÁòÙYO–Ã‰dSngçw®GËOîãJ¼—y!X„ïÈ†\"6·(”|ªz\"¸öúŠ3yêKPTŸÑCúÙžÃtQÙDªSÙ6ÅÁþ¸ämŸÅ½\'½ƒË|\n® \0öî¸´1õè_~%j¼àóÒÔy‡ã\nÃ¯õ*ÿ\r-\0.E[wœóYt¡-9*ÔYqe ³\0Ë=|\0ŸŸÑ¥5Z{|ë3\rž>h;÷º”m­¬Ñf_•òAË‡×¡î}€ƒº7\ndˆrk“Àh¦ØPÄÏŸèŒAµî²ì³Vt¶Ûï´Ð²žlü”Úõ‘tv[—¬†1t0ÆôÈ~³1ÇÒf½‘ŸYà›ÚëOK‘7\"ˆ ÷ÙŠèŒ3z;ž‰¬ŠS[n ¾z“D#›±\0','0‚þ\00\r	*†H†÷\r\0‚è0‚ä\0‚\0¥¤]1kA°ÃSÊý{&»0M@˜œ€&l	÷?¹D_ÞõQsð&dD@3äðÆ~’¦VFµ£ŸvMSƒó×P„Ã[Cë®iÎ:MÖÁòÙYO–Ã‰dSngçw®GËOîãJ¼—y!X„ïÈ†\"6·(”|ªz\"¸öúŠ3yêKPTŸÑCúÙžÃtQÙDªSÙ6ÅÁþ¸ämŸÅ½\'½ƒË|\n® \0öî¸´1õè_~%j¼àóÒÔy‡ã\nÃ¯õ*ÿ\r-\0.E[wœóYt¡-9*ÔYqe ³\0Ë=|\0ŸŸÑ¥5Z{|ë3\rž>h;÷º”m­¬Ñf_•òAË‡×¡î}€ƒº7\ndˆrk“Àh¦ØPÄÏŸèŒAµî²ì³Vt¶Ûï´Ð²žlü”Úõ‘tv[—¬†1t0ÆôÈ~³1ÇÒf½‘ŸYà›ÚëOK‘7\"ˆ ÷ÙŠèŒ3z;ž‰¬ŠS[n ¾z“D#›±\0‚\0#åE\\Úƒ¦RÂ¦À_\Zü*Þ˜}~ù\röV\\LdÒê—MáÊœ•Úâ‡ô—‚O4žvF‡üñ\":uÝ¹©cmKwÍQ©³Râj²öÔû;³¬‡³¤Ý·D¡ú\nr[Ê\rÖÕð\Z2…+™˜…³A\"cÚò#©zŠ;êÀî\06OÐ5éì;$P¤’W†ƒâ*POŒ‰\\ãÖ\"þÊ(íÒh¡ÑÄ+í’³MÑx/ù<“8ë¬o]>R(¡Kåõ(aã©||&|ìÛg–ÊH×/!Eöp	¨“²%ã#ý @$ËóÓBh…ÞSf<(½ßñŒˆaÒ|3þéøPÂ‚(ê‰…\0%`®ºZC¤Á+ ”YÛzhøG±dq³H{¬\\ôv2ï­;˜aqimb£hÓé±í)8½ƒt5ÎÆX=ºF°NKÀ]9¼«)£±¨’VìMƒ0	\\ÜÔÞ}	«©.n?j Á\0óAy?œµ“ü2€˜1ÐVBòÂ“š>iwN»qÞ\0ËöÏá/¢PX¨V+!TÐ²†wCœÉì¾hÓþü·‹pÀßh¡?÷Ñ =BzSÆ=\'AÄh¯\0ÿ#eÿ3Ãg§³ÌJ£|üì,‰V÷/bZ<@Ü™:o7ÂËh–ÝoXƒ¿€Y“êš$€wˆ›è\Z4ûé|G»ÀÊðQØ]•„vW“yû pXÕÈu\"^É]”bñöi¢•g•äøº³È™(Ú½±Á\0®Ry\Zß¾×öì¦Kå§×lÍò•:Wà]6ÄÇ„Yhs9Y7ÌÙ¡S¹N¢Gžkún¥¦ý’¹^TøT]%x°Æô/ôæú_÷Ë›x?Ô~~;/_N>”Fæ\\U\rï MF¨Dû[usi¢\'n”Ý,÷f‘µ9\Z_.@ï\r©z,#a¦\ZIªA„ˆD¯\'a,Ú¶õ—ò¯Óoð˜ƒ¦øÖÄÉÍ‹:}\0ëVÿ\'`T¡N¦•LÊÅTØ>ÀrÅ“_ˆ)€4=¸fêP9×Äíc(\rùm„kx‹4;êr[£îÑË\'»‡*\"†\r»Æ‰¼ð«GHJa`#[M\\è©JæË^N)P9<ÝañÏdJÃ±Í—\\¨h¦ õæ.èÏi\Z¢›ùd^tÕYÈF|X]K«i\0\0*Òêx0Ì‹§l~¸~¦T ìzè]zåµ/øÊPQ,ˆkZ\ZÄøö±iôp£ûÖ\Z”Ã>ROtÓaÀVC:2Ó‚Ñ1­°yåVÔþ3ëü¤ü+Á¼låM=3z$ºÅÌÎï4-Éï© .+þQr-Þžht>«¢¸RÖ6O\0/ƒ´\0E 2îR¢GØãdºÓÉÅ¢\0¨¨¡ ¿+°¤O”\r‰Œ•n+,™\'~»v\'SµKž5üž¸.ÕÝþ¶\r#ê4«Àa³\Z‡\r\Z÷ý˜ó¶á\n?…³&žI£é gh¦Ä÷\n´Îi:GZ.WßNbü\r˜–b*ù°RUbÁ\0­\nNuÌzê‰ÖÅWßÛ\'bï·rhce‹ùÈÝ¡B:%‘Yg7äªàÀrnqÉ¸‰\nÓkÐhzÍ¢7™ØÓYây§\nk#êˆÂ¬·×„’kR€Ò¡—´°C/QaD¢an(NÆ¬mXs÷læCùc$éòM¸U™éÁã›u5çwU—ïûïIä¢+ý¸9R±Ùž)Û¢g£È\"X:yØ‰6ä¦ï\0IŒèîÕ0õ,L­xß');
+INSERT INTO `voterkeys` VALUES ('sfrink','0‚¢0\r	*†H†÷\r\0‚\00‚Š‚\06ž·æê\r´‘Ÿàë‡âª¸MÓÌº‘À×mG‚fP-QùªÑÐ^Gv¶Cš‘û‘Ôï\n*é¥oøí<b3#ú;XÚŒ~oÁdì·tÜmþ¢g‰Ã¶¥w÷£0ÌIÒïÙµ™îÄšŒ¼ÜÿÜw@ÛÜ2íyäëé]þürá4ÿ6nÕœúÁ3ÉTÚ³ûFK©Ggu\Z •–#õµÃ{epèæ¹cÚQ±²¿ËÒi½`À@ƒäÕ\n>Ùl¼|‹4B.°%¨ÔO?#¢™ç}9ÒâÎÅTá4Â´ü™æzÿž+±ÆÿÕT >v!ú—0³(Ž¦À,‡y[,>_ç¼×G`SucÎ¯Êy<°ŸßééD\n}™ˆ*zÓ39ˆ†Å©OeYc^_Õ™º¢·ð†^;Ž±ò•Ç\Zƒ\'“&ÞÅ‹.Ç¼þ¨pÏ•	/œì‚Ã‰K¸Õ)õ©ø´\'»â$·=³Ö…e‰U„®cº†Í`»®ue›z†Ç’3Ï\0³¢G\0','0‚ÿ\00\r	*†H†÷\r\0‚é0‚å\0‚\06ž·æê\r´‘Ÿàë‡âª¸MÓÌº‘À×mG‚fP-QùªÑÐ^Gv¶Cš‘û‘Ôï\n*é¥oøí<b3#ú;XÚŒ~oÁdì·tÜmþ¢g‰Ã¶¥w÷£0ÌIÒïÙµ™îÄšŒ¼ÜÿÜw@ÛÜ2íyäëé]þürá4ÿ6nÕœúÁ3ÉTÚ³ûFK©Ggu\Z •–#õµÃ{epèæ¹cÚQ±²¿ËÒi½`À@ƒäÕ\n>Ùl¼|‹4B.°%¨ÔO?#¢™ç}9ÒâÎÅTá4Â´ü™æzÿž+±ÆÿÕT >v!ú—0³(Ž¦À,‡y[,>_ç¼×G`SucÎ¯Êy<°ŸßééD\n}™ˆ*zÓ39ˆ†Å©OeYc^_Õ™º¢·ð†^;Ž±ò•Ç\Zƒ\'“&ÞÅ‹.Ç¼þ¨pÏ•	/œì‚Ã‰K¸Õ)õ©ø´\'»â$·=³Ö…e‰U„®cº†Í`»®ue›z†Ç’3Ï\0³¢G\0‚\0‡^¸]ûp7ð:³Ž“p)ë\'’9h©o™ª;.©H¿õ(<~¤3\0u½îL¨ô[¶äqÆÀ²näÙª…\r¥Á1Ç©“éüO2Öhév>~Š–L;£üDLhA¸Î²ùL\\X€äJYÍ±Zç\'Ê”äÉ=Ü±ÔÒî;CºÝßèLì:Šõõ=@‰„óÙÊ)÷\0#l”“2…eÕ‘è&ý›W~·®sºOv˜Î*žýAƒž€µ«Eg°z>‰™åúó_\\>äíUåä „fñþVJMÅ s¥ëW­¡C(°ÑX¶°•{XÍµ‰÷ãt,R­éŽ\'àï‹Ié¿e‰èÁ*ðÊŠn³´#ÎÏ«t™Ð\'„b5›ª-â•†/8\\Z¶à+Ð¹¶-(vÊy¥\ZÉ^¾Ü±‰ß\"\ZM¬m<Q•fHƒ@ä/7J#n.Ç»/ƒÄ]3Q‰kbzœpÉ*÷0ëÝv’M\\ïØ¹…ŠÆå7]›à¯\0NÆhÊW»ßiAÁ\0Å¾¾…zs‹Æ\Zçæ\\béÀ¨ú7:¨‰ûB,	¥LKˆñ²ò¶è´nQ+\r—l|U£«¢–ªVoÿcC–_ÆæYu©ëkœª‹î°­ @7“›A2Á(x\0+QÎ³4¡Þ÷£–Ï¾¼ž¢…à	““Ô™©€d=M‰b§¿ÚÙ)(Ÿ«+¿Œ\r’á+w ÄuÆ•”Òäv¹ÿ*–Gy6y•Ù)|\"»7–oô/à—æmvùS—ÕÁ\0¶Ñ\ZZ¤!zíæ€zÆí¨>Úp—æ¥»š}ò#}W‡¾Hð‹©èO´I°ä$h!«°Û[[~ðÇ‘iöœt[Nû†2áÆÍ\'[„Ÿ¦”åÁ¹\'[\"{,\0ßJb’]®jbYÓ£Û0ÉÖ\"yçƒF?‘ò\'°×*Å†s|3uUZjéUß4t„ÂWw>ö—b7çK¯U{&Op$8á`9À\ZpbCl”cÝŽ+‰ÎÎCvÉ(•Er³p.Û«Á\0ŒD8¿¬¿\'§Fg_ˆ0\0yRµ%L\n±jÕÎoÒ#&IÑOEefÍ¡\rÎ¦ÇzØ€É«Wðú­Åªb2­±’Ð~\0ßa«žÓW1÷ÎGÎaË:!îTL@@È|XÂ!ò1¤…º4Õ‚˜²ì]~cûNÇm}¹P²F1„Õ A?Ó+G°õ8ûSWÚçÊ“4§ðÊâÅ„û;í#[Ÿo1w)öÀ^êªŽ	êÎ²»hkæ·œÂ1 ÌU’$Œ uxJ¼Ò\Z\Z	áÀkdjs÷/Å.‰Î›´XKÏÜŽº¤™r°;¶IW´NÈ5;Ÿ\'‚=Gr	°Ûv\"—2m›ÐFE]v\"s:ý¢¥äo:ÿØÄ6pBï´Ô\"QÛþE6í£¢ÚÌÀ}§ÈÔe&ÔO…pŒ¯?Ç­NSç¹p¸Ä\'Íè\04ÙEz¨*7^	|£ïÒœˆ‹yþÖ¹¡cN•ûæ‘P™²÷æ­çaì;caŒ%®Vuæß.îž¹Žžéžó©[±»eÁ\0†DôjþºÍ]gñ¨v®iºk]Õkä@yŽê.7+dþìãÜœ>(ìÔR‚SÕ+#nõbk)öä½ÿp<û£xÀ¿ÝU€<Æ&üÌ*ÎøÎ/0èÓDNð˜”}éÜy½Î ªž71Ufü&7,*¢yF&Ã€vn™cçö†õé6TÌŽ”ˆ•q?/ðè9 WÑ±\nGg¥kÄbª(ZÌHx9»éæôÜž6`¿5tÄo´ˆC>LZ'),('calvin','0‚¢0\r	*†H†÷\r\0‚\00‚Š‚\0¥¤]1kA°ÃSÊý{&»0M@˜œ€&l	÷?¹D_ÞõQsð&dD@3äðÆ~’¦VFµ£ŸvMSƒó×P„Ã[Cë®iÎ:MÖÁòÙYO–Ã‰dSngçw®GËOîãJ¼—y!X„ïÈ†\"6·(”|ªz\"¸öúŠ3yêKPTŸÑCúÙžÃtQÙDªSÙ6ÅÁþ¸ämŸÅ½\'½ƒË|\n® \0öî¸´1õè_~%j¼àóÒÔy‡ã\nÃ¯õ*ÿ\r-\0.E[wœóYt¡-9*ÔYqe ³\0Ë=|\0ŸŸÑ¥5Z{|ë3\rž>h;÷º”m­¬Ñf_•òAË‡×¡î}€ƒº7\ndˆrk“Àh¦ØPÄÏŸèŒAµî²ì³Vt¶Ûï´Ð²žlü”Úõ‘tv[—¬†1t0ÆôÈ~³1ÇÒf½‘ŸYà›ÚëOK‘7\"ˆ ÷ÙŠèŒ3z;ž‰¬ŠS[n ¾z“D#›±\0','0‚þ\00\r	*†H†÷\r\0‚è0‚ä\0‚\0¥¤]1kA°ÃSÊý{&»0M@˜œ€&l	÷?¹D_ÞõQsð&dD@3äðÆ~’¦VFµ£ŸvMSƒó×P„Ã[Cë®iÎ:MÖÁòÙYO–Ã‰dSngçw®GËOîãJ¼—y!X„ïÈ†\"6·(”|ªz\"¸öúŠ3yêKPTŸÑCúÙžÃtQÙDªSÙ6ÅÁþ¸ämŸÅ½\'½ƒË|\n® \0öî¸´1õè_~%j¼àóÒÔy‡ã\nÃ¯õ*ÿ\r-\0.E[wœóYt¡-9*ÔYqe ³\0Ë=|\0ŸŸÑ¥5Z{|ë3\rž>h;÷º”m­¬Ñf_•òAË‡×¡î}€ƒº7\ndˆrk“Àh¦ØPÄÏŸèŒAµî²ì³Vt¶Ûï´Ð²žlü”Úõ‘tv[—¬†1t0ÆôÈ~³1ÇÒf½‘ŸYà›ÚëOK‘7\"ˆ ÷ÙŠèŒ3z;ž‰¬ŠS[n ¾z“D#›±\0‚\0#åE\\Úƒ¦RÂ¦À_\Zü*Þ˜}~ù\röV\\LdÒê—MáÊœ•Úâ‡ô—‚O4žvF‡üñ\":uÝ¹©cmKwÍQ©³Râj²öÔû;³¬‡³¤Ý·D¡ú\nr[Ê\rÖÕð\Z2…+™˜…³A\"cÚò#©zŠ;êÀî\06OÐ5éì;$P¤’W†ƒâ*POŒ‰\\ãÖ\"þÊ(íÒh¡ÑÄ+í’³MÑx/ù<“8ë¬o]>R(¡Kåõ(aã©||&|ìÛg–ÊH×/!Eöp	¨“²%ã#ý @$ËóÓBh…ÞSf<(½ßñŒˆaÒ|3þéøPÂ‚(ê‰…\0%`®ºZC¤Á+ ”YÛzhøG±dq³H{¬\\ôv2ï­;˜aqimb£hÓé±í)8½ƒt5ÎÆX=ºF°NKÀ]9¼«)£±¨’VìMƒ0	\\ÜÔÞ}	«©.n?j Á\0óAy?œµ“ü2€˜1ÐVBòÂ“š>iwN»qÞ\0ËöÏá/¢PX¨V+!TÐ²†wCœÉì¾hÓþü·‹pÀßh¡?÷Ñ =BzSÆ=\'AÄh¯\0ÿ#eÿ3Ãg§³ÌJ£|üì,‰V÷/bZ<@Ü™:o7ÂËh–ÝoXƒ¿€Y“êš$€wˆ›è\Z4ûé|G»ÀÊðQØ]•„vW“yû pXÕÈu\"^É]”bñöi¢•g•äøº³È™(Ú½±Á\0®Ry\Zß¾×öì¦Kå§×lÍò•:Wà]6ÄÇ„Yhs9Y7ÌÙ¡S¹N¢Gžkún¥¦ý’¹^TøT]%x°Æô/ôæú_÷Ë›x?Ô~~;/_N>”Fæ\\U\rï MF¨Dû[usi¢\'n”Ý,÷f‘µ9\Z_.@ï\r©z,#a¦\ZIªA„ˆD¯\'a,Ú¶õ—ò¯Óoð˜ƒ¦øÖÄÉÍ‹:}\0ëVÿ\'`T¡N¦•LÊÅTØ>ÀrÅ“_ˆ)€4=¸fêP9×Äíc(\rùm„kx‹4;êr[£îÑË\'»‡*\"†\r»Æ‰¼ð«GHJa`#[M\\è©JæË^N)P9<ÝañÏdJÃ±Í—\\¨h¦ õæ.èÏi\Z¢›ùd^tÕYÈF|X]K«i\0\0*Òêx0Ì‹§l~¸~¦T ìzè]zåµ/øÊPQ,ˆkZ\ZÄøö±iôp£ûÖ\Z”Ã>ROtÓaÀVC:2Ó‚Ñ1­°yåVÔþ3ëü¤ü+Á¼låM=3z$ºÅÌÎï4-Éï© .+þQr-Þžht>«¢¸RÖ6O\0/ƒ´\0E 2îR¢GØãdºÓÉÅ¢\0¨¨¡ ¿+°¤O”\r‰Œ•n+,™\'~»v\'SµKž5üž¸.ÕÝþ¶\r#ê4«Àa³\Z‡\r\Z÷ý˜ó¶á\n?…³&žI£é gh¦Ä÷\n´Îi:GZ.WßNbü\r˜–b*ù°RUbÁ\0­\nNuÌzê‰ÖÅWßÛ\'bï·rhce‹ùÈÝ¡B:%‘Yg7äªàÀrnqÉ¸‰\nÓkÐhzÍ¢7™ØÓYây§\nk#êˆÂ¬·×„’kR€Ò¡—´°C/QaD¢an(NÆ¬mXs÷læCùc$éòM¸U™éÁã›u5çwU—ïûïIä¢+ý¸9R±Ùž)Û¢g£È\"X:yØ‰6ä¦ï\0IŒèîÕ0õ,L­xß'),('user','0‚¢0\r	*†H†÷\r\0‚\00‚Š‚\0ãŒ‚=ÂÄ§Q°²Ï&¸ko:aä¤$Àr]v2ŒÝ×¸«Ÿ…ôO{@¦t~ã:<a”YB¸öÆ ¤ÿ^Ä5–GHà‹=-5þh8gEK.U\nËú÷Õg·Ñ)œ[ÖØ_RÀ¦î@cE3ÛEÈ\\’ø=ÄÈ¸ÍÔà[Ø	Þjõ.¶…žßP¸GK«¥ìP‘²4®p92%d})¤û Op§ØaYPÂàé[NñÇÇÑ2óäæMLü¥ÒY.˜<Ø$.Gæ„lÈe~ :n“¾‘.©os ä×sâÐ®\rfN·Åg›ˆ\Zç!µý®ÖŸlì>[ž03üýËßr¡htø»‰ö9¹ÑÊtåt¡.¦ºy6ð¤CŠèS±\n ‰ºaAþÁ\núq¤ia^·óoÒ\0êv\rÓ¬ŠiE¡ã‚Q¨õ2¼¨n\'=§zXûj¶¸vEÿ“ÅjOòW\"uú¨¶4LèA£+!´…‡¡dúõ\0','0‚ÿ\00\r	*†H†÷\r\0‚é0‚å\0‚\0ãŒ‚=ÂÄ§Q°²Ï&¸ko:aä¤$Àr]v2ŒÝ×¸«Ÿ…ôO{@¦t~ã:<a”YB¸öÆ ¤ÿ^Ä5–GHà‹=-5þh8gEK.U\nËú÷Õg·Ñ)œ[ÖØ_RÀ¦î@cE3ÛEÈ\\’ø=ÄÈ¸ÍÔà[Ø	Þjõ.¶…žßP¸GK«¥ìP‘²4®p92%d})¤û Op§ØaYPÂàé[NñÇÇÑ2óäæMLü¥ÒY.˜<Ø$.Gæ„lÈe~ :n“¾‘.©os ä×sâÐ®\rfN·Åg›ˆ\Zç!µý®ÖŸlì>[ž03üýËßr¡htø»‰ö9¹ÑÊtåt¡.¦ºy6ð¤CŠèS±\n ‰ºaAþÁ\núq¤ia^·óoÒ\0êv\rÓ¬ŠiE¡ã‚Q¨õ2¼¨n\'=§zXûj¶¸vEÿ“ÅjOòW\"uú¨¶4LèA£+!´…‡¡dúõ\0‚\0¤Ê?¥g¶OŽc¯;BI5oŽ¿ò²Ì<ë¸ËšP\rOã!eF5c\'S«ÎIîŠ÷þ§hµmÝ§¿àCÛîž-vJÒð¹ö9m×à>ÏÍ8u¹¤<ŸÏ{à9ÂÞ4õGsK7Ž¿Š§\\\\v¯¨ðŸ\'Td}	OÏ£ôA–SP×!b6¼=ŠDÅ,“âƒi^øÝ/Œ)ñÀF\'hØÐ2gžÎÉyF´÷Û”Zƒè}®ÌáND\'pØZT3Cn\\\0u\"wöpEë9v;ÒiªÚ…êíËcYì`z“ Š¨‰/ìeb°¯Á÷LÒ¬6\'”OñK:MF˜(0Í¸Ý×u\\¯žD¨,1m”<Ñz¶½°†x9}Ëu^ª\'è·XÑ{\nÌ\r¿|Ø.wÊOã6.OpõÛ\Zb yrrÔt,Ü41ýž1ÑES¾N^]\'u—?{»Ó 9›#2âÙÀOL©…\\¢.®q\0Eê\Zn¥ÎdÃ§ô—ÝÂ«|¦¼Í¡²\'f9˜E©IÁ\0üL¨®j‡’¬—èôå^Ð^­Ê¯y¬÷Êµry±Œ»J…˜=,­·dð	Åó¶•Æ<…ù”!o\n¿>ÕX¡\\ÞÜt¯‡#Knf‡²ó…fáõU‰2:\Z%l¢SÛA—žØQÔô„dß)³%­ûÆ®%OíÖsJãÔçF#õ×J>º\n‡¢?•7_ò<°„¼õáîŠñbI7º˜¡Ê˜„ã gnm È1¢%H¼ÝpJ»\n«â¿ð³þ9MK‡Á\0æâzE’LÐ-Ž1}þ° æºÛÄ„]¤í\nBË–i&KœçEÒ®…Â(ó}qâ¼¾¼‘Ä÷÷¢\"É–Š,&Ø(‹wäíš\rê¶%,Ø9cH	Éù‚°HXBg^\Z	)Ù|—cŸoÈõä \râ•Wžôƒa·ÈžÔda5Š4~!«ñiRwãPº2¨¹ÔÑ\n†ÍK0ƒÈŠ×sæšÂ~Ål4nÎ¡{ó³Cñ¡f1.\"C\Z¡VgªÞjV§¥èƒÃü£À]¼©‹+¿5\ntâ3ÜeN¨#>ðÉÃCˆ™«ô\0%­1ùnùŽ¹ˆ\núÆ–Ç,±fò+ÙVì:CÁMåpSòˆßû£’†ü-fv\"$0¿GÎC³™z¥,:¢´Ëˆõ«Q)Š	Eìs5­çl•§D`Œ­¹ P«ÔO²CGP,–eÊÛ]€CÚ6Y]Î›Â¼PÆ;Ñ\Zïò¢õí“ù7*|×kÅd\Z‚¦v÷sGvä™H/Á\0Û°M¿UËkBZÆ}LÿOVä5YYpmu®þá%&b8úPaŒÖ¥ŽEâ›5Êûàn)ádp“7K•§ÓBDºWý9Zx?ˆ1g€›–TFQ²ç·¾»XRA€ö*“az|¬4D_·¶Œ|)+‚Éë%Tñ\'Ég±Á—Œ <¸†¥ào\"F9£ÐFÎ­||äùš7eß®ˆj¹-ËùÌ!³5g²Ó¼æwU¬’/GÿWÑÉ(v6\ZIØÉÁ\0¤þí¦Å*}\Z±ã\nW1ÖKã£ßž‡Ñæç…Žsù)ôp\0Cëõ¿\\îµ¼úrÀ<}S½ŒÝˆ¡”ž.ˆ®*7ÉðÀ ‰ÚYôý£†O²™Ü¤´Œð•Ïæ©©Ú®º\rJlKPK2žµ¦©¤É!yÉã‡*ª¬æÊ_Ìm$B·Ó/DëÓ€pm\0Pš¡Ó<¹ô:°òrj£[¥t^å·	c£?ƒÌ\0jv1¾ûO	`ŸH·gà0óÊv;');
 /*!40000 ALTER TABLE `voterkeys` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -211,4 +214,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-22  0:03:31
+-- Dump completed on 2013-10-22 18:14:16

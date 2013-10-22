@@ -188,6 +188,7 @@ public class Vote {
 			pst.setBytes(1,c);
 			rs=pst.executeQuery();
 			rs.next();
+			System.out.println("testing6");
 			byte[] nonce=rs.getBytes("nonce");
 			byte[] key=k.getEncoded();
 			

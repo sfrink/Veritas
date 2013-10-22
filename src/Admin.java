@@ -137,7 +137,8 @@ public class Admin {
 	            pstmt.setBytes(2, blindBytes);
 	            pstmt.setBytes(3, signedBlind);
 	            pstmt.execute();
-				clntSock.close();
+				
+	            //clntSock.close();
 	
 				logwrite.close();
 			}
