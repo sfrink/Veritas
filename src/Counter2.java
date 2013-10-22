@@ -43,7 +43,7 @@ public class Counter2 {
 			int servPort=7000;
 			ServerSocket servSock=new ServerSocket(servPort);	
 			int recvMsgSize;
-			byte [] receiveBuf=new byte[128];
+			byte [] receiveBuf=new byte[1280];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			while(true){
 				Socket clntSock=servSock.accept();

@@ -46,7 +46,7 @@ public class Counter {
 			int servPort=8000;
 			ServerSocket servSock=new ServerSocket(servPort);	
 			int recvMsgSize;
-			byte [] receiveBuf=new byte[128];
+			byte [] receiveBuf=new byte[1280];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			while(true){
 				Socket clntSock=servSock.accept();
@@ -55,14 +55,15 @@ public class Counter {
 				InputStream in=clntSock.getInputStream();
 				OutputStream out=clntSock.getOutputStream();
 
+				System.out.println("testing1");
 				for(int j=0;j<=2;j++){	
 					recvMsgSize=in.read(receiveBuf);
+					System.out.println(recvMsgSize);
 					byte[] tmp = new byte[recvMsgSize];
 					System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 					bufArray.add(tmp);
 					
 				}
-		
 			
 				// get the value of enVote, signedVote and electionname 
 				byte[] encVote=bufArray.get(0);
@@ -70,7 +71,7 @@ public class Counter {
 				String electionname = new String(bufArray.get(2), "UTF-8");
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
 				
-			
+                System.out.println("testing2");
 				//Network stuff to get encVote, signedVote and username from voter
 				//Check signature
 				Signature ver=Signature.getInstance("SHA256WITHRSA");
@@ -81,7 +82,9 @@ public class Counter {
 				ver.initVerify(pk);
 				ver.update(encVote);
 				boolean goodSign=ver.verify(signedVote);
+				System.out.println("testing3");
 				if(goodSign){
+					System.out.println("good signature");
 					SecureRandom rand=new SecureRandom();
 					byte[] nonce=new byte[20];
 					rand.nextBytes(nonce);
@@ -94,6 +97,8 @@ public class Counter {
 					//Store nonce along with encVote somewhere
 					//Add one to totalVotesCollected
 				}
+				else
+					System.out.println("bad signature");
 				//Do some waiting for all votes
 				//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
 				

@@ -42,9 +42,9 @@ public class Vote {
 			
 			System.out.println("testing0");
 
-			//Encrypting vote   ****THERES AN ERROR IN HERE******
+			//Encrypting vote
 			KeyGenerator gen=KeyGenerator.getInstance("AES");
-			gen.init(128);
+			gen.init(256);
 			SecretKey k=gen.generateKey();
 			Cipher enc=Cipher.getInstance("AES/CBC/PKCS5PADDING");
 			enc.init(Cipher.ENCRYPT_MODE, k);
@@ -120,7 +120,7 @@ public class Vote {
 			
 			// receive the signedVote from the admin
 			int recvMsgSize;
-			byte [] receiveBuf=new byte[12800];
+			byte [] receiveBuf=new byte[128000];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			recvMsgSize=in.read(receiveBuf);
 			byte[] tmp = new byte[recvMsgSize];			
@@ -131,16 +131,32 @@ public class Vote {
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
+			
+			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
+			ver.initVerify(pkAdmin);
+			ver.update(blindBytes);
+			boolean good=ver.verify(blindedSignedVote);
+			if(good)
+				System.out.println("blinded verified");*/
+			
 			//Need to unblind the returned signature
 			BigInteger blindsignature=new BigInteger(blindedSignedVote);
 			BigInteger s=r.modInverse(n).multiply(blindsignature).mod(n);
 			//s will be the signature of c, the encrypted vote with no blind.  Convert it to bytes.
+			BigInteger orig=s.modPow(e, n);
+			//byte[] origBytes=orig.toByteArray();
 			byte[] signedVote=s.toByteArray();
+			BigInteger cipher=new BigInteger(c);
 			//Check that signedVote is a valid signature of c
-			Signature ver=Signature.getInstance("SHA256WITHRSA");
+			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
 			ver.initVerify(pkAdmin);
 			ver.update(c);
-			boolean good=ver.verify(signedVote);
+			boolean good=ver.verify(signedVote);*/
+			boolean good=false;
+			if(orig.equals(cipher)){
+				System.out.println("good signature");
+				good=true;
+			}
 			System.out.println("testing4");
 			if(good){
 				

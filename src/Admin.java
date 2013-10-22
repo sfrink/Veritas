@@ -1,9 +1,11 @@
+import java.math.BigInteger;
 import java.net.*;
 
 import javax.crypto.*;
 
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,7 +38,7 @@ public class Admin {
 			int servPort=33333;
 			ServerSocket servSock=new ServerSocket(servPort);	
 			int recvMsgSize;
-			byte [] receiveBuf=new byte[128];
+			byte [] receiveBuf=new byte[1280];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			while(true){
 				Socket clntSock=servSock.accept();
@@ -64,11 +66,10 @@ public class Admin {
 			//	}
 			
 				// get the value of username, blindBytes and signedBlind --- also need to get election name
-				String username = new String(bufArray.get(0));
+				String username = new String(bufArray.get(0), "UTF-8");
 				byte[] blindBytes=bufArray.get(1);
 				byte[] signedBlind=bufArray.get(2);
-				String electionname=new String(bufArray.get(3));
-				System.out.println(username +" "+electionname);
+				String electionname=new String(bufArray.get(3), "UTF-8");
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 				RSAPrivateKey skAdmin;
 				System.out.println("testing2");
@@ -80,10 +81,9 @@ public class Admin {
 				
 				
 				rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"';");
-				if(rs.next())
-					System.out.println("not empty");
+				rs.next();
 				byte[] adminsk=rs.getBytes("sk");
-				skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(adminsk)));
+				skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(adminsk)));
 				System.out.println("testing3");
 
 				
@@ -94,6 +94,7 @@ public class Admin {
 				//get voter pk from a database
 				//RSAPublicKey voterPK=whatever in database for that user
 				rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
+				rs.next();
 				byte[] voterpk=rs.getBytes("pk");
 				PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
 				Signature ver=Signature.getInstance("SHA256WITHRSA");
@@ -101,15 +102,23 @@ public class Admin {
 				ver.update(blindBytes);
 				boolean goodSig=ver.verify(signedBlind);
 				boolean eligible=false;
-				rs=st.executeQuery("SELECT "+electionname+"FROM elections WHERE username='"+username+"'");
+				rs=st.executeQuery("SELECT "+electionname+" FROM elections WHERE usernames='"+username+"';");
+				rs.next();
+				System.out.println("testing4");
 				if(rs.getString(electionname).equals("1"))
 					eligible=true;
 				//Still need to check election eligibility
 				if(eligible && goodSig){
-					Signature sign=Signature.getInstance("SHA256WITHRSA");
+					System.out.println("good sig");
+					BigInteger n=skAdmin.getModulus();
+					BigInteger d=skAdmin.getPrivateExponent();
+					BigInteger blinded=new BigInteger(blindBytes);
+					BigInteger s=blinded.modPow(d,n);
+					byte[] signed=s.toByteArray();
+					/*Signature sign=Signature.getInstance("RSA");
 					sign.initSign(skAdmin);
 					sign.update(blindBytes);
-					byte[] signed=sign.sign();
+					byte[] signed=sign.sign();*/
 					out.write(signed);
 					logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 				}
