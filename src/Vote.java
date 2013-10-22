@@ -81,6 +81,7 @@ public class Vote {
 			//Blinding
 			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
 			byte[] blindBytes=blind.toByteArray();
+			
 			//Sign blind
 			
 			//These keys should be stored in the database in same way as admin keys
@@ -101,6 +102,7 @@ public class Vote {
 			//Send username, signedBlind and blindBytes, ******AND ELECTIONNAME****** to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
 			byte[] electionnameBytes=electionname.getBytes();
+		
 			Socket socket=new Socket("localhost",33333);
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
@@ -172,7 +174,7 @@ public class Vote {
 			rs=pst.executeQuery();
 			byte[] nonce=rs.getBytes("nonce");
 			byte[] key=k.getEncoded();
-
+			
 			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter");
 			InputStream in3=socket3.getInputStream();
@@ -182,6 +184,8 @@ public class Vote {
 			out3.write(key);
 			Thread.sleep(100);
 			out3.write(electionnameBytes);
+			Thread.sleep(100);
+			out3.write(iv);
 			Thread.sleep(100);
 			socket3.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
