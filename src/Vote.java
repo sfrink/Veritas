@@ -162,8 +162,8 @@ public class Vote {
 				
 				Socket socket2=new Socket("localhost",8000);
 				System.out.println("Connected to server of the counter");
-				InputStream in2=socket.getInputStream();
-				OutputStream out2=socket.getOutputStream();
+				InputStream in2=socket2.getInputStream();
+				OutputStream out2=socket2.getOutputStream();
 				out2.write(c);
 				Thread.sleep(100);
 				out2.write(signedVote);
@@ -194,7 +194,7 @@ public class Vote {
 			byte[] key=k.getEncoded();
 			
 			Socket socket3=new Socket("localhost",7000);
-			System.out.println("Connected to server of the counter");
+			System.out.println("Connected to server of the counter2");
 			InputStream in3=socket3.getInputStream();
 			OutputStream out3=socket3.getOutputStream();
 			out3.write(nonce);
@@ -210,8 +210,10 @@ public class Vote {
 			
 			
 			rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
+			rs.next();
 			int numVoters=Integer.parseInt(rs.getString("numVoters"));
 			rs=st.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"';");
+			rs.next();
 			String cand=rs.getString("candidateSet");
 			String[] candidates=cand.split(",");
 			int[] tally=new int[candidates.length];
@@ -240,7 +242,7 @@ public class Vote {
 							max=tally[i];
 						}
 					}
-					System.out.println("The winner was "+tally[maxindex]);
+					System.out.println("The winner was "+candidates[maxindex]+".");
 					System.exit(0);
 				}
 			}

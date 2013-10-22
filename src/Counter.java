@@ -1,9 +1,11 @@
+import java.math.BigInteger;
 import java.net.*;
 
 import javax.crypto.*;
 
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -58,7 +60,6 @@ public class Counter {
 				System.out.println("testing1");
 				for(int j=0;j<=2;j++){	
 					recvMsgSize=in.read(receiveBuf);
-					System.out.println(recvMsgSize);
 					byte[] tmp = new byte[recvMsgSize];
 					System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 					bufArray.add(tmp);
@@ -74,14 +75,23 @@ public class Counter {
                 System.out.println("testing2");
 				//Network stuff to get encVote, signedVote and username from voter
 				//Check signature
-				Signature ver=Signature.getInstance("SHA256WITHRSA");
+				//Signature ver=Signature.getInstance("SHA256WITHRSA");
 				//We need to get the pk from a database table
 				rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
+				rs.next();
 				byte[] adminpk=rs.getBytes("pk");
-				PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
-				ver.initVerify(pk);
-				ver.update(encVote);
-				boolean goodSign=ver.verify(signedVote);
+				RSAPublicKey pk=(RSAPublicKey)(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk)));
+				//ver.initVerify(pk);
+				//ver.update(encVote);
+				//boolean goodSign=ver.verify(signedVote);
+				BigInteger e=pk.getPublicExponent();
+				BigInteger n=pk.getModulus();
+				BigInteger sign=new BigInteger(signedVote);
+				BigInteger enc=new BigInteger(encVote);
+				BigInteger s=sign.modPow(e,n);
+				boolean goodSign=false;
+				if(s.equals(enc))
+					goodSign=true;
 				System.out.println("testing3");
 				if(goodSign){
 					System.out.println("good signature");
@@ -94,8 +104,6 @@ public class Counter {
         			pstmt.setBytes(3, signedVote);
         			pstmt.execute();
 					
-					//Store nonce along with encVote somewhere
-					//Add one to totalVotesCollected
 				}
 				else
 					System.out.println("bad signature");

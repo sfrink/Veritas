@@ -77,10 +77,11 @@ public class Counter2 {
 				pst=con.prepareStatement("SELECT encVote FROM "+electionname+"votes WHERE nonce=?");
 				pst.setBytes(1, nonce);
 				rs=pst.executeQuery();
+				rs.next();
 				byte[] encVote=rs.getBytes("encVote");
 				byte[] byteVote=dec.doFinal(encVote);
 				String decVote=new String(byteVote);
-				st.execute("INSERT INTO "+electionname+"results vote values '"+decVote+"';");
+				st.execute("INSERT INTO "+electionname+"results (vote) values ('"+decVote+"');");
 			
 			
 			logwrite.close();
