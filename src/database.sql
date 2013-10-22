@@ -107,7 +107,6 @@ CREATE TABLE `test1` (
 
 LOCK TABLES `test1` WRITE;
 /*!40000 ALTER TABLE `test1` DISABLE KEYS */;
-INSERT INTO `test1` VALUES ('sfrink','%„•¸Rê;sÓ…Iîe†c#Ø9N>k_½2`Ûà¯!_Ü¯Ì¢’[×iw1ÁÅRÛu\r„|ý2ÔÁßCvËjò•ÏŸÒàÖ¬™$JeiŠ°Õ@Tì`™vÌÝ­Ðk*³5§¼Y´>Û‡7^Â§À;\rìâï	…ä¯FfY^O@þ·%”Oá©Öy²t”6»Šð#4š‚\0e;÷«”\"¢³\ZZïAâíÄd¥î¤@ÿ[ë—„\0a£‹É:UTuñgŸOù‡E¹,f_¦^¹/¸k¾3]LGGö¢PãœûuÑ* Ý_~žðÇ¯U±Q«&È¤ŸžK\Zg°Ÿî9”Î¦/vÌÒ%©+€lo\'Û®,Þ³X\Zd_F™!Ñ²}ò0Ù…yL¡RäðkêQÂÌè qt ÕÑðƒ¾ü¿\nUšFñ`ÜÂ‹•%Uvœ¥@Åá™U+y(í¯‡2ÿÝÇ†úc<j<‹…I','S{heá&ñQ‡wªxÄ×æìÏÑ-)‚ëîxÊ.âŠW•\\X;´E@|Ÿ±	‰oVNÆ+VUZµŒ~c±\'ÅèüCî[áë¨JÊ÷á²è²ALÿûÒø²	ÏžñŒ0šw”µ^\'ˆ\n0(yóO”ØÀ|%f¤³f3,Ã¯½‚“*õv•aÎß°Úøæeëí,\ró5ijwûëŸ¸uÃzD1³Äÿ*~ØJúfè¤%€+[RÐ\n>õÇàX	2ßBÏ’ÉVAËùÎ6 þæf$±£7gy±%›ÏW)††¨TI0ñ/D8š±mWÑítWPãMß½¢¾vN\nP	æ[)R$´íc	Ìk!rR±{j•Àß–x$OÌ?5qB}qÓµ§LQÍ4-[?ô5Ë…²ÇÒz`Q]ü®žR.G_2‹ª«õÛ^ÆïO\Zýì‹ãøuä%à€¤\0ï÷Ë‰½¦iØâíåDp–òüìëP¼d‚Ó0¢Ó>g£|@èˆ~£nžƒ¬');
 /*!40000 ALTER TABLE `test1` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -129,7 +128,6 @@ CREATE TABLE `test1results` (
 
 LOCK TABLES `test1results` WRITE;
 /*!40000 ALTER TABLE `test1results` DISABLE KEYS */;
-INSERT INTO `test1results` VALUES ('a');
 /*!40000 ALTER TABLE `test1results` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -153,7 +151,6 @@ CREATE TABLE `test1votes` (
 
 LOCK TABLES `test1votes` WRITE;
 /*!40000 ALTER TABLE `test1votes` DISABLE KEYS */;
-INSERT INTO `test1votes` VALUES ('z=°\n’ãåL2oÆ^å&8r¡','Fiìw—@qàÃMÙF$','v—ë€ë±Ò¤¡>¾M;@ÞÜ}¡¾¿üÅÚ9†9Ùf¼rž\0Á¤‘0}Ã=sE0¸u;ä÷df×,’K·¾»â3mŒR»ZÍ†¥Å¢<C©wC½X‘ú{Mc5nÉhFl¬k´hèä…Ô¥ì&#» ÖäøÂ´­ŽQ7\0Ë\\mø–)ÆÒ5ŠœÓâ¨ú*Èbç ÄËbçjk<}ÿ?èÅ*GËHeÉú¡hYìï fé¤ø\\­\\à˜iâÈidGnÜÆ»‘+c.Ä7\r³JpüE@³dq^ÛzÎµ5EÏxnäp:çbKÞÿh·:Y_ÚÊ˜BömäM[Ø~ÇµË4ã8þ9ñ÷”Þ\\î-­äÞ‡ÿ¾Ift0ñìB=øp‹Ûê!qø>ÃƒWÔ·çM?l³™n’[2ÎjÎµ8é‹‹¸D†%ßv> zƒ»‰\\bë‰]¡-Ø3­.tÚ6ÖÕC·‚~	nÔFCb·@WˆæeÄÿ\Z');
 /*!40000 ALTER TABLE `test1votes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -214,4 +211,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-22 18:14:16
+-- Dump completed on 2013-10-22 18:17:50
