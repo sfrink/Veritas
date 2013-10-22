@@ -55,7 +55,7 @@ public class Counter2 {
 	            java.util.Date date = new java.util.Date();
 	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
 				PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
-				for(int j=0;j<=2;j++){	
+				for(int j=0;j<=3;j++){	
 					recvMsgSize=in.read(receiveBuf);
 					byte[] tmp = new byte[recvMsgSize];
 					System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
@@ -67,11 +67,11 @@ public class Counter2 {
 				byte[] nonce=bufArray.get(0);
 				byte[] key=bufArray.get(1);
 				String electionname = new String(bufArray.get(2), "UTF-8");
-                logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
+				byte[] iv=bufArray.get(3);
 				
-                
+                logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");        
                 SecretKeySpec sk=new SecretKeySpec(key, "AES");
-				byte[] iv={(byte)0};// = whatever iv the voter sends
+				//byte[] iv={(byte)0};// = whatever iv the voter sends
 				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
 				dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
 				pst=con.prepareStatement("SELECT encVote FROM "+electionname+"votes WHERE nonce=?");
