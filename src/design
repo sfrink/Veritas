@@ -14,7 +14,7 @@ In our project, blind technique is used to protect the confidentiality.
 
 Integrity:
 
-
+Need to be added...
 
 Audit:
 
@@ -30,3 +30,11 @@ Audit:
 ➢	Admin Send Info: The administrator sends information to the voter
 
 3.	Description: Detail about each operation.
+
+
+Authentication:
+
+
+Authorization:
+
+
