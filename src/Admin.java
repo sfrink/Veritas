@@ -32,7 +32,6 @@ public class Admin {
 		try{
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
-			int count=0;
 			System.out.println("start");
 			int servPort=33333;
 			ServerSocket servSock=new ServerSocket(servPort);	
@@ -46,6 +45,9 @@ public class Admin {
 				InputStream in=clntSock.getInputStream();
 				OutputStream out=clntSock.getOutputStream();
 				File log=new File("log.txt");
+				
+				System.out.println("testing1");
+				
 	            java.util.Date date = new java.util.Date();
 	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
 				PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
@@ -62,13 +64,14 @@ public class Admin {
 			//	}
 			
 				// get the value of username, blindBytes and signedBlind --- also need to get election name
-				String username = new String(bufArray.get(0), "UTF-8");
+				String username = new String(bufArray.get(0));
 				byte[] blindBytes=bufArray.get(1);
 				byte[] signedBlind=bufArray.get(2);
-				String electionname=new String(bufArray.get(3), "UTF-8");
+				String electionname=new String(bufArray.get(3));
+				System.out.println(username +" "+electionname);
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 				RSAPrivateKey skAdmin;
-				
+				System.out.println("testing2");
 		
 				
 				//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
@@ -76,10 +79,13 @@ public class Admin {
 				//KeyPair keypair=genRSA.genKeyPair();
 				
 				
-				rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"'");
+				rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"';");
+				if(rs.next())
+					System.out.println("not empty");
 				byte[] adminsk=rs.getBytes("sk");
 				skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(adminsk)));
-				
+				System.out.println("testing3");
+
 				
 				//get blinded message m, signature s of m, and username
 				//check that the user is eligible for this election -- database query
@@ -122,6 +128,7 @@ public class Admin {
 	            pstmt.setString(1, username);
 	            pstmt.setBytes(2, blindBytes);
 	            pstmt.setBytes(3, signedBlind);
+	            pstmt.execute();
 				clntSock.close();
 	
 				logwrite.close();

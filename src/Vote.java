@@ -40,10 +40,11 @@ public class Vote {
 			//BufferedReader in=new BufferedReader(new InputStreamReader(client.getInputStream()));
 			RSAPublicKey pkAdmin;
 			
-			
-			//Encrypting vote
-			KeyGenerator gen=KeyGenerator.getInstance("AES256");
-			gen.init(256);
+			System.out.println("testing0");
+
+			//Encrypting vote   ****THERES AN ERROR IN HERE******
+			KeyGenerator gen=KeyGenerator.getInstance("AES");
+			gen.init(128);
 			SecretKey k=gen.generateKey();
 			Cipher enc=Cipher.getInstance("AES/CBC/PKCS5PADDING");
 			enc.init(Cipher.ENCRYPT_MODE, k);
@@ -53,7 +54,10 @@ public class Vote {
 			byte[] c=enc.doFinal(vote);
 			//Blinding key setup
 			
+			System.out.println("testing1");
+			
 			rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
+			rs.next();
 			byte[] adminpk=rs.getBytes("pk");
 			PublicKey pubkey=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
 			pkAdmin=(RSAPublicKey)pubkey;
@@ -71,6 +75,9 @@ public class Vote {
 				gcd=r.gcd(n);
 			}
 			while(!gcd.equals(one) || r.compareTo(n)>=0 || r.compareTo(one)<=0);
+			
+			System.out.println("testing2");
+
 			//Blinding
 			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
 			byte[] blindBytes=blind.toByteArray();
@@ -79,11 +86,13 @@ public class Vote {
 			//These keys should be stored in the database in same way as admin keys
 			
 			rs=st.executeQuery("SELECT sk FROM voterkeys WHERE username='"+username+"'");
+			rs.next();
 			byte[] votersk=rs.getBytes("sk");
-			PrivateKey sk=KeyFactory.getInstance("RSA").generatePrivate(new X509EncodedKeySpec(votersk));
+			PrivateKey sk=KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(votersk));
 			
 			
-			
+			System.out.println("testing3");
+
 			Signature sign=Signature.getInstance("SHA256WITHRSA");
 			sign.initSign(sk);
 			sign.update(blindBytes);
@@ -105,7 +114,7 @@ public class Vote {
 			out.write(electionnameBytes);
 			Thread.sleep(100);
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
-			
+			System.out.println("testing3");
 			// receive the signedVote from the admin
 			int recvMsgSize;
 			byte [] receiveBuf=new byte[128];
@@ -202,7 +211,7 @@ public class Vote {
 					}
 					int maxindex=0;
 					int max=0;
-					String tie="";
+					//String tie=""; We'll want to check for ties somehow
 					for(int i=0;i<tally.length;i++){
 						if(tally[i]>max){
 							maxindex=i;
@@ -210,6 +219,7 @@ public class Vote {
 						}
 					}
 					System.out.println("The winner was "+tally[maxindex]);
+					System.exit(0);
 				}
 			}
 			
