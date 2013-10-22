@@ -1,10 +1,8 @@
 import java.math.BigInteger;
 import java.net.*;
 
-import javax.crypto.*;
 
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
@@ -16,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.io.*;
 
-import javax.crypto.spec.IvParameterSpec;
 
 
 public class Counter {
@@ -55,7 +52,6 @@ public class Counter {
 				SocketAddress clientAddress=clntSock.getRemoteSocketAddress();
 				System.out.println("receiving requests from client at "+clientAddress);
 				InputStream in=clntSock.getInputStream();
-				OutputStream out=clntSock.getOutputStream();
 
 				System.out.println("testing1");
 				for(int j=0;j<=2;j++){	

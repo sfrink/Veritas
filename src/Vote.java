@@ -4,7 +4,6 @@ import java.net.*;
 import javax.crypto.*;
 
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
@@ -162,7 +161,6 @@ public class Vote {
 				
 				Socket socket2=new Socket("localhost",8000);
 				System.out.println("Connected to server of the counter");
-				InputStream in2=socket2.getInputStream();
 				OutputStream out2=socket2.getOutputStream();
 				out2.write(c);
 				Thread.sleep(100);
@@ -195,7 +193,6 @@ public class Vote {
 			
 			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter2");
-			InputStream in3=socket3.getInputStream();
 			OutputStream out3=socket3.getOutputStream();
 			out3.write(nonce);
 			Thread.sleep(100);

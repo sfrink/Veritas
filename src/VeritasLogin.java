@@ -30,7 +30,7 @@ public class VeritasLogin {
             String databaseUsername = "";
             String databasePassword = "";
             
-            System.out.println("Enter Username: ");         //Input Username
+            System.out.println("Enter UserID: ");         //Input Username
             String name = sc.next();
             System.out.println("Enter Password: ");         //Input Password
             String password = sc.next();
@@ -40,10 +40,10 @@ public class VeritasLogin {
             Connection conn = DriverManager.getConnection(url, user, pw);          /*  Steven, please help me fill in this line  */
             Statement stmt = conn.createStatement();
             PreparedStatement pstmt=null;
-            String query = "SELECT * from users WHERE username='"+name+"'";
+            String query = "SELECT * from users WHERE userID='"+name+"'";
             ResultSet rs = stmt.executeQuery(query);
             while(rs.next()){                           //Read username & password from database
-                databaseUsername = rs.getString("username");
+                databaseUsername = rs.getString("userID");
                 databasePassword = rs.getString("password");
             }
             

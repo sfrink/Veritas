@@ -2,9 +2,6 @@ import java.net.*;
 
 import javax.crypto.*;
 
-import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -50,7 +47,6 @@ public class Counter2 {
 				SocketAddress clientAddress=clntSock.getRemoteSocketAddress();
 				System.out.println("receiving requests from client at "+clientAddress);
 				InputStream in=clntSock.getInputStream();
-				OutputStream out=clntSock.getOutputStream();
 				File log=new File("log.txt");
 	            java.util.Date date = new java.util.Date();
 	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
