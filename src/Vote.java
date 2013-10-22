@@ -98,7 +98,7 @@ public class Vote {
 			sign.update(blindBytes);
 			byte[] signedBlind=sign.sign();
 			
-			//Send username, signedBlind and blindBytes, ******AND ELECTIONNAME****** to Administrator to be signed
+			//Send username, signedBlind and blindBytes, and electionname to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
 			byte[] electionnameBytes=electionname.getBytes();
 			Socket socket=new Socket("localhost",33333);
@@ -115,19 +115,19 @@ public class Vote {
 			Thread.sleep(100);
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			System.out.println("testing3");
+			
 			// receive the signedVote from the admin
 			int recvMsgSize;
-			byte [] receiveBuf=new byte[128];
+			byte [] receiveBuf=new byte[12800];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			recvMsgSize=in.read(receiveBuf);
-			byte[] tmp = new byte[recvMsgSize];
+			byte[] tmp = new byte[recvMsgSize];			
 			System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 			bufArray.add(tmp);
 			//System.out.println( bufArray.get(0));
 			byte[] blindedSignedVote=bufArray.get(0); //need to unblind
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
-			
 			
 			//Need to unblind the returned signature
 			BigInteger blindsignature=new BigInteger(blindedSignedVote);
@@ -139,8 +139,8 @@ public class Vote {
 			ver.initVerify(pkAdmin);
 			ver.update(c);
 			boolean good=ver.verify(signedVote);
+			System.out.println("testing4");
 			if(good){
-				
 				
 				Socket socket2=new Socket("localhost",8000);
 				System.out.println("Connected to server of the counter");
@@ -154,7 +154,7 @@ public class Vote {
 				Thread.sleep(100);
 				socket2.close();
 				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
-
+				System.out.println("testing5 sig verified");
 				/*Send signedVote along with c to Counting Principal.*/
 				
 				/*Once Counter publishes list, voter must:
@@ -164,12 +164,14 @@ public class Vote {
 				 */
 			}
 			else{
+				System.out.println("did not verify");
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
 			
 			pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote=?");
 			pst.setBytes(1,c);
 			rs=pst.executeQuery();
+			rs.next();
 			byte[] nonce=rs.getBytes("nonce");
 			byte[] key=k.getEncoded();
 
