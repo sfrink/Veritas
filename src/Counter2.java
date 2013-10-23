@@ -18,10 +18,8 @@ import javax.crypto.spec.SecretKeySpec;
 public class Counter2 {
 
 	public static void main(String[] args){
-		Connection con=null;
-		Statement st=null;
-		ResultSet rs=null;
-		PreparedStatement pst=null;
+
+
 		String url="jdbc:mysql://localhost:3306/elections";
 		String user="root";
 		String pw="";
@@ -33,24 +31,33 @@ public class Counter2 {
 		}
 		try{
 			
-			con=DriverManager.getConnection(url, user, pw);
-			st=con.createStatement();
+			final Connection con=DriverManager.getConnection(url, user, pw);
+			final Statement st=con.createStatement();
 			
 			System.out.println("start");
 			int servPort=7000;
 			ServerSocket servSock=new ServerSocket(servPort);	
-			int recvMsgSize;
-			byte [] receiveBuf=new byte[1280];
-			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+
 			while(true){
-				Socket clntSock=servSock.accept();
+				final Socket clntSock=servSock.accept();
 				SocketAddress clientAddress=clntSock.getRemoteSocketAddress();
 				System.out.println("receiving requests from client at "+clientAddress);
+				
+				new Thread(new Runnable() {
+				PreparedStatement pst=null;
+				ResultSet rs=null;	
+				int recvMsgSize;
+				byte [] receiveBuf=new byte[1280];
+				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				InputStream in=clntSock.getInputStream();
 				File log=new File("log.txt");
 	            java.util.Date date = new java.util.Date();
 	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
 				PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
+				public void run(){
+					try{
+						
+					
 				for(int j=0;j<=3;j++){	
 					recvMsgSize=in.read(receiveBuf);
 					byte[] tmp = new byte[recvMsgSize];
@@ -82,8 +89,14 @@ public class Counter2 {
 			
 			logwrite.close();
 
-			}
-		}
+					}
+					catch (Exception e){}
+				}
+		
+		}).start();
+	}
+	
+}
 		catch(Exception e){
 			System.out.println(e);
 		}
