@@ -184,12 +184,12 @@ public class Vote {
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
 			
-			pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote=?");
+			pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote= (?)");
 			pst.setBytes(1,c);
 			rs=pst.executeQuery();
 			rs.next();
-			System.out.println("testing6");
 			byte[] nonce=rs.getBytes("nonce");
+			System.out.println("testing6");
 			byte[] key=k.getEncoded();
 			
 			Socket socket3=new Socket("localhost",7000);
@@ -205,13 +205,15 @@ public class Vote {
 			Thread.sleep(100);
 			socket3.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
-			
+			System.out.println("testing7");
 			
 			rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
 			rs.next();
 			int numVoters=Integer.parseInt(rs.getString("numVoters"));
+			System.out.println("testing8");
 			rs=st.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"';");
 			rs.next();
+			System.out.println("testing9");
 			String cand=rs.getString("candidateSet");
 			String[] candidates=cand.split(",");
 			int[] tally=new int[candidates.length];

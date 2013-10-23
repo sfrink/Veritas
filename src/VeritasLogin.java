@@ -30,7 +30,7 @@ public class VeritasLogin {
             String databaseUsername = "";
             String databasePassword = "";
             
-            System.out.println("Enter UserID: ");         //Input Username
+            System.out.println("Enter Username: ");         //Input Username
             String name = sc.next();
             System.out.println("Enter Password: ");         //Input Password
             String password = sc.next();
