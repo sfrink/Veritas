@@ -13,6 +13,13 @@ import java.sql.*;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 public class VeritasLogin {
 
@@ -47,6 +54,7 @@ public class VeritasLogin {
                 databasePassword = rs.getString("password");
             }
             
+            //Old stuff.  Need to use BouncyCastle Version
             /*KeyPairGenerator genRSA1=KeyPairGenerator.getInstance("RSA");
 			genRSA1.initialize(3072);
 			KeyPair keypair1=genRSA1.genKeyPair();
@@ -124,24 +132,37 @@ public class VeritasLogin {
             			stmt.execute("INSERT into candidates (election, candidateSet) VALUES ('" + elec +"','" + cand+"')");
             			stmt.execute("ALTER TABLE elections ADD "+elec+" varchar(1)");
             			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; UserID: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
-            			KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
-            			genRSA.initialize(3072);
-            			KeyPair keypair=genRSA.genKeyPair();
-            			RSAPrivateKey skAdmin=(RSAPrivateKey)keypair.getPrivate();
-            			RSAPublicKey pkAdmin=(RSAPublicKey)keypair.getPublic();
-            			byte[] skAdminBytes=skAdmin.getEncoded();
-            			byte[] pkAdminBytes=pkAdmin.getEncoded();
+            			//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
+            			//genRSA.initialize(3072);
+            			//KeyPair keypair=genRSA.genKeyPair();
+            			//RSAPrivateKey skAdmin=(RSAPrivateKey)keypair.getPrivate();
+            			//RSAPublicKey pkAdmin=(RSAPublicKey)keypair.getPublic();
+            			//byte[] skAdminBytes=skAdmin.getEncoded();
+            			//byte[] pkAdminBytes=pkAdmin.getEncoded();
+            			
+            			RSAKeyPairGenerator r=new RSAKeyPairGenerator();
+            			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
+            			AsymmetricCipherKeyPair keys=r.generateKeyPair();
+            			AsymmetricKeyParameter pkAdmin=keys.getPublic();
+            			AsymmetricKeyParameter skAdmin=keys.getPrivate();
+            			//need to store this stuff somehow
+            			
             			//testing stuff
             			/*Signature sign=Signature.getInstance("SHA256WITHRSA");
             			sign.initSign(skAdmin);
             			byte[] tester= {(byte)0, (byte)1, (byte)2};
             			sign.update(tester);
-            			byte[] signed=sign.sign();*/
-            			pstmt=con2.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
-            			pstmt.setString(1, elec);
-            			pstmt.setBytes(2, pkAdminBytes);
-            			pstmt.setBytes(3, skAdminBytes);
-            			pstmt.execute();
+            			//byte[] signed=sign.sign();*/
+            			
+            			/************/
+            			//This is how we used to store keys.  Need to adapt to bouncycastle
+            			//pstmt=con2.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
+            			//pstmt.setString(1, elec);
+            			//pstmt.setString(2, pkAdminString);
+            			//pstmt.setString(3, skAdminString);
+            			//pstmt.execute();
+            			/***********/
+            			
             			stmt.execute("create table "+elec+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
             			stmt.execute("create table "+elec+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
             			//This was some stuff to test key storage worked correctly

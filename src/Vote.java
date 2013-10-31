@@ -36,10 +36,11 @@ public class Vote {
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 		
-			//BufferedReader in=new BufferedReader(new InputStreamReader(client.getInputStream()));
 			RSAPublicKey pkAdmin;
+			//Need to replace with BC
 			
-			System.out.println("testing0");
+			
+			//System.out.println("testing0");
 
 			//Encrypting vote
 			KeyGenerator gen=KeyGenerator.getInstance("AES");
@@ -53,8 +54,10 @@ public class Vote {
 			byte[] c=enc.doFinal(vote);
 			//Blinding key setup
 			
-			System.out.println("testing1");
+			//System.out.println("testing1");
 			
+			//Replace query with key exchange
+			//Replace signing with BC
 			rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
 			rs.next();
 			byte[] adminpk=rs.getBytes("pk");
@@ -75,7 +78,7 @@ public class Vote {
 			}
 			while(!gcd.equals(one) || r.compareTo(n)>=0 || r.compareTo(one)<=0);
 			
-			System.out.println("testing2");
+			//System.out.println("testing2");
 
 			//Blinding
 			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
@@ -91,7 +94,7 @@ public class Vote {
 			PrivateKey sk=KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(votersk));
 			
 			
-			System.out.println("testing3");
+			//System.out.println("testing3");
 
 			Signature sign=Signature.getInstance("SHA256WITHRSA");
 			sign.initSign(sk);
@@ -115,7 +118,7 @@ public class Vote {
 			out.write(electionnameBytes);
 			Thread.sleep(100);
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
-			System.out.println("testing3");
+			//System.out.println("testing3");
 			
 			// receive the signedVote from the admin
 			int recvMsgSize;
@@ -153,10 +156,10 @@ public class Vote {
 			boolean good=ver.verify(signedVote);*/
 			boolean good=false;
 			if(orig.equals(cipher)){
-				System.out.println("good signature");
+				//System.out.println("good signature");
 				good=true;
 			}
-			System.out.println("testing4");
+			//System.out.println("testing4");
 			if(good){
 				
 				Socket socket2=new Socket("localhost",8000);
@@ -170,7 +173,7 @@ public class Vote {
 				Thread.sleep(100);
 				socket2.close();
 				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
-				System.out.println("testing5 sig verified");
+				//System.out.println("testing5 sig verified");
 				/*Send signedVote along with c to Counting Principal.*/
 				
 				/*Once Counter publishes list, voter must:
@@ -189,7 +192,7 @@ public class Vote {
 			rs=pst.executeQuery();
 			rs.next();
 			byte[] nonce=rs.getBytes("nonce");
-			System.out.println("testing6");
+			//System.out.println("testing6");
 			byte[] key=k.getEncoded();
 			
 			Socket socket3=new Socket("localhost",7000);
@@ -205,7 +208,7 @@ public class Vote {
 			Thread.sleep(100);
 			socket3.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
-			System.out.println("testing7");
+			//System.out.println("testing7");
 			
 			rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
 			rs.next();

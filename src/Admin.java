@@ -72,7 +72,7 @@ public class Admin {
 								String electionname=new String(bufArray.get(3), "UTF-8");
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 								RSAPrivateKey skAdmin;
-								System.out.println("testing2");
+								//System.out.println("testing2");
 		
 								
 									//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
@@ -84,7 +84,7 @@ public class Admin {
 								rs.next();
 								byte[] adminsk=rs.getBytes("sk");
 								skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(adminsk)));
-								System.out.println("testing3");
+								//System.out.println("testing3");
 
 				
 								//get blinded message m, signature s of m, and username
@@ -104,7 +104,7 @@ public class Admin {
 								boolean eligible=false;
 								rs=st.executeQuery("SELECT "+electionname+" FROM elections WHERE usernames='"+username+"';");
 								rs.next();
-								System.out.println("testing4");
+								//System.out.println("testing4");
 								if(rs.getString(electionname).equals("1"))
 									eligible=true;
 								//Still need to check election eligibility
