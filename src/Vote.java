@@ -1,7 +1,18 @@
 import java.math.BigInteger;
 import java.net.*;
-
 import javax.crypto.*;
+
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.engines.RSABlindingEngine;
+import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.generators.RSABlindingFactorGenerator;
+import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.params.RSABlindingParameters;
+import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.signers.PSSSigner;
 
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
@@ -36,7 +47,7 @@ public class Vote {
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 		
-			RSAPublicKey pkAdmin;
+			//RSAPublicKey pkAdmin;
 			//Need to replace with BC
 			
 			
@@ -58,9 +69,29 @@ public class Vote {
 			
 			//Replace query with key exchange
 			//Replace signing with BC
-			rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
+			/*rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
 			rs.next();
-			byte[] adminpk=rs.getBytes("pk");
+			byte[] adminpk=rs.getBytes("pk");*/
+			
+			//To-Do: Need to serialize(?) the admin RSAKeyParameters object on server side and send it to voter
+			//Voter de-serializes, gets the adminpk object back
+			
+			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
+			gen.init(adminpk);
+			BigInteger blindfactor=genBlind.generateBlindingFactor();
+			
+			//Blinding:
+			RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindfactor);
+			RSABlindingEngine eng=new RSABlindingEngine();
+			PSSSigner blinder=new PSSSigner(eng, new SHA1Digest(), 20);
+			
+			blinder.init(true, blindParams);
+			blinder.update(c, 0, c.length);
+			byte[] blindBytes=blinder.generateSignature();
+			
+			
+			//needs to all be BC
+			/*  OLD STUFF
 			PublicKey pubkey=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
 			pkAdmin=(RSAPublicKey)pubkey;
 			BigInteger n=pkAdmin.getModulus();
@@ -83,6 +114,8 @@ public class Vote {
 			//Blinding
 			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
 			byte[] blindBytes=blind.toByteArray();
+			*/
+			
 			
 			//Sign blind
 			
@@ -121,6 +154,7 @@ public class Vote {
 			//System.out.println("testing3");
 			
 			// receive the signedVote from the admin
+			/****NEED TO CHANGE FOR BOUNCYCASTLE****/
 			int recvMsgSize;
 			byte [] receiveBuf=new byte[128000];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
@@ -133,7 +167,21 @@ public class Vote {
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
+			//unblind
+			eng=new RSABlindingEngine();
+			eng.init(false, blindParams);
+			byte[] signedVote=eng.processBlock(blindedSignedVote, 0, blindedSignedVote.length);
 			
+			//verify
+			PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
+			signer.init(false, adminpk);
+			signer.update(c, 0,c.length);
+			boolean good=signer.verifySignature(signedVote);
+			
+			
+			
+			
+			//NEED TO VERIFY USING BC KEYS
 			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
 			ver.initVerify(pkAdmin);
 			ver.update(blindBytes);
@@ -142,7 +190,7 @@ public class Vote {
 				System.out.println("blinded verified");*/
 			
 			//Need to unblind the returned signature
-			BigInteger blindsignature=new BigInteger(blindedSignedVote);
+			/*BigInteger blindsignature=new BigInteger(blindedSignedVote);
 			BigInteger s=r.modInverse(n).multiply(blindsignature).mod(n);
 			//s will be the signature of c, the encrypted vote with no blind.  Convert it to bytes.
 			BigInteger orig=s.modPow(e, n);
@@ -153,12 +201,13 @@ public class Vote {
 			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
 			ver.initVerify(pkAdmin);
 			ver.update(c);
-			boolean good=ver.verify(signedVote);*/
+			boolean good=ver.verify(signedVote);
 			boolean good=false;
 			if(orig.equals(cipher)){
 				//System.out.println("good signature");
 				good=true;
-			}
+			}*/
+			
 			//System.out.println("testing4");
 			if(good){
 				

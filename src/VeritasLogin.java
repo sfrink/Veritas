@@ -17,9 +17,9 @@ import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 public class VeritasLogin {
 
@@ -145,7 +145,7 @@ public class VeritasLogin {
             			AsymmetricCipherKeyPair keys=r.generateKeyPair();
             			AsymmetricKeyParameter pkAdmin=keys.getPublic();
             			AsymmetricKeyParameter skAdmin=keys.getPrivate();
-            			//need to store this stuff somehow
+            			//need to send to server and store this stuff somehow
             			
             			//testing stuff
             			/*Signature sign=Signature.getInstance("SHA256WITHRSA");
