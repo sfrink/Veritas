@@ -75,6 +75,8 @@ public class Vote {
 			
 			//To-Do: Need to serialize(?) the admin RSAKeyParameters object on server side and send it to voter
 			//Voter de-serializes, gets the adminpk object back
+			//Some network stuff to get:
+			//RSAKeyParameters adminpk = deserialize(stuffFromAdmin);
 			
 			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
 			gen.init(adminpk);

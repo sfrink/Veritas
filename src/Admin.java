@@ -71,21 +71,25 @@ public class Admin {
 								byte[] signedBlind=bufArray.get(2);
 								String electionname=new String(bufArray.get(3), "UTF-8");
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
-								RSAPrivateKey skAdmin;
+								//RSAPrivateKey skAdmin;
 								//System.out.println("testing2");
 		
 								
-									//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
+								//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
 								//genRSA.initialize(3072);
 								//KeyPair keypair=genRSA.genKeyPair();
 				
-				
+								//This needs to be be BC keys
 								rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
-								byte[] adminsk=rs.getBytes("sk");
-								skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(adminsk)));
+								//want something like RSAKeyParameters adminsk=deserialize(rs.getBytes("sk"));
+								
+								
+								//OLD STUFF
+								//byte[] adminsk=rs.getBytes("sk");
+								//skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(adminsk)));
 								//System.out.println("testing3");
-
+								//
 				
 								//get blinded message m, signature s of m, and username
 								//check that the user is eligible for this election -- database query
@@ -93,9 +97,15 @@ public class Admin {
 								//Check signature of the blinded message
 								//get voter pk from a database
 								//RSAPublicKey voterPK=whatever in database for that user
+								
+								//This needs to be sent from client
 								rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
 								rs.next();
-								byte[] voterpk=rs.getBytes("pk");
+								
+								//again something like RSAKeyParams voterpk=deserialize(rs.getBytes("pk"));
+								//byte[] voterpk=rs.getBytes("pk");
+								
+								/***Needs to be RSAKeyParameters voterpk=deserialize(stuff from network) if not already in database***/
 								PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
 								Signature ver=Signature.getInstance("SHA256WITHRSA");
 								ver.initVerify(pk);
