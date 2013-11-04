@@ -156,7 +156,6 @@ public class Vote {
 			//System.out.println("testing3");
 			
 			// receive the signedVote from the admin
-			/****NEED TO CHANGE FOR BOUNCYCASTLE****/
 			int recvMsgSize;
 			byte [] receiveBuf=new byte[128000];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();

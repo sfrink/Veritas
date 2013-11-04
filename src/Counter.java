@@ -12,6 +12,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.io.*;
 
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.signers.PSSSigner;
+
 
 
 public class Counter {
@@ -75,11 +79,21 @@ public class Counter {
 							//We need to get the pk from a database table
 							rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
 							rs.next();
+							//RSAKeyParameters adminpk=deserialize(rs.getBytes("pk"));
 							byte[] adminpk=rs.getBytes("pk");
 							RSAPublicKey pk=(RSAPublicKey)(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk)));
 							//ver.initVerify(pk);
 							//ver.update(encVote);
 							//boolean goodSign=ver.verify(signedVote);
+							
+							/*
+							 * BouncyCastle verification stuff
+							 *PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
+							 *signer.init(false, adminpk);
+							 *signer.update(encVote, 0,encVote.length);
+							 *boolean goodSign=signer.verifySignature(signedVote);  
+							 */
+							
 							BigInteger e=pk.getPublicExponent();
 							BigInteger n=pk.getModulus();
 							BigInteger sign=new BigInteger(signedVote);

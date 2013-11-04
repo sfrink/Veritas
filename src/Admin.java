@@ -101,11 +101,8 @@ public class Admin {
 								//This needs to be sent from client
 								rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
 								rs.next();
+								byte[] voterpk=rs.getBytes("pk");
 								
-								//again something like RSAKeyParams voterpk=deserialize(rs.getBytes("pk"));
-								//byte[] voterpk=rs.getBytes("pk");
-								
-								/***Needs to be RSAKeyParameters voterpk=deserialize(stuff from network) if not already in database***/
 								PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
 								Signature ver=Signature.getInstance("SHA256WITHRSA");
 								ver.initVerify(pk);
