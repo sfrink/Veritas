@@ -68,7 +68,7 @@ public class Admin {
 			
 		
 			
-							// get the value of username, blindBytes and signedBlind --- also need to get election name
+							    //get the value of username, blindBytes and signedBlind --- also need to get election name
 								String username = new String(bufArray.get(0), "UTF-8");
 								byte[] blindBytes=bufArray.get(1);
 								byte[] signedBlind=bufArray.get(2);

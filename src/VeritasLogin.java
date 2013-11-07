@@ -128,7 +128,6 @@ public class VeritasLogin {
             			//If candidates are input in a form other than c1,c2,c3 (for example, as c1, c2, c3) it breaks the code --
             			//either specify the input form and let it break if it doesn't match, or modify how we get candidates
             			String cand=sc.next();
-            			stmt.execute("INSERT into candidates (election, candidateSet) VALUES ('" + elec +"','" + cand+"')");
             			stmt.execute("ALTER TABLE elections ADD "+elec+" varchar(1)");
             			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; UserID: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
             			//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
@@ -156,17 +155,7 @@ public class VeritasLogin {
         				byteArray.write(candByte);
         				out2.write(byteArray.toByteArray());
         				socket.close();
-            			
-            	
-            			
-            			
-            			RSAKeyPairGenerator r=new RSAKeyPairGenerator();
-            			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
-            			AsymmetricCipherKeyPair keys=r.generateKeyPair();
-            			AsymmetricKeyParameter pkAdmin=keys.getPublic();
-            			AsymmetricKeyParameter skAdmin=keys.getPrivate();
-            			//need to send to server and store this stuff somehow
-            			
+            			            			
             			//testing stuff
             			/*Signature sign=Signature.getInstance("SHA256WITHRSA");
             			sign.initSign(skAdmin);
@@ -174,17 +163,9 @@ public class VeritasLogin {
             			sign.update(tester);
             			//byte[] signed=sign.sign();*/
             			
-            			/************/
-            			//This is how we used to store keys.  Need to adapt to bouncycastle
-            			//pstmt=con2.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
-            			//pstmt.setString(1, elec);
-            			//pstmt.setString(2, pkAdminString);
-            			//pstmt.setString(3, skAdminString);
-            			//pstmt.execute();
-            			/***********/
             			
-            			stmt.execute("create table "+elec+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
-            			stmt.execute("create table "+elec+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
+            			//stmt.execute("create table "+elec+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
+            			//stmt.execute("create table "+elec+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
             			//This was some stuff to test key storage worked correctly
             			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
             			rs=stmt.executeQuery("SELECT pk FROM adminkeys WHERE election='"+elec+"'");
@@ -196,17 +177,16 @@ public class VeritasLogin {
             				boolean good=ver.verify(signed);
             				if(good)
             					System.out.println("key test succeeded");
-            			}
-            					
-            			//pstmt.execute("INSERT INTO adminkeys (election, pk, sk) values ('"+elec+"',"+pkAdminBytes+","+skAdminBytes+");");
+            			}            			
             			
-            			
-            			//add admin key to table
-            			*/
-            		//}  
-            		stmt.execute("create table "+elec+"results (vote varchar(50));");
-            		rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
-
+            			*/ 
+            		
+        				/**Get Usernames from server****/
+        				//stmt.execute("create table "+elec+"results (vote varchar(50));");
+        				//rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
+        	
+        				
+        				
             		int numVoters=0;
         			while(rs.next()) { 
         				userName = rs.getString("usernames");

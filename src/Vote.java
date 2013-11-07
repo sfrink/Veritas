@@ -71,6 +71,8 @@ public class Vote {
 			
 			
 			//Some network stuff to get:
+			/**Receive from admin public key**/
+			
 			RSAKeyParameters adminpk = deserialize(stuffFromAdmin);
 			
 			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
