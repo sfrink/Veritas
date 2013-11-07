@@ -66,7 +66,7 @@ public class settup {
     			stmt.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '0');");
     			
     			ResultSet rs=stmt.executeQuery("SELECT usernames FROM elections WHERE usertype='1'");
-    			
+    			//Send usernames from rs over to veritaslogin
     			
 				}
 		

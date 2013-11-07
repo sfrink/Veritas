@@ -1,8 +1,5 @@
-import java.math.BigInteger;
 import java.net.*;
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,6 +11,7 @@ import java.io.*;
 
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
 
 
@@ -66,42 +64,24 @@ public class Counter {
 					
 							}
 			
-							// get the value of enVote, signedVote and electionname 
+							// get the value of encVote, signedVote and electionname 
 							byte[] encVote=bufArray.get(0);
 							byte[] signedVote=bufArray.get(1);
 							String electionname = new String(bufArray.get(2), "UTF-8");
 							logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
 				
 			                System.out.println("testing2");
-							//Network stuff to get encVote, signedVote and username from voter
 							//Check signature
-							//Signature ver=Signature.getInstance("SHA256WITHRSA");
-							//We need to get the pk from a database table
 							rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
 							rs.next();
-							//RSAKeyParameters adminpk=deserialize(rs.getBytes("pk"));
-							byte[] adminpk=rs.getBytes("pk");
-							RSAPublicKey pk=(RSAPublicKey)(KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk)));
-							//ver.initVerify(pk);
-							//ver.update(encVote);
-							//boolean goodSign=ver.verify(signedVote);
+							RSAKeyParameters adminpk=(RSAKeyParameters)deserialize(rs.getBytes("pk"));
 							
-							/*
-							 * BouncyCastle verification stuff
-							 *PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
-							 *signer.init(false, adminpk);
-							 *signer.update(encVote, 0,encVote.length);
-							 *boolean goodSign=signer.verifySignature(signedVote);  
-							 */
+							//BouncyCastle verification stuff
+							PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
+							signer.init(false, adminpk);
+							signer.update(encVote, 0,encVote.length);
+							boolean goodSign=signer.verifySignature(signedVote); 
 							
-							BigInteger e=pk.getPublicExponent();
-							BigInteger n=pk.getModulus();
-							BigInteger sign=new BigInteger(signedVote);
-							BigInteger enc=new BigInteger(encVote);
-							BigInteger s=sign.modPow(e,n);
-							boolean goodSign=false;
-							if(s.equals(enc))
-								goodSign=true;
 							System.out.println("testing3");
 							if(goodSign){
 								System.out.println("good signature");
@@ -118,9 +98,10 @@ public class Counter {
 							else
 								System.out.println("bad signature");
 							//Do some waiting for all votes
-				//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
+							//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
+							
+							/****When all votes collected, send list of all (nonce, encVote, signedVote) to all Vote clients***/
 				
-				//Once all votes are decrypted, count them up
 							logwrite.close();
 
 					}
@@ -135,4 +116,34 @@ public class Counter {
 			System.out.println(e);
 		}
 	}
+	
+	
+	private static byte[] serialize(Object n) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = null;
+		try {
+			o = new ObjectOutputStream(b);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+        try {
+			o.writeObject(n);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        return b.toByteArray();
+	}
+	
+	
+	
+	
+	
+	
+	
+	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
+        ObjectInputStream o = new ObjectInputStream(b);
+        return o.readObject();
+	}
+	
 }

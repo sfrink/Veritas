@@ -52,20 +52,6 @@ public class VeritasLogin {
                 databaseUsername = rs.getString("username");
                 databasePassword = rs.getString("password");
             }
-            
-            //Old stuff.  Need to use BouncyCastle Version
-            /*KeyPairGenerator genRSA1=KeyPairGenerator.getInstance("RSA");
-			genRSA1.initialize(3072);
-			KeyPair keypair1=genRSA1.genKeyPair();
-			RSAPrivateKey skAdmin1=(RSAPrivateKey)keypair1.getPrivate();
-			RSAPublicKey pkAdmin1=(RSAPublicKey)keypair1.getPublic();
-			byte[] skAdminBytes1=skAdmin1.getEncoded();
-			byte[] pkAdminBytes1=pkAdmin1.getEncoded();
-			pstmt=pstmt=conn.prepareStatement("INSERT INTO voterkeys (username, pk, sk) values (?,?,?);");
-			pstmt.setString(1, name);
-			pstmt.setBytes(2, pkAdminBytes1);
-			pstmt.setBytes(3, skAdminBytes1);
-			pstmt.execute();*/
 
 			
 			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
@@ -80,7 +66,6 @@ public class VeritasLogin {
             rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
             while(rs.next()){
             	if(rs.getString("usertype").equals("1")){
-            		//use voter code
             		rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
         			System.out.println("You are eligible for the following elections:");
         			int numelections=0;
@@ -113,7 +98,6 @@ public class VeritasLogin {
         			}
             	}
             	else{
-            		//Ruinian's supervisor code should go here (in some form)
         			Connection con2=DriverManager.getConnection(url, user, pw);
         			Statement st2=con2.createStatement();
         			

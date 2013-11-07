@@ -74,7 +74,6 @@ public class Counter2 {
 				
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");        
                 SecretKeySpec sk=new SecretKeySpec(key, "AES");
-				//byte[] iv={(byte)0};// = whatever iv the voter sends
 				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
 				dec.init(Cipher.DECRYPT_MODE,sk,new IvParameterSpec(iv));
 				pst=con.prepareStatement("SELECT encVote FROM "+electionname+"votes WHERE nonce=?");
@@ -92,7 +91,8 @@ public class Counter2 {
 					}
 					catch (Exception e){}
 				}
-		
+				/***When all of the results have been put in the table, do the tally and send tally result to all vote clients****/
+
 		}).start();
 	}
 	

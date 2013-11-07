@@ -47,10 +47,7 @@ public class Vote {
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 		
-			//RSAPublicKey pkAdmin;
-			//Need to replace with BC
-			
-			
+			//Need to replace with BC			
 			//System.out.println("testing0");
 
 			//Encrypting vote
@@ -70,10 +67,10 @@ public class Vote {
 			//Replace query with key exchange
 			
 			
-			//Some network stuff to get:
-			/**Receive from admin public key**/
+			//Some network stuff to get pk:
+			/***Admin needs to send adminpk to Vote*/
 			
-			RSAKeyParameters adminpk = deserialize(stuffFromAdmin);
+			RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(stuffFromAdmin);
 			
 			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
 			gen.init(adminpk);
@@ -118,8 +115,6 @@ public class Vote {
 			
 			//Sign blind
 			
-			//These keys should be stored in the database in same way as admin keys
-			
 			rs=st.executeQuery("SELECT sk FROM voterkeys WHERE username='"+username+"'");
 			rs.next();
 			byte[] votersk=rs.getBytes("sk");
@@ -160,7 +155,6 @@ public class Vote {
 			byte[] tmp = new byte[recvMsgSize];			
 			System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 			bufArray.add(tmp);
-			//System.out.println( bufArray.get(0));
 			byte[] blindedSignedVote=bufArray.get(0); //need to unblind
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
@@ -233,14 +227,16 @@ public class Vote {
 				System.out.println("did not verify");
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
-			
-			pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote= (?)");
+			/***List of (nonce,encVote,signedVote) needs to be sent from Counter to Vote***/
+			/*
+			 * Needs to be redone with list sent from Counter--find your nonce, send over with key
+			 * pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote= (?)");
 			pst.setBytes(1,c);
 			rs=pst.executeQuery();
-			rs.next();
-			byte[] nonce=rs.getBytes("nonce");
+			rs.next();*/
+			//byte[] nonce=rs.getBytes("nonce");
 			//System.out.println("testing6");
-			byte[] key=k.getEncoded();
+			//byte[] key=k.getEncoded();
 			
 			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter2");
@@ -269,6 +265,9 @@ public class Vote {
 			int[] tally=new int[candidates.length];
 			logwrite.close();
 
+			/***Counter needs to send tally results to ALL clients - not sure of implementation yet exactly***/
+			/*
+			 * This whole while loop needs to be replaced.  Tally should be done on server side.
 			while(true){
 				rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
 				int count=0;
@@ -295,7 +294,7 @@ public class Vote {
 					System.out.println("The winner was "+candidates[maxindex]+".");
 					System.exit(0);
 				}
-			}
+			}*/
 			
 			
 		}

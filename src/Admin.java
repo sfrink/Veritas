@@ -1,10 +1,7 @@
-import java.math.BigInteger;
 import java.net.*;
 
 
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -96,7 +93,9 @@ public class Admin {
 								//get voter pk from a database
 								//RSAPublicKey voterPK=whatever in database for that user
 								
-								//This needs to be sent from client
+								
+								/*****Vote client sends voter pk to Admin****/
+								
 								rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
 								rs.next();
 								byte[] voterpk=rs.getBytes("pk");
@@ -147,7 +146,8 @@ public class Admin {
 					            pstmt.setBytes(2, blindBytes);
 					            pstmt.setBytes(3, signedBlind);
 					            pstmt.execute();
-								
+								/***When all voters have received signatures from admin, send list of (username, blindBytes, signedBlind) to all voters***/
+
 					            //clntSock.close();
 					
 								logwrite.close();
