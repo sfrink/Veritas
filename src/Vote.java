@@ -68,15 +68,10 @@ public class Vote {
 			//System.out.println("testing1");
 			
 			//Replace query with key exchange
-			//Replace signing with BC
-			/*rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
-			rs.next();
-			byte[] adminpk=rs.getBytes("pk");*/
 			
-			//To-Do: Need to serialize(?) the admin RSAKeyParameters object on server side and send it to voter
-			//Voter de-serializes, gets the adminpk object back
+			
 			//Some network stuff to get:
-			//RSAKeyParameters adminpk = deserialize(stuffFromAdmin);
+			RSAKeyParameters adminpk = deserialize(stuffFromAdmin);
 			
 			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
 			gen.init(adminpk);
@@ -306,4 +301,35 @@ public class Vote {
 			System.out.println(e);
 		}
 	}
+	
+	private static byte[] serialize(Object n) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = null;
+		try {
+			o = new ObjectOutputStream(b);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        try {
+			o.writeObject(n);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return b.toByteArray();
+	}
+	
+	
+	
+	
+	
+	
+	
+	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
+        ObjectInputStream o = new ObjectInputStream(b);
+        return o.readObject();
+	}
+
 }

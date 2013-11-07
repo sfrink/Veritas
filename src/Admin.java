@@ -15,6 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.io.*;
 
+import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+
 public class Admin {
 	
 	public static void main(String[] args){
@@ -73,16 +76,11 @@ public class Admin {
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 								//RSAPrivateKey skAdmin;
 								//System.out.println("testing2");
-		
-								
-								//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
-								//genRSA.initialize(3072);
-								//KeyPair keypair=genRSA.genKeyPair();
 				
 								//This needs to be be BC keys
 								rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
-								//want something like RSAKeyParameters adminsk=deserialize(rs.getBytes("sk"));
+								RSAKeyParameters adminsk=(RSAKeyParameters)deserialize(rs.getBytes("sk"));
 								
 								
 								//OLD STUFF
@@ -116,18 +114,22 @@ public class Admin {
 									eligible=true;
 								//Still need to check election eligibility
 								if(eligible && goodSig){
-												System.out.println("good sig");
-								BigInteger n=skAdmin.getModulus();
-								BigInteger d=skAdmin.getPrivateExponent();
-								BigInteger blinded=new BigInteger(blindBytes);
-								BigInteger s=blinded.modPow(d,n);
-								byte[] signed=s.toByteArray();
-								/*Signature sign=Signature.getInstance("RSA");
-								sign.initSign(skAdmin);
-								sign.update(blindBytes);
-								byte[] signed=sign.sign();*/
-								out.write(signed);
-								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
+									System.out.println("good sig");
+									RSAEngine sign=new RSAEngine();
+									sign.init(true, adminsk);
+									byte[] signed=sign.processBlock(blindBytes, 0, blindBytes.length);
+									
+									/*BigInteger n=skAdmin.getModulus();
+									BigInteger d=skAdmin.getPrivateExponent();
+									BigInteger blinded=new BigInteger(blindBytes);
+									BigInteger s=blinded.modPow(d,n);
+									byte[] signed=s.toByteArray();
+									Signature sign=Signature.getInstance("RSA");
+									sign.initSign(skAdmin);
+									sign.update(blindBytes);
+									byte[] signed=sign.sign();*/
+									out.write(signed);
+									logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 								}
 								//Keep track of how many voters have requested signatures
 								//rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"'");
@@ -160,6 +162,36 @@ public class Admin {
 		catch(Exception e){
 			System.out.println(e);
 		}
+	}
+	
+	private static byte[] serialize(Object n) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = null;
+		try {
+			o = new ObjectOutputStream(b);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        try {
+			o.writeObject(n);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return b.toByteArray();
+	}
+	
+	
+	
+	
+	
+	
+	
+	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
+        ObjectInputStream o = new ObjectInputStream(b);
+        return o.readObject();
 	}
 	
 }
