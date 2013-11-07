@@ -1,4 +1,3 @@
-
 /**
  *
  * @author Zhen Ni
@@ -139,6 +138,27 @@ public class VeritasLogin {
             			//RSAPublicKey pkAdmin=(RSAPublicKey)keypair.getPublic();
             			//byte[] skAdminBytes=skAdmin.getEncoded();
             			//byte[] pkAdminBytes=pkAdmin.getEncoded();
+            			
+            			
+            			
+            			
+            			        
+            			byte[] elecByte=elec.getBytes();
+            			byte[] candByte=cand.getBytes();
+            			Socket socket=new Socket("localhost",8001);
+        				System.out.println("Connected to server of settup");
+        				InputStream in=socket.getInputStream();
+        				OutputStream out2=socket.getOutputStream();
+        				ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+        				byteArray.write(elecByte.length);
+        				byteArray.write(elecByte);
+        				byteArray.write(candByte.length);
+        				byteArray.write(candByte);
+        				out2.write(byteArray.toByteArray());
+        				socket.close();
+            			
+            	
+            			
             			
             			RSAKeyPairGenerator r=new RSAKeyPairGenerator();
             			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
