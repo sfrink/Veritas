@@ -84,15 +84,50 @@ public class Counter2 {
 				byte[] byteVote=dec.doFinal(encVote);
 				String decVote=new String(byteVote);
 				st.execute("INSERT INTO "+electionname+"results (vote) values ('"+decVote+"');");
-			
-			
-			logwrite.close();
+				logwrite.close();
 
+			
+				rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
+				rs.next();
+				int numVoters=Integer.parseInt(rs.getString("numVoters"));
+				System.out.println("testing8");
+				rs=st.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"';");
+				rs.next();
+				System.out.println("testing9");
+				String cand=rs.getString("candidateSet");
+				String[] candidates=cand.split(",");
+				int[] tally=new int[candidates.length];
+				while(true){
+					rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
+					int count=0;
+					while(rs.next()){
+						count++;
 					}
+					if(count==numVoters){
+						rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
+						while(rs.next()){
+							for(int i=0;i<candidates.length;i++){
+								if(rs.getString("vote").equals(candidates[i]))
+									tally[i]++;
+							}
+						}
+						int maxindex=0;
+						int max=0;
+						//String tie=""; We'll want to check for ties somehow
+						for(int i=0;i<tally.length;i++){
+							if(tally[i]>max){
+								maxindex=i;
+								max=tally[i];
+							}
+						}
+						/*****Send candidates[maxindex] to all Vote clients****/
+						System.exit(0);
+					}
+				}
+
+				}
 					catch (Exception e){}
 				}
-				/***When all of the results have been put in the table, do the tally and send tally result to all vote clients****/
-
 		}).start();
 	}
 	
