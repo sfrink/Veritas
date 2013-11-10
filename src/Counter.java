@@ -49,6 +49,7 @@ public class Counter {
 					PreparedStatement pstmt=null;
 					ResultSet rs=null;
 					InputStream in=clntSock.getInputStream();
+					OutputStream out=clntSock.getOutputStream();
 					int recvMsgSize;
 					byte [] receiveBuf=new byte[1280];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
@@ -56,13 +57,17 @@ public class Counter {
 				
 					public void run(){
 						try{
-							for(int j=0;j<=2;j++){	
-								recvMsgSize=in.read(receiveBuf);
-								byte[] tmp = new byte[recvMsgSize];
-								System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
-								bufArray.add(tmp);
-					
+							
+							in.read(receiveBuf);
+							ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
+							ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
+							for (int j = 0; j <= 2; j++) {
+								int tmp = byteArray.read();
+								byte[] tmpArray = new byte[tmp];
+								byteArray.read(tmpArray, 0, tmp);
+								bufArray.add(tmpArray);
 							}
+							
 			
 							// get the value of encVote, signedVote and electionname 
 							byte[] encVote=bufArray.get(0);
@@ -93,7 +98,9 @@ public class Counter {
 			        			pstmt.setBytes(2, encVote);
 			        			pstmt.setBytes(3, signedVote);
 			        			pstmt.execute();
-								
+			        			
+			        			
+			        			
 							}
 							else
 								System.out.println("bad signature");
@@ -102,6 +109,14 @@ public class Counter {
 							
 							/****When all votes collected, send list of all (nonce, encVote, signedVote) to all Vote clients***/
 				
+							byteArray2.write(nonce.length);
+	        				byteArray2.write(nonce);
+	        				byteArray2.write(encVote.length);
+	        				byteArray2.write(encVote);
+	        				byteArray2.write(signedVote);
+	        				byteArray2.write(signedVote);
+	        				out.write(byteArray2.toByteArray());
+			      
 							logwrite.close();
 
 					}
