@@ -148,10 +148,8 @@ public class Vote {
 			byteArray2.write(usernameBytes);
 			byteArray2.write(blindBytes.length);
 			byteArray2.write(blindBytes);
-			byteArray3.write(signedBlind.length);
-			byteArray3.write(signedBlind);
-			byteArray2.write(electionnameBytes.length);
-			byteArray2.write(electionnameBytes);
+			byteArray2.write(signedBlind.length);
+			byteArray2.write(signedBlind);
 			out.write(byteArray2.toByteArray());
 			
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");

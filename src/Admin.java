@@ -61,7 +61,7 @@ public class Admin {
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
 							//receive username, blindbytes, signedBlind and electionname	
-								for (int j = 0; j <= 3; j++) {
+								for (int j = 0; j <= 2; j++) {
 									int tmp = byteArray.read();
 									byte[] tmpArray = new byte[tmp];
 									byteArray.read(tmpArray, 0, tmp);
@@ -73,7 +73,6 @@ public class Admin {
 								String username = new String(bufArray.get(0), "UTF-8");
 								byte[] blindBytes=bufArray.get(1);
 								byte[] signedBlind=bufArray.get(2);
-								electionname=new String(bufArray.get(3), "UTF-8");
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 								//RSAPrivateKey skAdmin;
 								//System.out.println("testing2");
