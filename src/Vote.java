@@ -1,5 +1,6 @@
 import java.math.BigInteger;
 import java.net.*;
+
 import javax.crypto.*;
 
 import org.bouncycastle.crypto.digests.SHA1Digest;
@@ -69,6 +70,19 @@ public class Vote {
 			
 			//Some network stuff to get pk:
 			/***Admin needs to send adminpk to Vote*/
+			Socket socket=new Socket("localhost",33333);
+			System.out.println("Connected to server");
+			InputStream in=socket.getInputStream();
+			OutputStream out=socket.getOutputStream();
+			int request= 1;
+			ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+			byteArray.write(serialize(request).length);
+			out.write(byteArray.toByteArray());
+			byte[] receiveBuf = new byte[4096];
+			in.read(receiveBuf);
+			byte[] adminkey=receiveBuf;
+			
+			
 			
 			RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(stuffFromAdmin);
 			
@@ -132,30 +146,35 @@ public class Vote {
 			byte[] usernameBytes=username.getBytes();
 			byte[] electionnameBytes=electionname.getBytes();
 		
-			Socket socket=new Socket("localhost",33333);
-			System.out.println("Connected to server");
-			InputStream in=socket.getInputStream();
-			OutputStream out=socket.getOutputStream();
-			out.write(usernameBytes);
-			Thread.sleep(100);
-			out.write(blindBytes);
-			Thread.sleep(100);
-			out.write(signedBlind);
-			Thread.sleep(100);
-			out.write(electionnameBytes);
-			Thread.sleep(100);
+			
+
+		
+			ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
+			byteArray2.write(usernameBytes.length);
+			byteArray2.write(usernameBytes);
+			byteArray2.write(blindBytes.length);
+			byteArray2.write(blindBytes);
+			byteArray2.write(electionnameBytes.length);
+			byteArray2.write(electionnameBytes);
+			out.write(byteArray2.toByteArray());
+			
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			//System.out.println("testing3");
 			
 			// receive the signedVote from the admin
-			int recvMsgSize;
+			
+			byte [] receiveBuf2=new byte[128000];
+			in.read(receiveBuf2);
+			byte[] blindedSignedVote= receiveBuf2;
+			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+			/*int recvMsgSize;
 			byte [] receiveBuf=new byte[128000];
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			recvMsgSize=in.read(receiveBuf);
 			byte[] tmp = new byte[recvMsgSize];			
 			System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
 			bufArray.add(tmp);
-			byte[] blindedSignedVote=bufArray.get(0); //need to unblind
+			byte[] blindedSignedVote=bufArray.get(0); */     //need to unblind
 			socket.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
@@ -206,13 +225,16 @@ public class Vote {
 				Socket socket2=new Socket("localhost",8000);
 				System.out.println("Connected to server of the counter");
 				OutputStream out2=socket2.getOutputStream();
-				out2.write(c);
-				Thread.sleep(100);
-				out2.write(signedVote);
-				Thread.sleep(100);
-				out2.write(electionnameBytes);
-				Thread.sleep(100);
+				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
+				byteArray3.write(c.length);
+				byteArray3.write(c);
+				byteArray3.write(signedVote.length);
+				byteArray3.write(signedVote);
+				byteArray3.write(electionnameBytes.length);
+				byteArray3.write(electionnameBytes);
+				out.write(byteArray3.toByteArray());
 				socket2.close();
+
 				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 				//System.out.println("testing5 sig verified");
 				/*Send signedVote along with c to Counting Principal.*/
@@ -228,6 +250,18 @@ public class Vote {
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
 			/***List of (nonce,encVote,signedVote) needs to be sent from Counter to Vote***/
+			
+			in.read(receiveBuf);
+			ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf);
+			for (int j = 0; j <= 1; j++) {
+				int tmp = byteArray4.read();
+				byte[] tmpArray = new byte[tmp];
+				byteArray4.read(tmpArray, 0, tmp);
+				bufArray.add(tmpArray);
+			}
+			byte[] nonce= bufArray.get(0);
+			byte[] encVote= bufArray.get(1);	
+			byte[] signedVote2= bufArray.get(2);	
 			/*
 			 * Needs to be redone with list sent from Counter--find your nonce, send over with key
 			 * pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote= (?)");
@@ -241,14 +275,14 @@ public class Vote {
 			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter2");
 			OutputStream out3=socket3.getOutputStream();
-			out3.write(nonce);
-			Thread.sleep(100);
-			out3.write(key);
-			Thread.sleep(100);
-			out3.write(electionnameBytes);
-			Thread.sleep(100);
-			out3.write(iv);
-			Thread.sleep(100);
+			ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
+			byteArray3.write(nonce.length);
+			byteArray3.write(nonce);
+			byteArray3.write(key.length);
+			byteArray3.write(key);
+			byteArray3.write(iv.length);
+			byteArray3.write(iv);
+			out3.write(byteArray.toByteArray());
 			socket3.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 			//System.out.println("testing7");
