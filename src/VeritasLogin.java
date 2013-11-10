@@ -52,8 +52,10 @@ public class VeritasLogin {
             Connection conn = DriverManager.getConnection(url, user, pw);
             Statement stmt = conn.createStatement();
             PreparedStatement pstmt=null;
-            String query = "SELECT * from users WHERE username='"+name+"'";
-            ResultSet rs = stmt.executeQuery(query);
+            //String query = "SELECT * from users WHERE username='"+name+"'";
+            //ResultSet rs = stmt.executeQuery(query);
+            
+            //Send username to server, server authenticates, sends back yes or no and also send back usertype
             while(rs.next()){                           //Read username & password from database
                 databaseUsername = rs.getString("username");
                 databasePassword = rs.getString("password");
@@ -69,6 +71,7 @@ public class VeritasLogin {
                 out.close();
                 System.exit(0);
             }
+			
             rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
             while(rs.next()){
             	if(rs.getString("usertype").equals("1")){
@@ -87,7 +90,11 @@ public class VeritasLogin {
         			pstmt.setBytes(3, skvoterBytes);
         			pstmt.execute();
         			
-            		rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
+            		
+        			
+        			//rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
+        			//Need to get these election names from server
+        			
         			System.out.println("You are eligible for the following elections:");
         			int numelections=0;
         			while(rs.next()){
@@ -105,7 +112,11 @@ public class VeritasLogin {
         			else{
         				System.out.println("\nPlease type the election name you would like to vote in:");
         				String election=sc.next();
-        				rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+election+"'");
+        				
+        				
+        				//rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+election+"'");
+        				//Need to get candidate set from server
+        				
         				if(rs.next()){
         					System.out.println("Here are the candidates:");
         					String candidates=rs.getString(1);

@@ -70,6 +70,7 @@ public class Counter {
 							
 			
 							// get the value of encVote, signedVote and electionname 
+							//This should eventually be over TOR
 							byte[] encVote=bufArray.get(0);
 							byte[] signedVote=bufArray.get(1);
 							String electionname = new String(bufArray.get(2), "UTF-8");
@@ -98,23 +99,25 @@ public class Counter {
 			        			pstmt.setBytes(2, encVote);
 			        			pstmt.setBytes(3, signedVote);
 			        			pstmt.execute();
-			        			
+			        			byteArray2.write(nonce.length);
+		        				byteArray2.write(nonce);
+		        				byteArray2.write(encVote.length);
+		        				byteArray2.write(encVote);
+		        				byteArray2.write(signedVote);
+		        				byteArray2.write(signedVote);
 			        			
 			        			
 							}
 							else
 								System.out.println("bad signature");
-							//Do some waiting for all votes
-							//when all votes are collected, publish (nonce, encVote, signedVote) somewhere (maybe a publicly readable table)
 							
+							
+							//Do some waiting for all votes
+							//when all votes are collected, publish (nonce, encVote, signedVote) somewhere
+							//Do we need to send whole list back, or just their nonce, encVote, signedVote?
 							/****When all votes collected, send list of all (nonce, encVote, signedVote) to all Vote clients***/
-				
-							byteArray2.write(nonce.length);
-	        				byteArray2.write(nonce);
-	        				byteArray2.write(encVote.length);
-	        				byteArray2.write(encVote);
-	        				byteArray2.write(signedVote);
-	        				byteArray2.write(signedVote);
+							
+							
 	        				out.write(byteArray2.toByteArray());
 			      
 							logwrite.close();

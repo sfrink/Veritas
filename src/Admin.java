@@ -54,7 +54,10 @@ public class Admin {
 					PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));  
 						public void run(){
 							try{
-						// send adminkey			
+						// send adminkey
+								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
+								rs.next();
+								byte[] adminpk=rs.getBytes("pk");
 								in.read(receiveBuf);
 								int request= (Integer)deserialize(receiveBuf);
 								if (request==1){

@@ -9,6 +9,7 @@ import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.RSABlindingFactorGenerator;
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.RSABlindingParameters;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
@@ -74,7 +75,7 @@ public class Vote {
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
 			OutputStream out=socket.getOutputStream();
-			int request= 1;
+			int request=1;
 			ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
 			byteArray.write(serialize(request).length);
 			out.write(byteArray.toByteArray());
@@ -84,10 +85,10 @@ public class Vote {
 			
 			
 			
-			RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(stuffFromAdmin);
+			RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(adminkey);
 			
 			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
-			gen.init(adminpk);
+			genBlind.init(adminpk);
 			BigInteger blindfactor=genBlind.generateBlindingFactor();
 			
 			//Blinding:
@@ -270,7 +271,7 @@ public class Vote {
 			rs.next();*/
 			//byte[] nonce=rs.getBytes("nonce");
 			//System.out.println("testing6");
-			//byte[] key=k.getEncoded();
+			byte[] key=k.getEncoded();
 			
 			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter2");
@@ -343,13 +344,13 @@ public class Vote {
 		try {
 			o = new ObjectOutputStream(b);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e1.printStackTrace();
 		}
         try {
 			o.writeObject(n);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e.printStackTrace();
 		}
         return b.toByteArray();

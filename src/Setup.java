@@ -26,15 +26,12 @@ public class Setup {
             
             
 			int servPort = 8001;
-<<<<<<< HEAD
 			ServerSocket servSock = new ServerSocket(servPort);
 			/***Need to make this an if stmt like in veritas login -- should do one thing if its a voter,
 			 * Something else if its a supervisor
 			 */
-=======
 			final ServerSocket servSock = new ServerSocket(servPort);
 			System.out.print("start");
->>>>>>> bf753a2836b59642d081fdebd70e4ba69d427068
 			while (true) {
 				final Socket clntSock = servSock.accept();
 				SocketAddress clientAddress = clntSock.getRemoteSocketAddress();
@@ -45,7 +42,7 @@ public class Setup {
 				byte[] receiveBuf2 = new byte[4096];
 				InputStream in = clntSock.getInputStream();
 				OutputStream out=clntSock.getOutputStream();
-		// get the username and candidate
+				// get the username and candidate
 				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
 			
