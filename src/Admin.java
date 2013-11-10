@@ -174,30 +174,6 @@ public class Admin {
 		}
 	}
 	
-	private static byte[] serialize(Object n) throws IOException {
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-        ObjectOutputStream o = null;
-		try {
-			o = new ObjectOutputStream(b);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-        try {
-			o.writeObject(n);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return b.toByteArray();
-	}
-	
-	
-	
-	
-	
-	
-	
 	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
 		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
         ObjectInputStream o = new ObjectInputStream(b);
