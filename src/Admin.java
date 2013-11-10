@@ -59,13 +59,7 @@ public class Admin {
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
 								in.read(receiveBuf);
-								int request= (Integer)deserialize(receiveBuf);
-								if (request==1){
-									out.write(adminpk);
-								}
-								else {
-									System.out.println("error: does not receive the request for adminkey");
-								}
+								String electionname=new String(receivebuf, "UTF-8");
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 2; j++) {
 									int tmp = byteArray.read();
