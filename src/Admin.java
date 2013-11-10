@@ -1,6 +1,4 @@
 import java.net.*;
-
-
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
@@ -43,11 +41,12 @@ public class Admin {
 					ResultSet rs=null;
 					int recvMsgSize;
 					byte [] receiveBuf=new byte[1280];
+					byte [] receiveBuf2=new byte[1280];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				  	InputStream in=clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
 					File log=new File("log.txt");
-					
+					ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
 					
 					
 		            java.util.Date date = new java.util.Date();
@@ -55,14 +54,22 @@ public class Admin {
 					PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));  
 						public void run(){
 							try{
-								for(int j=0;j<=3;j++){	
-									recvMsgSize=in.read(receiveBuf);
-									byte[] tmp = new byte[recvMsgSize];
-									System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
-									bufArray.add(tmp);
-					
+						// send adminkey			
+								in.read(receiveBuf);
+								int request= (Integer)deserialize(receiveBuf);
+								if (request==1){
+									out.write(adminpk);
 								}
-			
+								else {
+									System.out.println("error: does not receive the request for adminkey");
+								}
+							//receive username, blindbytes, signedBlind and electionname	
+								for (int j = 0; j <= 2; j++) {
+									int tmp = byteArray.read();
+									byte[] tmpArray = new byte[tmp];
+									byteArray.read(tmpArray, 0, tmp);
+									bufArray.add(tmpArray);
+								}
 		
 			
 							    //get the value of username, blindBytes and signedBlind --- also need to get election name
