@@ -7,17 +7,11 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.RSABlindingEngine;
 import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.RSABlindingFactorGenerator;
-import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.params.RSABlindingParameters;
-import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.signers.PSSSigner;
 
 import java.security.*;
-import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
 import java.security.spec.*;
@@ -336,29 +330,6 @@ public class Vote {
 			System.out.println(e);
 		}
 	}
-	
-	private static byte[] serialize(Object n) throws IOException {
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-        ObjectOutputStream o = null;
-		try {
-			o = new ObjectOutputStream(b);
-		} catch (IOException e1) {
-			// Auto-generated catch block
-			e1.printStackTrace();
-		}
-        try {
-			o.writeObject(n);
-		} catch (IOException e) {
-			// Auto-generated catch block
-			e.printStackTrace();
-		}
-        return b.toByteArray();
-	}
-	
-	
-	
-	
-	
 	
 	
 	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {

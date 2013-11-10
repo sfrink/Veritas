@@ -55,11 +55,11 @@ public class Admin {
 						public void run(){
 							try{
 						// send adminkey
+								in.read(receiveBuf);
+								String electionname=new String(receiveBuf, "UTF-8");
 								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
-								in.read(receiveBuf);
-								String electionname=new String(receivebuf, "UTF-8");
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 2; j++) {
 									int tmp = byteArray.read();
@@ -73,7 +73,7 @@ public class Admin {
 								String username = new String(bufArray.get(0), "UTF-8");
 								byte[] blindBytes=bufArray.get(1);
 								byte[] signedBlind=bufArray.get(2);
-								String electionname=new String(bufArray.get(3), "UTF-8");
+								electionname=new String(bufArray.get(3), "UTF-8");
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 								//RSAPrivateKey skAdmin;
 								//System.out.println("testing2");
