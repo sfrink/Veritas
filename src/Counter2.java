@@ -46,7 +46,6 @@ public class Counter2 {
 				new Thread(new Runnable() {
 				PreparedStatement pst=null;
 				ResultSet rs=null;	
-				int recvMsgSize;
 				byte [] receiveBuf=new byte[1280];
 				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				InputStream in=clntSock.getInputStream();
@@ -56,15 +55,15 @@ public class Counter2 {
 				PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
 				public void run(){
 					try{
-						
+						in.read(receiveBuf);
+						ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
+						for (int j = 0; j <= 3; j++) {
+							int tmp = byteArray.read();
+							byte[] tmpArray = new byte[tmp];
+							byteArray.read(tmpArray, 0, tmp);
+							bufArray.add(tmpArray);
+						}		
 					
-				for(int j=0;j<=3;j++){	
-					recvMsgSize=in.read(receiveBuf);
-					byte[] tmp = new byte[recvMsgSize];
-					System.arraycopy(receiveBuf, 0, tmp, 0, recvMsgSize);
-					bufArray.add(tmp);
-					
-				}
 				
 				
 				byte[] nonce=bufArray.get(0);

@@ -3,7 +3,9 @@
  * @author Zhen Ni
  */
 import java.security.spec.*;
+
 import javax.crypto.*;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -13,12 +15,15 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+
 import java.math.BigInteger;
+import java.net.Socket;
 import java.security.SecureRandom;
 
 public class VeritasLogin {
@@ -128,7 +133,25 @@ public class VeritasLogin {
             			//If candidates are input in a form other than c1,c2,c3 (for example, as c1, c2, c3) it breaks the code --
             			//either specify the input form and let it break if it doesn't match, or modify how we get candidates
             			String cand=sc.next();
-            			stmt.execute("ALTER TABLE elections ADD "+elec+" varchar(1)");
+            			
+            			
+            			
+            			
+            			Socket socket=new Socket("localhost",8001);
+            			InputStream in=socket.getInputStream();
+        				OutputStream out2=socket.getOutputStream();
+            	
+            			byte[] elecByte=elec.getBytes();
+            			byte[] candByte=cand.getBytes();
+            			System.out.println("Connected to server of settup");
+        				ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+        				byteArray.write(elecByte.length);
+        				byteArray.write(elecByte);
+        				byteArray.write(candByte.length);
+        				byteArray.write(candByte);
+        				out2.write(byteArray.toByteArray());
+            			
+
             			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; UserID: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
             			//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
             			//genRSA.initialize(3072);
@@ -140,21 +163,8 @@ public class VeritasLogin {
             			
             			
             			
-            			
-            			        
-            			byte[] elecByte=elec.getBytes();
-            			byte[] candByte=cand.getBytes();
-            			Socket socket=new Socket("localhost",8001);
-        				System.out.println("Connected to server of settup");
-        				InputStream in=socket.getInputStream();
-        				OutputStream out2=socket.getOutputStream();
-        				ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-        				byteArray.write(elecByte.length);
-        				byteArray.write(elecByte);
-        				byteArray.write(candByte.length);
-        				byteArray.write(candByte);
-        				out2.write(byteArray.toByteArray());
-        				socket.close();
+            	
+        		
             			            			
             			//testing stuff
             			/*Signature sign=Signature.getInstance("SHA256WITHRSA");
@@ -182,11 +192,43 @@ public class VeritasLogin {
             			*/ 
             		
         				/**Get Usernames from server****/
+        				byte[] receiveBuf = new byte[4096];
+        				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+        				in.read(receiveBuf);
+        				ByteArrayInputStream byteArray2 = new ByteArrayInputStream(receiveBuf);
+        				for (int j = 0; j <= 100; j++) {
+        					int tmp = byteArray2.read();
+        					byte[] tmpArray = new byte[tmp];
+        					byteArray2.read(tmpArray, 0, tmp);
+        					bufArray.add(tmpArray);
+        				}
+        				// get the credential and send to the server
+        				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
+        				int numVoters=0;
+        				byte[] m=bufArray.get(0);	
+    					int count= (Integer)deserialize(m);
+        				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
+        				for(int i=1; i<=count;i++){
+        					System.out.println(bufArray.get(i));
+        					authorize = sc.next();
+            				if(authorize.equals("1")){
+            					numVoters++;
+            					//out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
+            					
+            				}
+            					  byte[] authorizeByte=authorize.getBytes();
+            	  				  byteArray3.write(authorizeByte.length);
+            	  				  byteArray3.write(authorizeByte);
+            					
+        				}
+        				
+        				out2.write(byteArray3.toByteArray());;
+        
         				//stmt.execute("create table "+elec+"results (vote varchar(50));");
         				//rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
         	
         				
-        				
+        		/*		
             		int numVoters=0;
         			while(rs.next()) { 
         				userName = rs.getString("usernames");
@@ -196,9 +238,9 @@ public class VeritasLogin {
         				if(authorize.equals("1")){
         					numVoters++;
         					out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
-        				}
+        				} 
         				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
-        			}
+        			}*/
 					st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
             	}
             	out.close();
@@ -208,4 +250,10 @@ public class VeritasLogin {
             System.out.println(e+"  Authentication failed");
         }
     }       //end main
+
+	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
+        ObjectInputStream o = new ObjectInputStream(b);
+        return o.readObject();
+	}
 }       //end class
