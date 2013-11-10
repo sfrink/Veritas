@@ -75,10 +75,9 @@ public class Vote {
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
 			OutputStream out=socket.getOutputStream();
-			int request=1;
-			ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-			byteArray.write(serialize(request).length);
-			out.write(byteArray.toByteArray());
+			byte[] electionnameByte=electionname.getBytes();
+			out.write(electionnameByte);
+		
 			byte[] receiveBuf = new byte[4096];
 			in.read(receiveBuf);
 			byte[] adminkey=receiveBuf;
