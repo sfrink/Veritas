@@ -1,5 +1,6 @@
 import java.net.*;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -60,6 +61,9 @@ public class Admin {
 								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
+								/***need to actually send this****/
+								
+								
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 2; j++) {
 									int tmp = byteArray.read();
@@ -80,21 +84,7 @@ public class Admin {
 								//This needs to be be BC keys
 								rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
-								RSAKeyParameters adminsk=(RSAKeyParameters)deserialize(rs.getBytes("sk"));
-								
-								
-								//OLD STUFF
-								//byte[] adminsk=rs.getBytes("sk");
-								//skAdmin=(RSAPrivateKey)(KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(adminsk)));
-								//System.out.println("testing3");
-								//
-				
-								//get blinded message m, signature s of m, and username
-								//check that the user is eligible for this election -- database query
-								//check that user has not already asked for signature -- some storage???
-								//Check signature of the blinded message
-								//get voter pk from a database
-								//RSAPublicKey voterPK=whatever in database for that user
+								byte[] adminsk=rs.getBytes("sk");
 								
 								
 								/*****Vote client sends voter pk to Admin****/
@@ -102,12 +92,9 @@ public class Admin {
 								rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
 								rs.next();
 								byte[] voterpk=rs.getBytes("pk");
+								boolean goodSig=verify(voterpk, blindBytes, signedBlind);
 								
-								PublicKey pk=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
-								Signature ver=Signature.getInstance("SHA256WITHRSA");
-								ver.initVerify(pk);
-								ver.update(blindBytes);
-								boolean goodSig=ver.verify(signedBlind);
+								
 								boolean eligible=false;
 								rs=st.executeQuery("SELECT "+electionname+" FROM elections WHERE usernames='"+username+"';");
 								rs.next();
@@ -117,19 +104,7 @@ public class Admin {
 								//Still need to check election eligibility
 								if(eligible && goodSig){
 									System.out.println("good sig");
-									RSAEngine sign=new RSAEngine();
-									sign.init(true, adminsk);
-									byte[] signed=sign.processBlock(blindBytes, 0, blindBytes.length);
-									
-									/*BigInteger n=skAdmin.getModulus();
-									BigInteger d=skAdmin.getPrivateExponent();
-									BigInteger blinded=new BigInteger(blindBytes);
-									BigInteger s=blinded.modPow(d,n);
-									byte[] signed=s.toByteArray();
-									Signature sign=Signature.getInstance("RSA");
-									sign.initSign(skAdmin);
-									sign.update(blindBytes);
-									byte[] signed=sign.sign();*/
+									byte[] signed=sign(adminsk, blindBytes);
 									out.write(signed);
 									logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 								}
@@ -165,6 +140,22 @@ public class Admin {
 		catch(Exception e){
 			System.out.println(e);
 		}
+	}
+	
+	private static byte[] sign(byte[] sk, byte[] message) throws IOException, ClassNotFoundException{
+		RSAKeyParameters adminsk=(RSAKeyParameters)deserialize(sk);
+		RSAEngine sign=new RSAEngine();
+		sign.init(true, adminsk);
+		return sign.processBlock(message, 0, message.length);
+
+	}
+	
+	private static boolean verify(byte[] pk, byte[] message, byte[] sig) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException{
+		PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(pk));
+		Signature ver=Signature.getInstance("SHA256WITHRSA");
+		ver.initVerify(PK);
+		ver.update(message);
+		return ver.verify(sig);
 	}
 	
 	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
