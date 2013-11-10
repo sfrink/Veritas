@@ -61,7 +61,7 @@ public class Admin {
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
 							//receive username, blindbytes, signedBlind and electionname	
-								for (int j = 0; j <= 2; j++) {
+								for (int j = 0; j <= 3; j++) {
 									int tmp = byteArray.read();
 									byte[] tmpArray = new byte[tmp];
 									byteArray.read(tmpArray, 0, tmp);
