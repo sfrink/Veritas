@@ -15,7 +15,7 @@ import java.sql.*;
 
 public class Setup {
 
-	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, SQLException, UnsupportedEncodingException{
 
 		try{
 			String url="jdbc:mysql://localhost:3306/Server";
@@ -26,7 +26,6 @@ public class Setup {
             
             
 			int servPort = 8001;
-			ServerSocket servSock = new ServerSocket(servPort);
 			/***Need to make this an if stmt like in veritas login -- should do one thing if its a voter,
 			 * Something else if its a supervisor
 			 */
@@ -61,7 +60,7 @@ public class Setup {
 				stmt.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
 				stmt.execute("create table "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
     			stmt.execute("create table "+electionname+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
-        		stmt.execute("create table "+elec+"results (vote varchar(50));");
+        		stmt.execute("create table "+electionname+"results (vote varchar(50));");
 
     			
 				//send usernames to the client
@@ -100,36 +99,35 @@ public class Setup {
 					
 				}
 				
-			}
-		}).start();
+				}	
+				}).start();
 				
 				
 	  
-  }
+			}
  		
- }
-}
+		}
+		catch(Exception e){
+			System.out.println(e);
+		}
+	}
+	
+	
 	private static byte[] serialize(Object n) throws IOException {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
         ObjectOutputStream o = null;
 		try {
 			o = new ObjectOutputStream(b);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
         try {
 			o.writeObject(n);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         return b.toByteArray();
 	}
-	
-	
-	
-	
 	
 	
 	
