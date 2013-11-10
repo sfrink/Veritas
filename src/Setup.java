@@ -80,7 +80,7 @@ public class Setup {
   				 out.write(byteArray2.toByteArray());
 				
   				 
-  				 // get the credential from the client:
+  				 // get the authorized users from the client:
   				in.read(receiveBuf2);
 				ByteArrayInputStream byteArray3 = new ByteArrayInputStream(receiveBuf2);
 				for (int j = 0; j <count; j++) {
@@ -89,11 +89,13 @@ public class Setup {
 					byteArray3.read(tmpArray, 0, tmp);
 					bufArray2.add(tmpArray);
 				}
+				
+ 				 // update the database using the authorized list:  
 				for(int i=0;i<count;i++){
-					int cred=(Integer)deserialize(bufArray2.get(i));
+					String user=new String (bufArray2.get(i));
+					stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE username='"+user+"'");
 					
 				}
-  				 // update the database using the credential:  
 				
 			}
 		}).start();

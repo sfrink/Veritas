@@ -3,6 +3,8 @@ import java.net.*;
 
 import javax.crypto.*;
 
+import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.RSABlindingEngine;
 import org.bouncycastle.crypto.engines.RSAEngine;
@@ -43,7 +45,6 @@ public class Vote {
 			con=DriverManager.getConnection(url, user, pw);
 			st=con.createStatement();
 		
-			//Need to replace with BC			
 			//System.out.println("testing0");
 
 			//Encrypting vote
@@ -58,13 +59,9 @@ public class Vote {
 			byte[] c=enc.doFinal(vote);
 			//Blinding key setup
 			
-			//System.out.println("testing1");
-			
-			//Replace query with key exchange
-			
+			//System.out.println("testing1");			
 			
 			//Some network stuff to get pk:
-			/***Admin needs to send adminpk to Vote*/
 			Socket socket=new Socket("localhost",33333);
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
@@ -76,65 +73,18 @@ public class Vote {
 			in.read(receiveBuf);
 			byte[] adminkey=receiveBuf;
 			
+			BigInteger blindFactor=getBlindingFactor(adminkey);
 			
-			
-			RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(adminkey);
-			
-			RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
-			genBlind.init(adminpk);
-			BigInteger blindfactor=genBlind.generateBlindingFactor();
-			
-			//Blinding:
-			RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindfactor);
-			RSABlindingEngine eng=new RSABlindingEngine();
-			PSSSigner blinder=new PSSSigner(eng, new SHA1Digest(), 20);
-			
-			blinder.init(true, blindParams);
-			blinder.update(c, 0, c.length);
-			byte[] blindBytes=blinder.generateSignature();
-			
-			
-			//needs to all be BC
-			/*  OLD STUFF
-			PublicKey pubkey=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(adminpk));
-			pkAdmin=(RSAPublicKey)pubkey;
-			BigInteger n=pkAdmin.getModulus();
-			BigInteger e=pkAdmin.getPublicExponent();
-			BigInteger ct=new BigInteger(c);
-			SecureRandom rand=new SecureRandom();
-			byte[] random=new byte[10];
-			BigInteger r=null;
-			BigInteger gcd=null;
-			BigInteger one=new BigInteger("1");
-			do{
-				rand.nextBytes(random);
-				r=new BigInteger(1,random);
-				gcd=r.gcd(n);
-			}
-			while(!gcd.equals(one) || r.compareTo(n)>=0 || r.compareTo(one)<=0);
-			
-			//System.out.println("testing2");
-
-			//Blinding
-			BigInteger blind=((r.modPow(e,n)).multiply(ct)).mod(n);
-			byte[] blindBytes=blind.toByteArray();
-			*/
+			//Blind encrypted vote:
+			byte[] blindBytes=blind(c, adminkey, blindFactor);
 			
 			
 			//Sign blind
-			
 			rs=st.executeQuery("SELECT sk FROM voterkeys WHERE username='"+username+"'");
 			rs.next();
 			byte[] votersk=rs.getBytes("sk");
-			PrivateKey sk=KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(votersk));
-			
-			
-			//System.out.println("testing3");
+			byte[] signedBlind=signBlind(blindBytes, votersk);
 
-			Signature sign=Signature.getInstance("SHA256WITHRSA");
-			sign.initSign(sk);
-			sign.update(blindBytes);
-			byte[] signedBlind=sign.sign();
 			
 			//Send username, signedBlind and blindBytes, and electionname to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
@@ -173,47 +123,11 @@ public class Vote {
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
 			
 			//unblind
-			eng=new RSABlindingEngine();
-			eng.init(false, blindParams);
-			byte[] signedVote=eng.processBlock(blindedSignedVote, 0, blindedSignedVote.length);
+			byte[] signedVote=unblind(blindedSignedVote, blindFactor, adminkey);
 			
 			//verify
-			PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
-			signer.init(false, adminpk);
-			signer.update(c, 0,c.length);
-			boolean good=signer.verifySignature(signedVote);
+			boolean good=verify(adminkey, c, signedVote);
 			
-			
-			
-			
-			//NEED TO VERIFY USING BC KEYS
-			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
-			ver.initVerify(pkAdmin);
-			ver.update(blindBytes);
-			boolean good=ver.verify(blindedSignedVote);
-			if(good)
-				System.out.println("blinded verified");*/
-			
-			//Need to unblind the returned signature
-			/*BigInteger blindsignature=new BigInteger(blindedSignedVote);
-			BigInteger s=r.modInverse(n).multiply(blindsignature).mod(n);
-			//s will be the signature of c, the encrypted vote with no blind.  Convert it to bytes.
-			BigInteger orig=s.modPow(e, n);
-			//byte[] origBytes=orig.toByteArray();
-			byte[] signedVote=s.toByteArray();
-			BigInteger cipher=new BigInteger(c);
-			//Check that signedVote is a valid signature of c
-			/*Signature ver=Signature.getInstance("SHA256WITHRSA");
-			ver.initVerify(pkAdmin);
-			ver.update(c);
-			boolean good=ver.verify(signedVote);
-			boolean good=false;
-			if(orig.equals(cipher)){
-				//System.out.println("good signature");
-				good=true;
-			}*/
-			
-			//System.out.println("testing4");
 			if(good){
 				
 				Socket socket2=new Socket("localhost",8000);
@@ -331,7 +245,50 @@ public class Vote {
 			System.out.println(e);
 		}
 	}
+	private static boolean verify(byte[] pk, byte[] message, byte[] sig) throws IOException, ClassNotFoundException{
+		PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
+		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+		signer.init(false, adminpk);
+		signer.update(message, 0,message.length);
+		return signer.verifySignature(sig);
+	}
 	
+	private static byte[] unblind(byte[] blindedMessage, BigInteger blindFactor, byte[] pk) throws IOException, ClassNotFoundException{
+		RSABlindingEngine eng=new RSABlindingEngine();
+		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+
+		RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindFactor);
+		eng.init(false, blindParams);
+		return eng.processBlock(blindedMessage, 0, blindedMessage.length);
+	}
+	
+	private static BigInteger getBlindingFactor(byte[] pk) throws IOException, ClassNotFoundException{
+		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+		
+		RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
+		genBlind.init(adminpk);
+		return genBlind.generateBlindingFactor();
+	}
+	
+	private static byte[] blind(byte[] message, byte[] pk, BigInteger blindFactor) throws IOException, ClassNotFoundException, DataLengthException, CryptoException{
+		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+		
+		RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindFactor);
+		RSABlindingEngine eng=new RSABlindingEngine();
+		PSSSigner blinder=new PSSSigner(eng, new SHA1Digest(), 20);
+		
+		blinder.init(true, blindParams);
+		blinder.update(message, 0, message.length);
+		return blinder.generateSignature();
+	}
+	
+	private static byte[] signBlind(byte[] blind, byte[] sk) throws InvalidKeySpecException, NoSuchAlgorithmException, InvalidKeyException, SignatureException{
+		PrivateKey SK=KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(sk));
+		Signature sign=Signature.getInstance("SHA256WITHRSA");
+		sign.initSign(SK);
+		sign.update(blind);
+		return 	sign.sign();
+	}
 	
 	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
 		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
