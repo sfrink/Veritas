@@ -42,6 +42,53 @@ public class VeritasLogin {
             String databaseUsername = "";
             String databasePassword = "";
             
+            System.out.println("Please make your choice:\n");
+            System.out.println("A. Create a new account\n");
+            System.out.println("B. Sign in with existing account\n");
+            String choice = sc.next();
+            
+            if(choice == "A" || choice == "a"){				//Create new account
+            	/*----Need to connect to the server----*/
+            	System.out.println("Please set up your username:\n");
+            	String c_name = sc.next();
+            	System.out.println("Please set up your password:\n");
+            	String c_pwd = sc.next();
+            	/*----Send c_name and c_pwd to the server----*/
+            	/*----Receive notification from the server----*/
+            	System.out.println("Your account has been successfully created!\n");
+            	
+        		/*Assign pk, sk to new user*/
+            	KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
+    			genRSA.initialize(3072);
+    			KeyPair keypair=genRSA.genKeyPair();
+    			RSAPrivateKey skvoter=(RSAPrivateKey)keypair.getPrivate();
+    			RSAPublicKey pkvoter=(RSAPublicKey)keypair.getPublic();
+    			byte[] skvoterBytes=skvoter.getEncoded();
+    			byte[] pkvoterBytes=pkvoter.getEncoded();
+    			
+            	/*Add username, pk, sk to the client-side database*/    			
+    			String url="jdbc:mysql://localhost:3306/Client";
+    			String user="root";
+    			String pw="";
+    			try{
+    				Class.forName("com.mysql.jdbc.Driver");
+    			}
+    			catch(Exception e){
+    				System.out.println(e);
+    			}
+    			try{
+    				Connection con=DriverManager.getConnection(url, user, pw);
+    				PreparedStatement st=con.prepareStatement("INSERT INTO voterkey (username, pk, sk) VALUES (?,?,?);");
+    				st.setString(1,c_name);
+    				st.setBytes(2, pkvoterBytes);
+    				st.setBytes(3, skvoterBytes);
+    				System.out.println("USER INFO ADDED TO THE DATABASE\n");
+    			}
+    			catch(Exception e){
+    				System.out.println(e);
+    			}
+            }			//End creating new account
+            
             System.out.println("Enter Username: ");         //Input Username
             String name = sc.next();
             System.out.println("Enter Password: ");         //Input Password
@@ -57,21 +104,21 @@ public class VeritasLogin {
             //ResultSet rs = stmt.executeQuery(query);
             
             //Send username and password to server, server authenticates, sends back yes or no and also send back usertype
-            while(rs.next()){                           //Read username & password from database
-                databaseUsername = rs.getString("username");
-                databasePassword = rs.getString("password");
-            }
+//            while(rs.next()){                           //Read username & password from database
+//                databaseUsername = rs.getString("username");
+//                databasePassword = rs.getString("password");
+//            }
 
 			
-			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
-                System.out.println("Successful Login!\n----");
-                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Successful Login\n");
-            } else {
-                System.out.println("Incorrect Username or Password!\n----");
-                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
-                out.close();
-                System.exit(0);
-            }
+//			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
+//                System.out.println("Successful Login!\n----");
+//                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Successful Login\n");
+//            } else {
+//                System.out.println("Incorrect Username or Password!\n----");
+//                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
+//                out.close();
+//                System.exit(0);
+//            }
 			
             //rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
 			//Get from server
