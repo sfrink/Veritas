@@ -59,8 +59,11 @@ public class Setup {
 				String cand=new String(bufArray.get(1), "UTF-8");
 				//add electionname and cand to database
 				stmt.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
-				
-				
+				stmt.execute("create table "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
+    			stmt.execute("create table "+electionname+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
+        		stmt.execute("create table "+elec+"results (vote varchar(50));");
+
+    			
 				//send usernames to the client
 				 ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
         		 ResultSet rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
