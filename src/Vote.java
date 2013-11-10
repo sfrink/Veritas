@@ -148,6 +148,8 @@ public class Vote {
 			byteArray2.write(usernameBytes);
 			byteArray2.write(blindBytes.length);
 			byteArray2.write(blindBytes);
+			byteArray3.write(signedBlind.length);
+			byteArray3.write(signedBlind);
 			byteArray2.write(electionnameBytes.length);
 			byteArray2.write(electionnameBytes);
 			out.write(byteArray2.toByteArray());
@@ -224,8 +226,7 @@ public class Vote {
 				byteArray3.write(c);
 				byteArray3.write(signedVote.length);
 				byteArray3.write(signedVote);
-				byteArray3.write(signedBlind.length);
-				byteArray3.write(signedBlind);
+				
 				byteArray3.write(electionnameBytes.length);
 				byteArray3.write(electionnameBytes);
 				out.write(byteArray3.toByteArray());
