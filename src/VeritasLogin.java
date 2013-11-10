@@ -52,6 +52,7 @@ public class VeritasLogin {
             Connection conn = DriverManager.getConnection(url, user, pw);
             Statement stmt = conn.createStatement();
             PreparedStatement pstmt=null;
+            ResultSet rs=null;
             //String query = "SELECT * from users WHERE username='"+name+"'";
             //ResultSet rs = stmt.executeQuery(query);
             
@@ -222,12 +223,12 @@ public class VeritasLogin {
     					int count= (Integer)deserialize(m);
         				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
         				for(int i=1; i<=count;i++){
-        					String user=new String(bufArray.get(i));
-        					System.out.println(user);
+        					String nextuser=new String(bufArray.get(i));
+        					System.out.println(nextuser);
         					authorize = sc.next();
             				if(authorize.equals("1")){
             					numVoters++;
-            					//send user;
+            					//send nextuser;
             					//out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
             					
             				}

@@ -132,7 +132,6 @@ public class Vote {
 				
 				Socket socket2=new Socket("localhost",8000);
 				System.out.println("Connected to server of the counter");
-				OutputStream out2=socket2.getOutputStream();
 				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
 				byteArray3.write(c.length);
 				byteArray3.write(c);

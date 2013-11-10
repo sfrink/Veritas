@@ -120,6 +120,11 @@ public class Counter2 {
 							}
 						}
 						/*****Send candidates[maxindex] to all Vote clients****/
+						
+						
+						st.execute("DROP TABLE "+electionname);
+						st.execute("DROP TABLE "+electionname+"votes");
+						st.execute("DROP TABLE "+electionname+"results");
 						System.exit(0);
 					}
 				}
