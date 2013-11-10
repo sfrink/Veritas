@@ -288,7 +288,7 @@ public class Vote {
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 			//System.out.println("testing7");
 			
-			rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
+			/*rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
 			rs.next();
 			int numVoters=Integer.parseInt(rs.getString("numVoters"));
 			System.out.println("testing8");
@@ -298,7 +298,7 @@ public class Vote {
 			String cand=rs.getString("candidateSet");
 			String[] candidates=cand.split(",");
 			int[] tally=new int[candidates.length];
-			logwrite.close();
+			logwrite.close();*/
 
 			/***Counter needs to send tally results to ALL clients - not sure of implementation yet exactly***/
 			/*
