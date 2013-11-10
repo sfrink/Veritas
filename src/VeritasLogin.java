@@ -103,21 +103,21 @@ public class VeritasLogin {
             //ResultSet rs = stmt.executeQuery(query);
             
             //Send username and password to server, server authenticates, sends back yes or no and also send back usertype
-            while(rs.next()){                           //Read username & password from database
-                databaseUsername = rs.getString("username");
-                databasePassword = rs.getString("password");
-            }
+//            while(rs.next()){                           //Read username & password from database
+//                databaseUsername = rs.getString("username");
+//                databasePassword = rs.getString("password");
+//            }
 
 			
-			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
-                System.out.println("Successful Login!\n----");
-                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Successful Login\n");
-            } else {
-                System.out.println("Incorrect Username or Password!\n----");
-                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
-                out.close();
-                System.exit(0);
-            }
+//			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
+//                System.out.println("Successful Login!\n----");
+//                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Successful Login\n");
+//            } else {
+//                System.out.println("Incorrect Username or Password!\n----");
+//                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
+//                out.close();
+//                System.exit(0);
+//            }
 			
             //rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
 			//Get from server
