@@ -120,7 +120,7 @@ public class Vote {
 			bufArray.add(tmp);
 			byte[] blindedSignedVote=bufArray.get(0); */     //need to unblind
 			socket.close();
-			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received  signed blind from Admin\n");
+			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received signed blind from Admin\n");
 			
 			//unblind
 			byte[] signedVote=unblind(blindedSignedVote, blindFactor, adminkey);

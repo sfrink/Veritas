@@ -173,7 +173,7 @@ public class VeritasLogin {
         				}
         				System.out.println("Please enter the candidate of your choice:");
         				String choice=sc.next();
-        				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserID: "+name+"; Password: "+password+"; Description: Vote cast for "+choice+"\n");
+        				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				Vote voter=new Vote();
         				voter.vote(choice, name, election);
         			}
@@ -212,7 +212,7 @@ public class VeritasLogin {
         				out2.write(byteArray.toByteArray());
             			
 
-            			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; UserID: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
+            			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; Username: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
             			//KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
             			//genRSA.initialize(3072);
             			//KeyPair keypair=genRSA.genKeyPair();

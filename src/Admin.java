@@ -55,7 +55,7 @@ public class Admin {
 					PrintWriter logwrite =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));  
 						public void run(){
 							try{
-						// send adminkey
+								// send adminkey
 								in.read(receiveBuf);
 								String electionname=new String(receiveBuf, "UTF-8");
 								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
