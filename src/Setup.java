@@ -71,10 +71,10 @@ public class Setup {
         		 byteArray2.write(serialize(count).length);
  				 byteArray2.write(serialize(count)); 
     			 while(rs.next()) { 
-    			  String userName = rs.getString("usernames");
-    			  byte[] userNamebyte=userName.getBytes();
-  				  byteArray2.write(userNamebyte.length);
-  				  byteArray2.write(userNamebyte);
+    				 String userName = rs.getString("usernames");
+    				 byte[] userNamebyte=userName.getBytes();
+    				 byteArray2.write(userNamebyte.length);
+    				 byteArray2.write(userNamebyte);
   				  
     			 }
   				 out.write(byteArray2.toByteArray());
@@ -88,6 +88,10 @@ public class Setup {
 					byte[] tmpArray = new byte[tmp];
 					byteArray3.read(tmpArray, 0, tmp);
 					bufArray2.add(tmpArray);
+				}
+				for(int i=0;i<count;i++){
+					int cred=(Integer)deserialize(bufArray2.get(i));
+					
 				}
   				 // update the database using the credential:  
 				

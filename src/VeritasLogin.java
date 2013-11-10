@@ -55,7 +55,7 @@ public class VeritasLogin {
             //String query = "SELECT * from users WHERE username='"+name+"'";
             //ResultSet rs = stmt.executeQuery(query);
             
-            //Send username to server, server authenticates, sends back yes or no and also send back usertype
+            //Send username and password to server, server authenticates, sends back yes or no and also send back usertype
             while(rs.next()){                           //Read username & password from database
                 databaseUsername = rs.getString("username");
                 databasePassword = rs.getString("password");
@@ -72,7 +72,8 @@ public class VeritasLogin {
                 System.exit(0);
             }
 			
-            rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
+            //rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
+			//Get from server
             while(rs.next()){
             	if(rs.getString("usertype").equals("1")){
             		
@@ -154,7 +155,7 @@ public class VeritasLogin {
             	
             			byte[] elecByte=elec.getBytes();
             			byte[] candByte=cand.getBytes();
-            			System.out.println("Connected to server of settup");
+            			System.out.println("Connected to server of setup");
         				ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
         				byteArray.write(elecByte.length);
         				byteArray.write(elecByte);
@@ -171,6 +172,7 @@ public class VeritasLogin {
             			//RSAPublicKey pkAdmin=(RSAPublicKey)keypair.getPublic();
             			//byte[] skAdminBytes=skAdmin.getEncoded();
             			//byte[] pkAdminBytes=pkAdmin.getEncoded();
+            			 
             			
             			
             			
@@ -220,16 +222,18 @@ public class VeritasLogin {
     					int count= (Integer)deserialize(m);
         				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
         				for(int i=1; i<=count;i++){
-        					System.out.println(bufArray.get(i));
+        					String user=new String(bufArray.get(i));
+        					System.out.println(user);
         					authorize = sc.next();
             				if(authorize.equals("1")){
             					numVoters++;
+            					//send user;
             					//out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
             					
             				}
-            					  byte[] authorizeByte=authorize.getBytes();
+            					  /*byte[] authorizeByte=authorize.getBytes();
             	  				  byteArray3.write(authorizeByte.length);
-            	  				  byteArray3.write(authorizeByte);
+            	  				  byteArray3.write(authorizeByte);*/
             					
         				}
         				
@@ -252,7 +256,7 @@ public class VeritasLogin {
         				} 
         				st2.executeUpdate("UPDATE elections SET "+elec+" = " + authorize + " WHERE usernames = '" + userName + "'");
         			}*/
-					st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
+					//st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
             	}
             	out.close();
             }

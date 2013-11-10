@@ -248,7 +248,7 @@ public class Vote {
 			
 			in.read(receiveBuf);
 			ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf);
-			for (int j = 0; j <= 1; j++) {
+			for (int j = 0; j <= 2; j++) {
 				int tmp = byteArray4.read();
 				byte[] tmpArray = new byte[tmp];
 				byteArray4.read(tmpArray, 0, tmp);
