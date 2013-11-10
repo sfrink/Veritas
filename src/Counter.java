@@ -94,11 +94,11 @@ public class Counter {
 								SecureRandom rand=new SecureRandom();
 								byte[] nonce=new byte[20];
 								rand.nextBytes(nonce);
-								pstmt=con.prepareStatement("INSERT INTO "+electionname+"votes (nonce, encVote , signedVote) values (?,?,?);");
-			        			pstmt.setBytes(1,nonce);
-			        			pstmt.setBytes(2, encVote);
-			        			pstmt.setBytes(3, signedVote);
-			        			pstmt.execute();
+								//pstmt=con.prepareStatement("INSERT INTO "+electionname+"votes (nonce, encVote , signedVote) values (?,?,?);");
+			        			//pstmt.setBytes(1,nonce);
+			        			//pstmt.setBytes(2, encVote);
+			        			//pstmt.setBytes(3, signedVote);
+			        			//pstmt.execute();
 			        			byteArray2.write(nonce.length);
 		        				byteArray2.write(nonce);
 		        				byteArray2.write(encVote.length);
@@ -136,21 +136,7 @@ public class Counter {
 	}
 	
 	
-	private static byte[] serialize(Object n) throws IOException {
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-        ObjectOutputStream o = null;
-		try {
-			o = new ObjectOutputStream(b);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-        try {
-			o.writeObject(n);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        return b.toByteArray();
-	}
+
 	
 	
 	
