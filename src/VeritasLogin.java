@@ -10,6 +10,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.sql.*;
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
@@ -66,6 +67,21 @@ public class VeritasLogin {
             rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
             while(rs.next()){
             	if(rs.getString("usertype").equals("1")){
+            		
+            		/*This is to add some voter keys to table.  Will remove later*/
+            		KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
+        			genRSA.initialize(3072);
+        			KeyPair keypair=genRSA.genKeyPair();
+        			RSAPrivateKey skvoter=(RSAPrivateKey)keypair.getPrivate();
+        			RSAPublicKey pkvoter=(RSAPublicKey)keypair.getPublic();
+        			byte[] skvoterBytes=skvoter.getEncoded();
+        			byte[] pkvoterBytes=pkvoter.getEncoded();
+        			pstmt=conn.prepareStatement("INSERT INTO voterkey (username, pk, sk) VALUES (?,?,?);");
+        			pstmt.setString(1,name);
+        			pstmt.setBytes(2, pkvoterBytes);
+        			pstmt.setBytes(3, skvoterBytes);
+        			pstmt.execute();
+        			
             		rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
         			System.out.println("You are eligible for the following elections:");
         			int numelections=0;

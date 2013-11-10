@@ -26,7 +26,9 @@ public class settup {
             
 			int servPort = 8001;
 			ServerSocket servSock = new ServerSocket(servPort);
-	
+			/***Need to make this an if stmt like in veritas login -- should do one thing if its a voter,
+			 * Something else if its a supervisor
+			 */
 			while (true) {
 	
 				System.out.print("start");
