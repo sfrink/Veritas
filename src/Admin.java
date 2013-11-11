@@ -49,6 +49,7 @@ public class Admin {
 					File log=new File("log.txt");
 					ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
 					
+				
 					
 		            java.util.Date date = new java.util.Date();
 		            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
@@ -62,7 +63,7 @@ public class Admin {
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
 								/***need to actually send this****/
-								
+								out.write(adminpk);
 								
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 2; j++) {
