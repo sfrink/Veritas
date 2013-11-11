@@ -88,28 +88,6 @@ INSERT INTO `elections` VALUES ('sfrink','1','1'),('test','0',NULL),('calvin','1
 UNLOCK TABLES;
 
 --
--- Table structure for table `hash`
---
-
-DROP TABLE IF EXISTS `hash`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `hash` (
-  `password` varbinary(256) DEFAULT NULL,
-  `salt` varbinary(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `hash`
---
-
-LOCK TABLES `hash` WRITE;
-/*!40000 ALTER TABLE `hash` DISABLE KEYS */;
-/*!40000 ALTER TABLE `hash` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `userpk`
 --
 
@@ -139,9 +117,9 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
-  `userid` varchar(50) DEFAULT NULL,
-  `password` varchar(50) DEFAULT NULL,
-  `username` varchar(50) DEFAULT NULL
+  `username` varchar(50) DEFAULT NULL,
+  `password` varbinary(256) DEFAULT NULL,
+  `salt` varbinary(32) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -151,7 +129,6 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('stevefrink','pw','sfrink'),('test','pw','test'),('spiff','hobbes','calvin'),('user','pw','user');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -164,4 +141,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-11 13:40:38
+-- Dump completed on 2013-11-11 14:50:27
