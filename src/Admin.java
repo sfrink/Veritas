@@ -61,7 +61,6 @@ public class Admin {
 								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
-								/***need to actually send this****/
 								out.write(adminpk);
 								
 							//receive username, blindbytes, signedBlind and electionname	
