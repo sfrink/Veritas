@@ -253,11 +253,19 @@ public class VeritasLogin {
             			*/ 
             		
         				/**Get Usernames from server****/
+            			byte[] userNumber = new byte[4096];
         				byte[] receiveBuf = new byte[4096];
+        				byte[] receiveBuf2 = new byte[4096];
         				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+        				
+        				in.read(userNumber);
+        				int user_number=(Integer)deserialize(userNumber);
+        				int ack=1;
+    	  				out2.write(serialize(ack));
         				in.read(receiveBuf);
         				ByteArrayInputStream byteArray2 = new ByteArrayInputStream(receiveBuf);
-        				for (int j = 0; j <= 100; j++) {
+        				
+        				for (int j = 0; j <user_number; j++) {
         					int tmp = byteArray2.read();
         					byte[] tmpArray = new byte[tmp];
         					byteArray2.read(tmpArray, 0, tmp);
@@ -266,27 +274,27 @@ public class VeritasLogin {
         				// get the credential and send to the server
         				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
         				int numVoters=0;
-        				byte[] m=bufArray.get(0);	
-    					int count= (Integer)deserialize(m);
         				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
-        				for(int i=1; i<=count;i++){
+        				for(int i=0; i<user_number;i++){
         					String nextuser=new String(bufArray.get(i));
-        					System.out.println(nextuser);
+        					System.out.println(nextuser+":");
         					authorize = sc.next();
             				if(authorize.equals("1")){
             					numVoters++;
-            					//send nextuser;
+            					byteArray3.write(bufArray.get(i).length);
+            					byteArray3.write(bufArray.get(i));  					
             					//out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
             					
             				}
-            					  /*byte[] authorizeByte=authorize.getBytes();
-            	  				  byteArray3.write(authorizeByte.length);
-            	  				  byteArray3.write(authorizeByte);*/
             					
         				}
-        				
-        				out2.write(byteArray3.toByteArray());;
-        
+        				out2.write(serialize(numVoters));
+        				in.read(receiveBuf2);
+        				int ack2=(Integer)deserialize(receiveBuf2);
+        				if(ack2==1)
+        				{
+        				out2.write(byteArray3.toByteArray());
+        				}
         				//stmt.execute("create table "+elec+"results (vote varchar(50));");
         				//rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
         	
@@ -313,6 +321,19 @@ public class VeritasLogin {
             System.out.println(e+"  Authentication failed");
         }
     }       //end main
+
+		private static  byte[] serialize(int n) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = null;
+		try {
+			o = new ObjectOutputStream(b);
+			o.writeObject(n);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return b.toByteArray();
+	}
 
 	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
 		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
