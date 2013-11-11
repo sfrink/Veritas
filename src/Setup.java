@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.sql.*;
+import java.security.MessageDigest;
+
 
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -37,8 +39,6 @@ public class Setup {
 				final Socket clntSock = servSock.accept();
 				SocketAddress clientAddress = clntSock.getRemoteSocketAddress();
 				System.out.println("receiving requests from client at "+clientAddress);
-				 final String databaseUsername = "";
-		         final String databasePassword = "";
 				new Thread(new Runnable() {
 				public void run(){
 				try{
@@ -88,20 +88,20 @@ public class Setup {
 						SecureRandom rand=new SecureRandom();
 						byte[] salt=new byte[4];
 						rand.nextBytes(salt);
-						pstmt=conn.prepareStatment("INSERT INTO users (salt) values (?)");
+						pstmt=conn.prepareStatement("INSERT INTO users (salt) values (?)");
 						pstmt.setBytes(1, salt);
 						pstmt.execute();
-						byte[] pw=pwd.getBytes();
-						byte[] toHash=new byte[pw.length+4];
+						byte[] password=pwd.getBytes();
+						byte[] toHash=new byte[password.length+4];
 						toHash[0]=salt[0];
 						toHash[1]=salt[1];
 						toHash[2]=salt[2];
 						toHash[3]=salt[3];
-						for(int i=0;i<pw.length;i++){
-							toHash[i+4]=pw[i];
+						for(int i=0;i<password.length;i++){
+							toHash[i+4]=password[i];
 						}
 						byte[] hash=sha.digest(toHash);
-						pstmt=conn.prepareStatment("INSERT INTO users (password) values (?)");
+						pstmt=conn.prepareStatement("INSERT INTO users (password) values (?)");
 						pstmt.setBytes(1, hash);
 						pstmt.execute();
 						out.write(serialize(1));
@@ -123,6 +123,8 @@ public class Setup {
 						String pwd= new String(bufArray3.get(1));
 						String query = "SELECT * from users WHERE username='"+username+"'";
 						ResultSet rs = stmt.executeQuery(query);
+						String databaseUsername = "";
+						String databasePassword = "";
 			            while(rs.next()){  
 			            	
 		                databaseUsername = rs.getString("username");

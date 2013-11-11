@@ -54,6 +54,15 @@ public class VeritasLogin {
         	byte[] election_number = new byte[4096];
         	byte[] election_names= new byte[4096];
         	ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+        	String url="jdbc:mysql://localhost:3306/Client";
+			String user="root";
+			String pw="";
+			try{
+				Class.forName("com.mysql.jdbc.Driver");
+			}
+			catch(Exception e){
+				System.out.println(e);
+			}
         	//System.out.println("Do you want to log in or creat your account? enter 1 for log and 0 for creating");
         	String choice1 = sc.next();
         /*	These stuff can be used for future to fully implement the functions 
@@ -116,15 +125,7 @@ public class VeritasLogin {
     			byte[] pkvoterBytes=pkvoter.getEncoded();
     			
             	/*Add username, pk, sk to the client-side database*/    			
-    			String url="jdbc:mysql://localhost:3306/Client";
-    			String user="root";
-    			String pw="";
-    			try{
-    				Class.forName("com.mysql.jdbc.Driver");
-    			}
-    			catch(Exception e){
-    				System.out.println(e);
-    			}
+    			
     			try{
     				Connection con=DriverManager.getConnection(url, user, pw);
     				PreparedStatement st=con.prepareStatement("INSERT INTO voterkey (username, pk, sk) VALUES (?,?,?);");
@@ -255,19 +256,16 @@ public class VeritasLogin {
         					System.out.println(candidate);
         			
         				System.out.println("Please enter the candidate of your choice:");
-<<<<<<< HEAD
         				String cand=sc.next();
         				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				Vote voter=new Vote();
-        				voter.vote(cand, name, election);
-=======
+        				voter.vote(cand, name, electionname);
         			
         				String choice=sc.next();
         				out3.write(choice.getBytes());
         			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				//Vote voter=new Vote();
         				//voter.vote(choice, name, election);
->>>>>>> 08948089f78d959cad804e06de118c3c67aa5299
         			}
             	
             	if(check_identity==1){
