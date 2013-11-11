@@ -191,6 +191,10 @@ public class Vote {
 			byteArray3.write(iv.length);
 			byteArray3.write(iv);
 			out3.write(byteArray3.toByteArray());
+			byte[] recevBuff;
+			in.read(recevBuff);
+			String results=new String(recevBuff);
+			System.out.println("results");
 			socket3.close();
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 			//System.out.println("testing7");
