@@ -49,6 +49,7 @@ public class Counter2 {
 				byte [] receiveBuf=new byte[1280];
 				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				InputStream in=clntSock.getInputStream();
+				OutputStream out=clntSock.getOutputStream();
 				File log=new File("log.txt");
 	            java.util.Date date = new java.util.Date();
 	            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
@@ -120,7 +121,8 @@ public class Counter2 {
 							}
 						}
 						/*****Send candidates[maxindex] to all Vote clients****/
-						
+						byte[] maxindexByte=serialize(maxindex);
+						out.write(maxindexByte);
 						
 						st.execute("DROP TABLE "+electionname);
 						st.execute("DROP TABLE "+electionname+"votes");
@@ -132,6 +134,18 @@ public class Counter2 {
 				}
 					catch (Exception e){}
 				}
+				private  byte[] serialize(int n) throws IOException {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = null;
+		try {
+			o = new ObjectOutputStream(b);
+			o.writeObject(n);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return b.toByteArray();
+	}
 		}).start();
 	}
 	
