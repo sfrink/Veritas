@@ -345,8 +345,8 @@ public class VeritasLogin {
         				/**Get Usernames from server****/
             			byte[] userNumber = new byte[4096];
         				byte[] receiveBuf3 = new byte[4096];
-        				byte[] receiveBuf2 = new byte[4096];
-        				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+        				byte[] receiveBuf4 = new byte[4096];
+        				ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
         				
         				in.read(userNumber);
         				int user_number=(Integer)deserialize(userNumber);
@@ -359,28 +359,28 @@ public class VeritasLogin {
         					int tmp = byteArray2.read();
         					byte[] tmpArray = new byte[tmp];
         					byteArray2.read(tmpArray, 0, tmp);
-        					bufArray.add(tmpArray);
+        					bufArray2.add(tmpArray);
         				}
         				// get the credential and send to the server
         				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
         				int numVoters=0;
         				ByteArrayOutputStream byteArray4 = new ByteArrayOutputStream();
         				for(int i=0; i<user_number;i++){
-        					String nextuser=new String(bufArray.get(i));
+        					String nextuser=new String(bufArray2.get(i));
         					System.out.println(nextuser+":");
         					authorize = sc.next();
             				if(authorize.equals("1")){
             					numVoters++;
-            					byteArray4.write(bufArray.get(i).length);
-            					byteArray4.write(bufArray.get(i));  					
+            					byteArray4.write(bufArray2.get(i).length);
+            					byteArray4.write(bufArray2.get(i));  					
             					//out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
             					
             				}
             					
         				}
         				out2.write(serialize(numVoters));
-        				in.read(receiveBuf2);
-        				int ack2=(Integer)deserialize(receiveBuf2);
+        				in.read(receiveBuf4);
+        				int ack2=(Integer)deserialize(receiveBuf4);
         				if(ack2==1)
         				{
         				out2.write(byteArray3.toByteArray());
