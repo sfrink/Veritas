@@ -94,7 +94,7 @@ public class VeritasLogin {
     			Socket socket2=new Socket("localhost",8001);
     			InputStream in2=socket2.getInputStream();
 				OutputStream out3=socket2.getOutputStream();
-            	out3.write(request);
+            	out3.write(request_voter);
             	in2.read(ack_voter);
             	System.out.println("Please set up your username:\n");
             	String c_name = sc.next();
@@ -220,7 +220,7 @@ public class VeritasLogin {
         			out3.write(serialize(1));
         			
         			int numelections=0;
-        			int election_num;
+        			int election_num=0;
         			in2.read(check_elections);
         			int check_electionsInt=(Integer)deserialize(check_elections);
         			if( check_electionsInt==0){ 
@@ -229,8 +229,8 @@ public class VeritasLogin {
         			if( check_electionsInt==1){ 
         				out3.write(serialize(1));
         				in2.read(election_number);
-        				 election_num=(Integer)deserialize(election_number);
-        				 out3.write(serialize(1));
+        				election_num=(Integer)deserialize(election_number);
+        				out3.write(serialize(1));
         				
         				in2.read(receiveBuf2);
 						ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf2);

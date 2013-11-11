@@ -73,14 +73,14 @@ public class Setup {
 					if(requestInt==0){
 						out.write(ack_user);
 						in.read(receiveBuf5);	
-						ByteArrayInputStream byteArray5 = new ByteArrayInputStream(receiveBuf);
+						ByteArrayInputStream byteArray5 = new ByteArrayInputStream(receiveBuf5);
 						for (int j = 0; j <1; j++) {
 							int tmp = byteArray5.read();
 							byte[] tmpArray = new byte[tmp];
 							byteArray5.read(tmpArray, 0, tmp);
 							bufArray4.add(tmpArray);
 						}
-						
+						System.out.println("in setup");
 						String username= new String(bufArray4.get(0));
 						String pwd= new String(bufArray4.get(1));	
 						/***update the database ***/
@@ -250,7 +250,7 @@ public class Setup {
 			        				in.read(receiveBuf6);
 			        				rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"'");
 
-			        				String candidates;
+			        				String candidates=null;
 			        				if(rs.next()){
 			      	
 			        				candidates=rs.getString(1);
