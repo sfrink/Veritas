@@ -30,7 +30,6 @@ public class Vote {
 		String url="jdbc:mysql://localhost:3306/elections";
 		String user="root";
 		String pw="";
-		PreparedStatement pst=null;
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}

@@ -40,7 +40,6 @@ public class Admin {
 				System.out.println("receiving requests from client at "+clientAddress);
 				new Thread(new Runnable() {
 					ResultSet rs=null;
-					int recvMsgSize;
 					byte [] receiveBuf=new byte[1280];
 					byte [] receiveBuf2=new byte[1280];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();

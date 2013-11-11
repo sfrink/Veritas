@@ -50,7 +50,6 @@ public class Counter {
 					ResultSet rs=null;
 					InputStream in=clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
-					int recvMsgSize;
 					byte [] receiveBuf=new byte[1280];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			
