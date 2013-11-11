@@ -83,10 +83,29 @@ public class Setup {
 						
 						String username= new String(bufArray4.get(0));
 						String pwd= new String(bufArray4.get(1));	
-							/***update the database ***/
-
-							out.write(serialize(1));
+						/***update the database ***/
+						MessageDigest sha=MessageDigest.getInstance("SHA-256");
+						SecureRandom rand=new SecureRandom();
+						byte[] salt=new byte[4];
+						rand.nextBytes(salt);
+						pstmt=conn.prepareStatment("INSERT INTO users (salt) values (?)");
+						pstmt.setBytes(1, salt);
+						pstmt.execute();
+						byte[] pw=pwd.getBytes();
+						byte[] toHash=new byte[pw.length+4];
+						toHash[0]=salt[0];
+						toHash[1]=salt[1];
+						toHash[2]=salt[2];
+						toHash[3]=salt[3];
+						for(int i=0;i<pw.length;i++){
+							toHash[i+4]=pw[i];
 						}
+						byte[] hash=sha.digest(toHash);
+						pstmt=conn.prepareStatment("INSERT INTO users (password) values (?)");
+						pstmt.setBytes(1, hash);
+						pstmt.execute();
+						out.write(serialize(1));
+					}
 					
 					else{
 					/*** check if this user should be authenticated      ***/
