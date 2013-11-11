@@ -43,18 +43,67 @@ public class VeritasLogin {
             String databasePassword = "";
             
             System.out.println("Please make your choice:\n");
-            System.out.println("A. Create a new account\n");
-            System.out.println("B. Sign in with existing account\n");
-            String choice = sc.next();
-            
-            if(choice == "A" || choice == "a"){				//Create new account
+        	byte[] ack_supervisor=new byte[4096];
+        	byte[] ack_voter=new byte[4096];
+        	byte[] ack_voter2=new byte[4096];
+        	byte[] receiveBuf = new byte[4096];
+        	byte[] receiveBuf2 = new byte[4096];
+        	byte[] ack = new byte[4096];
+        	byte[] check_elections=new byte[4096];
+        	byte[] candidates = new byte[4096];
+        	byte[] election_number = new byte[4096];
+        	byte[] election_names= new byte[4096];
+        	ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+        	//System.out.println("Do you want to log in or creat your account? enter 1 for log and 0 for creating");
+        	String choice1 = sc.next();
+        /*	These stuff can be used for future to fully implement the functions 
+         * if (choice1=="1"){
+        		System.out.println("Do you want to creat an account for supervisor or voter? enter 1 for supervisor and 0 for voter");
+        		String choice2 = sc.next();
+        		if (choice2=="1"){
+        			//send username ,password, and 1 to the server
+        		}
+        		if(choice2=="0"){
+        			//send username, password and 0 to the server
+        		}
+  	
+        	}
+        	
+        	
+        	if (choice1=="0"){
+        		send username and password to the server and receive information:
+        		1.this user is a voter and is eligible to the following elections:
+        		2.this user is a supervisor and ask him if he wants to assign credentials
+        		
+        	}  */
+        	/***   create account                    ***/
+            if(choice1 == "A" || choice1 == "a"){				//Create new account
             	/*----Need to connect to the server----*/
+            	int request=0;
+            	byte[] request_voter=serialize(request);
+            	
+    			Socket socket2=new Socket("localhost",8001);
+    			InputStream in2=socket2.getInputStream();
+				OutputStream out3=socket2.getOutputStream();
+            	out3.write(request);
+            	in2.read(ack_voter);
             	System.out.println("Please set up your username:\n");
             	String c_name = sc.next();
             	System.out.println("Please set up your password:\n");
             	String c_pwd = sc.next();
             	/*----Send c_name and c_pwd to the server----*/
+            	byte[] c_nameByte=c_name.getBytes();
+            	byte[] c_pwdByte=c_pwd.getBytes();
+            	ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
+				byteArray2.write(c_nameByte.length);
+				byteArray2.write(c_nameByte);
+				byteArray2.write(c_pwdByte.length);
+				byteArray2.write(c_pwdByte);
+				out3.write(byteArray2.toByteArray());
+            	
+            	
             	/*----Receive notification from the server----*/
+				in2.read(ack_voter2);
             	System.out.println("Your account has been successfully created!\n");
             	
         		/*Assign pk, sk to new user*/
@@ -89,17 +138,38 @@ public class VeritasLogin {
     			}
             }			//End creating new account
             
+            /*** send user name and password to server for logging in ***/
             System.out.println("Enter Username: ");         //Input Username
             String name = sc.next();
             System.out.println("Enter Password: ");         //Input Password
             String password = sc.next();
-            String url="jdbc:mysql://localhost:3306/elections";
+            Socket socket2=new Socket("localhost",8001);
+            OutputStream out3=socket2.getOutputStream();
+            InputStream in2=socket2.getInputStream();
+            byte[] nameByte=name.getBytes();
+        	byte[] pwdByte=password.getBytes();
+        	ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
+			byteArray3.write(nameByte.length);
+			byteArray3.write(nameByte);
+			byteArray3.write(pwdByte.length);
+			byteArray3.write(pwdByte);
+			out3.write(byteArray3.toByteArray());
+            in2.read(receiveBuf);
+            int check=(Integer)deserialize(receiveBuf);
+            if(check==1){
+            	out3.write(ack);
+            }
+            if(check==0){
+            	System.out.println("password or username wrong!");
+            }
+            
+        /*    String url="jdbc:mysql://localhost:3306/elections";
     		String user="root";
     		String pw="";
             Connection conn = DriverManager.getConnection(url, user, pw);
             Statement stmt = conn.createStatement();
             PreparedStatement pstmt=null;
-            ResultSet rs=null;
+            ResultSet rs=null;*/
             //String query = "SELECT * from users WHERE username='"+name+"'";
             //ResultSet rs = stmt.executeQuery(query);
             
@@ -121,12 +191,15 @@ public class VeritasLogin {
 //            }
 			
             //rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
-			//Get from server
-            while(rs.next()){
-            	if(rs.getString("usertype").equals("1")){
+			//Get from server\
+            /*** if this user is authorized as a supervisor, he can assign credentials, if he is authorized as a  voter, he can vote   ***/
+            in2.read(receiveBuf);
+            int check_identity=(Integer)deserialize(receiveBuf);
+          
+            	if(check_identity==0){
             		
             		/*This is to add some voter keys to table.  Will remove later*/
-            		KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
+          /*  		KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
         			genRSA.initialize(3072);
         			KeyPair keypair=genRSA.genKeyPair();
         			RSAPrivateKey skvoter=(RSAPrivateKey)keypair.getPrivate();
@@ -139,46 +212,58 @@ public class VeritasLogin {
         			pstmt.setBytes(3, skvoterBytes);
         			pstmt.execute();
         			
-            		
+            		*/
         			
         			//rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
         			//Need to get these election names from server
+        			out3.write(serialize(1));
         			
-        			System.out.println("You are eligible for the following elections:");
         			int numelections=0;
-        			while(rs.next()){
-        				ResultSetMetaData metadata = rs.getMetaData();
-        				int columnCount = metadata.getColumnCount();
-        				for(int i=3;i<=columnCount;i++){
-        					if(rs.getString(i).equals("1")){
-        						System.out.print((i-2)+"."+metadata.getColumnName(i)+" ");
-        						numelections++;
-        					}
-        				}
+        			int election_num;
+        			in2.read(check_elections);
+        			int check_electionsInt=(Integer)deserialize(check_elections);
+        			if( check_electionsInt==0){ 
+        				System.out.println("You are not elegible for the current elections");
         			}
-        			if(numelections==0)
-        				System.out.println("You are not currently eligible for any elections.");
-        			else{
-        				System.out.println("\nPlease type the election name you would like to vote in:");
-        				String election=sc.next();
+        			if( check_electionsInt==1){ 
+        				out3.write(serialize(1));
+        				in2.read(election_number);
+        				 election_num=(Integer)deserialize(election_number);
+        				 out3.write(serialize(1));
         				
-        				
-        				//rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+election+"'");
-        				//Need to get candidate set from server
-        				
-        				if(rs.next()){
+        				in2.read(receiveBuf2);
+						ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf2);
+						for (int j = 0; j <election_num; j++) {
+							int tmp = byteArray4.read();
+							byte[] tmpArray = new byte[tmp];
+							byteArray4.read(tmpArray, 0, tmp);
+							bufArray.add(tmpArray);
+						}
+        				String electionname=new String("election_names");
+        				System.out.println("You are eligible for the following elections:");
+        			}
+        				for(int i=0; i<election_num;i++){
+        					System.out.println(bufArray.get(i));
+        					
+        				}
+        				System.out.print("Please type the election name you would like to vote in");
+        				String electionname = sc.next();
+        				out3.write(electionname.getBytes());
+        				in2.read(candidates);
         					System.out.println("Here are the candidates:");
-        					String candidates=rs.getString(1);
-        					System.out.println(candidates);
-        				}
+        					String candidate=new String(candidates);
+        					System.out.println(candidate);
+        			
         				System.out.println("Please enter the candidate of your choice:");
+        			
         				String choice=sc.next();
-        				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
-        				Vote voter=new Vote();
-        				voter.vote(choice, name, election);
+        				out3.write(choice.getBytes());
+        			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
+        				//Vote voter=new Vote();
+        				//voter.vote(choice, name, election);
         			}
-            	}
-            	else{
+            	
+            	if(check_identity==1){
         			Connection con2=DriverManager.getConnection(url, user, pw);
         			Statement st2=con2.createStatement();
         			
@@ -193,14 +278,14 @@ public class VeritasLogin {
             			//If candidates are input in a form other than c1,c2,c3 (for example, as c1, c2, c3) it breaks the code --
             			//either specify the input form and let it break if it doesn't match, or modify how we get candidates
             			String cand=sc.next();
-            			
-            			
-            			
-            			
             			Socket socket=new Socket("localhost",8001);
             			InputStream in=socket.getInputStream();
         				OutputStream out2=socket.getOutputStream();
-            	
+        				int request=1;
+        				byte[]request_supervisor=serialize(request);
+        				out2.write(request_supervisor);
+        			
+        				in.read(ack_supervisor);			
             			byte[] elecByte=elec.getBytes();
             			byte[] candByte=cand.getBytes();
             			System.out.println("Connected to server of setup");
@@ -254,16 +339,16 @@ public class VeritasLogin {
             		
         				/**Get Usernames from server****/
             			byte[] userNumber = new byte[4096];
-        				byte[] receiveBuf = new byte[4096];
+        				byte[] receiveBuf3 = new byte[4096];
         				byte[] receiveBuf2 = new byte[4096];
         				ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
         				
         				in.read(userNumber);
         				int user_number=(Integer)deserialize(userNumber);
-        				int ack=1;
-    	  				out2.write(serialize(ack));
-        				in.read(receiveBuf);
-        				ByteArrayInputStream byteArray2 = new ByteArrayInputStream(receiveBuf);
+        				int ack4=1;
+    	  				out2.write(serialize(ack4));
+        				in.read(receiveBuf3);
+        				ByteArrayInputStream byteArray2 = new ByteArrayInputStream(receiveBuf3);
         				
         				for (int j = 0; j <user_number; j++) {
         					int tmp = byteArray2.read();
@@ -274,15 +359,15 @@ public class VeritasLogin {
         				// get the credential and send to the server
         				System.out.println("Please authorize voters, 1 for yes, and 0 for no:");
         				int numVoters=0;
-        				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
+        				ByteArrayOutputStream byteArray4 = new ByteArrayOutputStream();
         				for(int i=0; i<user_number;i++){
         					String nextuser=new String(bufArray.get(i));
         					System.out.println(nextuser+":");
         					authorize = sc.next();
             				if(authorize.equals("1")){
             					numVoters++;
-            					byteArray3.write(bufArray.get(i).length);
-            					byteArray3.write(bufArray.get(i));  					
+            					byteArray4.write(bufArray.get(i).length);
+            					byteArray4.write(bufArray.get(i));  					
             					//out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Description: User "+userName+"authorized for election"+elec+".\n");
             					
             				}
@@ -315,7 +400,7 @@ public class VeritasLogin {
 					//st2.execute("UPDATE candidates SET numVoters='"+numVoters+"'");
             	}
             	out.close();
-            }
+            
             
         }catch (Exception e){
             System.out.println(e+"  Authentication failed");
