@@ -44,8 +44,10 @@ public class Setup {
 		    		Connection conn = DriverManager.getConnection(url, user, pw);
 		            Statement stmt = conn.createStatement();
 		            PreparedStatement pstmt=null;
+		            byte[] ack=new byte[4096];
 					byte[] receiveBuf = new byte[4096];
 					byte[] receiveBuf2 = new byte[4096];
+					byte[] receiveBuf3 = new byte[4096];
 					InputStream in = clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
 					// get the username and candidate
@@ -90,8 +92,9 @@ public class Setup {
 	        		 while (rs.next()){
 	        			 count++;
 	        		 }
-	        		 byteArray2.write(serialize(count).length);
-	 				 byteArray2.write(serialize(count)); 
+	        		 out.write(serialize(count));
+	        		
+	        	
 	    			 while(rs.next()) { 
 	    				 String userName = rs.getString("usernames");
 	    				 byte[] userNamebyte=userName.getBytes();
@@ -99,13 +102,22 @@ public class Setup {
 	    				 byteArray2.write(userNamebyte);
 	  				  
 	    			 }
-	  				 out.write(byteArray2.toByteArray());
-					
+	    			 	
+						in.read(ack);
+						int Ack= (Integer)deserialize(ack);	 
+						if (Ack==1){
+							out.write(byteArray2.toByteArray());
+						}
 	  				 
 	  				 // get the authorized users from the client:
+	  				 
 	  				in.read(receiveBuf2);
-					ByteArrayInputStream byteArray3 = new ByteArrayInputStream(receiveBuf2);
-					for (int j = 0; j <count; j++) {
+	  				int voteNumbers=(Integer)deserialize(receiveBuf2);
+	  				int ack2=1;
+	  				out.write(serialize(ack2));
+					in.read(receiveBuf3);
+					ByteArrayInputStream byteArray3 = new ByteArrayInputStream(receiveBuf3);
+					for (int j = 0; j <voteNumbers; j++) {
 						int tmp = byteArray.read();
 						byte[] tmpArray = new byte[tmp];
 						byteArray3.read(tmpArray, 0, tmp);
@@ -113,7 +125,7 @@ public class Setup {
 					}
 					
 	 				 // update the database using the authorized list:  
-					for(int i=0;i<count;i++){
+					for(int i=0;i<voteNumbers;i++){
 						String authuser=new String (bufArray2.get(i));
 						stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE username='"+authuser+"'");
 						
