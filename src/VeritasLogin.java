@@ -172,10 +172,10 @@ public class VeritasLogin {
         					System.out.println(candidates);
         				}
         				System.out.println("Please enter the candidate of your choice:");
-        				String choice=sc.next();
+        				String cand=sc.next();
         				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				Vote voter=new Vote();
-        				voter.vote(choice, name, election);
+        				voter.vote(cand, name, election);
         			}
             	}
             	else{
