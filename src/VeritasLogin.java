@@ -103,11 +103,13 @@ public class VeritasLogin {
             	in2.read(ack_voter);
             	int ack_voterInt=(Integer)deserialize(ack_voter);
             	System.out.println(ack_voterInt);
-            	System.out.println("Please set up your username:\n");
+            	System.out.println("Please set up your username:");
             	String c_name = sc.next();
-            	System.out.println("Please set up your password:\n");
+            	System.out.println("Please set up your password:");
             	String c_pwd = sc.next();
-            	/*----Send c_name and c_pwd to the server----*/
+            	System.out.println("Is this a voter or a supervisor account? (v for voter, s for supervisor):");
+            	String type=sc.next();
+            	/*----Send c_name and c_pwd and type to the server----*/
             	byte[] c_nameByte=c_name.getBytes();
             	byte[] c_pwdByte=c_pwd.getBytes();
             	ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();

@@ -161,7 +161,7 @@ public class Setup {
 			            	out.write(serialize(1));
 			            	in.read(ack2);
 			            	/*** check if this user is a supervisor or a voter  or go to different functions  ***/
-			            	query = "SELECT * from elections WHERE username='"+username+"'";
+			            	query = "SELECT * from elections WHERE usernames='"+username+"'";
 							 rs = stmt.executeQuery(query);
 			            	 while(rs.next()){
 			                 	if(rs.getString("usertype").equals("1")){
@@ -239,7 +239,7 @@ public class Setup {
 						 				 // update the database using the authorized list:  
 										for(int i=0;i<voteNumbers;i++){
 											String authuser=new String (bufArray2.get(i));
-											stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE username='"+authuser+"'");
+											stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE usernames='"+authuser+"'");
 											
 										}
 									}
