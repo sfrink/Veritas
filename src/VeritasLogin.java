@@ -258,11 +258,11 @@ public class VeritasLogin {
         				System.out.println(candidate);
         			
         				System.out.println("Please enter the candidate of your choice:");
-        				String cand=sc.next();
-        				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
+        				//String cand=sc.next();name+"; Description: Vote cast by user\n");
         			//	Vote voter=new Vote();
         			//	voter.vote(cand, name, electionname);
         			
+       
         				String choice=sc.next();
         				out3.write(choice.getBytes());
         			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
