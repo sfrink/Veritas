@@ -180,6 +180,9 @@ public class Setup {
 										
 									String electionname=new String(bufArray.get(0), "UTF-8");
 									String cand=new String(bufArray.get(1), "UTF-8");
+									String[] cands=cand.split(",");
+									int numV=cands.length;
+									String numVoters=Integer.parseInt(numV);
 									//add electionname and cand to database
 									stmt.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
 									stmt.execute("create table "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
