@@ -75,7 +75,7 @@ public class Setup {
 						in.read(receiveBuf5);	
 						
 						ByteArrayInputStream byteArray5 = new ByteArrayInputStream(receiveBuf5);
-						for (int j = 0; j <=1; j++) {
+						for (int j = 0; j <=2; j++) {
 							int tmp = byteArray5.read();
 							byte[] tmpArray = new byte[tmp];
 							byteArray5.read(tmpArray, 0, tmp);
@@ -86,6 +86,7 @@ public class Setup {
 						String username= new String(bufArray4.get(0));
 					
 						String pwd= new String(bufArray4.get(1));	
+						String usertype=new String(bufArray4.get(2));
 						/***update the database ***/
 						MessageDigest sha=MessageDigest.getInstance("SHA-256");
 						SecureRandom rand=new SecureRandom();
