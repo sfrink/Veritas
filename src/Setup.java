@@ -51,7 +51,6 @@ public class Setup {
 		            byte[] ack=new byte[4096];
 		            byte[] ack2=new byte[4096];
 		            byte[] ack_supervisor=serialize(1);
-		            byte[] ack_user=serialize(0);
 		            byte[] ack_voter=serialize(0);
 		            byte[] votes= new byte[4096];
 		            byte[] request = new byte[4096];
@@ -71,8 +70,10 @@ public class Setup {
 					in.read(request);
 					int requestInt=(Integer)deserialize(request);
 					if(requestInt==0){
-						out.write(ack_user);
+						
+						out.write(serialize(7));
 						in.read(receiveBuf5);	
+						
 						ByteArrayInputStream byteArray5 = new ByteArrayInputStream(receiveBuf5);
 						for (int j = 0; j <=1; j++) {
 							int tmp = byteArray5.read();
@@ -82,6 +83,11 @@ public class Setup {
 						}
 						System.out.println("in setup");
 						String username= new String(bufArray4.get(0));
+						pstmt=conn.prepareStatement("INSERT INTO users (username) values ( username )");
+					
+
+						pstmt.execute();
+					
 						String pwd= new String(bufArray4.get(1));	
 						/***update the database ***/
 						MessageDigest sha=MessageDigest.getInstance("SHA-256");
@@ -107,7 +113,7 @@ public class Setup {
 						out.write(serialize(1));
 					}
 					
-					else{
+					
 					/*** check if this user should be authenticated      ***/
 						/***  function for supervisor       ***/
 						in.read(receiveBuf4);
@@ -122,6 +128,7 @@ public class Setup {
 						String username= new String(bufArray3.get(0));
 						String pwd= new String(bufArray3.get(1));
 						String query = "SELECT * from users WHERE username='"+username+"'";
+					
 						ResultSet rs = stmt.executeQuery(query);
 						String databaseUsername = "";
 						String databasePassword = "";
@@ -136,6 +143,8 @@ public class Setup {
 			            	out.write(serialize(1));
 			            	in.read(ack2);
 			            	/*** check if this user is a supervisor or a voter  or go to different functions  ***/
+			            	query = "SELECT * from elections WHERE username='"+username+"'";
+							 rs = stmt.executeQuery(query);
 			            	 while(rs.next()){
 			                 	if(rs.getString("usertype").equals("1")){
 										out.write(ack_supervisor);
@@ -272,7 +281,7 @@ public class Setup {
 						
 						
 			           }
-			          }
+			          
 					
 				}
 				catch(Exception e){
