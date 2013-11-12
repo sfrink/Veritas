@@ -57,7 +57,7 @@ public class VeritasLogin {
         	ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
         	String url="jdbc:mysql://localhost:3306/Client";
 			String user="root";
-			String pw="";
+			String pw="lrn7777rui";
 			try{
 				Class.forName("com.mysql.jdbc.Driver");
 			}
@@ -288,19 +288,22 @@ public class VeritasLogin {
             			/*Socket socket=new Socket("localhost",8001);
             			InputStream in=socket.getInputStream();
         				OutputStream out2=socket.getOutputStream();*/
-        				int request=1;
-        				byte[]request_supervisor=serialize(request);
-        				out3.write(request_supervisor);
+        			//	int request=1;
+        			//	byte[]request_supervisor=serialize(request);
+        			//	out3.write(request_supervisor);
         			
-        				in2.read(ack_supervisor);			
+        			//	in2.read(ack_supervisor);			
             			byte[] elecByte=elec.getBytes();
             			byte[] candByte=cand.getBytes();
+            
+            			
             			System.out.println("Connected to server of setup");
         				ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
         				byteArray.write(elecByte.length);
         				byteArray.write(elecByte);
         				byteArray.write(candByte.length);
         				byteArray.write(candByte);
+  
         				out3.write(byteArray.toByteArray());
             			
 
