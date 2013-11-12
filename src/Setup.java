@@ -74,7 +74,7 @@ public class Setup {
 						out.write(ack_user);
 						in.read(receiveBuf5);	
 						ByteArrayInputStream byteArray5 = new ByteArrayInputStream(receiveBuf5);
-						for (int j = 0; j <1; j++) {
+						for (int j = 0; j <=1; j++) {
 							int tmp = byteArray5.read();
 							byte[] tmpArray = new byte[tmp];
 							byteArray5.read(tmpArray, 0, tmp);
@@ -112,7 +112,7 @@ public class Setup {
 						/***  function for supervisor       ***/
 						in.read(receiveBuf4);
 						ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf);
-						for (int j = 0; j <1; j++) {
+						for (int j = 0; j <=1; j++) {
 							int tmp = byteArray4.read();
 							byte[] tmpArray = new byte[tmp];
 							byteArray4.read(tmpArray, 0, tmp);
