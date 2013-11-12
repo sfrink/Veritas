@@ -70,7 +70,17 @@ public class Vote {
 		
 			byte[] receiveBuf = new byte[4096];
 			in.read(receiveBuf);
-			byte[] adminkey=receiveBuf;
+			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+			ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
+			for (int j = 0; j <=1; j++) {
+					int tmp = byteArray.read();
+					byte[] tmpArray = new byte[tmp];
+					byteArray.read(tmpArray, 0, tmp);
+					bufArray.add(tmpArray);
+				}  
+	
+			byte[] adminkey=bufArray.get(0);
+			byte[] mod=bufArray.get(1);
 			//byte[] modulus=
 			
 			BigInteger blindFactor=getBlindingFactor(adminkey);
