@@ -81,7 +81,8 @@ public class Setup {
 							byteArray5.read(tmpArray, 0, tmp);
 							bufArray4.add(tmpArray);
 						}
-						System.out.println("in setup");
+						
+						/**Need to get usertype**/
 						String username= new String(bufArray4.get(0));
 					
 						String pwd= new String(bufArray4.get(1));	
@@ -103,9 +104,14 @@ public class Setup {
 						byte[] hash=sha.digest(toHash);
 						pstmt=conn.prepareStatement("INSERT INTO users (username, password, salt) values (?,?,?)");
 						pstmt.setString(1, username);
-						pstmt.setString(2, hash);
+						pstmt.setBytes(2, hash);
 						pstmt.setBytes(3, salt);
 						pstmt.execute();
+						
+						//pstmt=conn.prepareStatement("INSERT INTO elections (usernames, usertype) values (?,?)");
+						//pstmt.setString(1,username);
+						//pstmt.setString(2, usertype);
+						//pstmt.execute();
 						out.write(serialize(1));
 					}
 					
@@ -123,33 +129,35 @@ public class Setup {
 						
 						String username= new String(bufArray3.get(0));
 						String pwd= new String(bufArray3.get(1));
-						String query = "SELECT * from users WHERE username='"+username+"'";
+						String query = "SELECT * FROM users WHERE username='"+username+"'";
 					
 						ResultSet rs = stmt.executeQuery(query);
 						String databaseUsername = "";
-						String databasePassword = "";
-						String databasesalt = "";
+						byte[] databasePassword=null;
+						byte[] databaseSalt=new byte[4];
 			            while(rs.next()){  
 			            	
-		                databaseUsername = rs.getString("username");
-		                databasePassword = rs.getString("password");
-		                databaseSalt = rs.getString("salt");		//Get salt from database to hash the input password
+			            	databaseUsername = rs.getString("username");
+			            	databasePassword = rs.getBytes("password");
+			            	databaseSalt = rs.getBytes("salt");		//Get salt from database to hash the input password
 			            }
 			            
 			            byte[] input_password=pwd.getBytes();		//Hash the input password & compare with the hash value in database
-						byte[] input=new byte[password.length+4];
+						byte[] input=new byte[input_password.length+4];
 						input[0]=databaseSalt[0];
 						input[1]=databaseSalt[1];
 						input[2]=databaseSalt[2];
 						input[3]=databaseSalt[3];
 						for(int i=0;i<input_password.length;i++){
 							input[i+4]=input_password[i];
-						}
+						}						
+						MessageDigest sha=MessageDigest.getInstance("SHA-256");
 						byte[] input_hash=sha.digest(input);
 						String hashed_input= new String(input_hash);
-
+						String databasePasswordString=new String(databasePassword);
 					
-			            if (username.equals(databaseUsername) && hashed_input.equals(databasePassword )) {           //check username & password
+			            if (username.equals(databaseUsername) && hashed_input.equals(databasePasswordString)) { //check username & password
+			            	
 			            	out.write(serialize(1));
 			            	in.read(ack2);
 			            	/*** check if this user is a supervisor or a voter  or go to different functions  ***/
@@ -166,7 +174,7 @@ public class Setup {
 											byteArray.read(tmpArray, 0, tmp);
 											bufArray.add(tmpArray);
 										}
-											
+										
 										String electionname=new String(bufArray.get(0), "UTF-8");
 										String cand=new String(bufArray.get(1), "UTF-8");
 										//add electionname and cand to database

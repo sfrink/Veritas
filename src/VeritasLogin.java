@@ -87,6 +87,7 @@ public class VeritasLogin {
         		2.this user is a supervisor and ask him if he wants to assign credentials
         		
         	}  */Socket socket2=new Socket("localhost",8001);
+        	
 			InputStream in2=socket2.getInputStream();
 			OutputStream out3=socket2.getOutputStream();
 			System.out.println(choice1);
@@ -134,10 +135,12 @@ public class VeritasLogin {
     			
     			try{
     				Connection con=DriverManager.getConnection(url, user, pw);
-    				PreparedStatement st=con.prepareStatement("INSERT INTO voterkey (username, pk, sk) VALUES (?,?,?);");
+    				PreparedStatement st=con.prepareStatement("INSERT INTO voterkey (username, pk, sk) VALUES (?,?,?)");
     				st.setString(1,c_name);
+    				System.out.println(c_name);
     				st.setBytes(2, pkvoterBytes);
     				st.setBytes(3, skvoterBytes);
+    				st.execute();
     				System.out.println("USER INFO ADDED TO THE DATABASE\n");
     			}
     			catch(Exception e){
@@ -202,22 +205,6 @@ public class VeritasLogin {
             int check_identity=(Integer)deserialize(receiveBuf);
           
             	if(check_identity==0){
-            		
-            		/*This is to add some voter keys to table.  Will remove later*/
-          /*  		KeyPairGenerator genRSA=KeyPairGenerator.getInstance("RSA");
-        			genRSA.initialize(3072);
-        			KeyPair keypair=genRSA.genKeyPair();
-        			RSAPrivateKey skvoter=(RSAPrivateKey)keypair.getPrivate();
-        			RSAPublicKey pkvoter=(RSAPublicKey)keypair.getPublic();
-        			byte[] skvoterBytes=skvoter.getEncoded();
-        			byte[] pkvoterBytes=pkvoter.getEncoded();
-        			pstmt=conn.prepareStatement("INSERT INTO voterkey (username, pk, sk) VALUES (?,?,?);");
-        			pstmt.setString(1,name);
-        			pstmt.setBytes(2, pkvoterBytes);
-        			pstmt.setBytes(3, skvoterBytes);
-        			pstmt.execute();
-        			
-            		*/
         			
         			//rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
         			//Need to get these election names from server
@@ -269,7 +256,7 @@ public class VeritasLogin {
         				out3.write(choice.getBytes());
         			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				Vote voter=new Vote();
-        				voter.vote(choice, name, election);
+        				voter.vote(choice, name, electionname);
         			}
             	
             	if(check_identity==1){
