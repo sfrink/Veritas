@@ -49,6 +49,7 @@ public class VeritasLogin {
         	byte[] receiveBuf = new byte[4096];
         	byte[] receiveBuf2 = new byte[4096];
         	byte[] ack = new byte[4096];
+        	byte[] ack0= new byte[4096];
         	byte[] check_elections=new byte[4096];
         	byte[] candidates = new byte[4096];
         	byte[] election_number = new byte[4096];
@@ -56,7 +57,7 @@ public class VeritasLogin {
         	ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
         	String url="jdbc:mysql://localhost:3306/Client";
 			String user="root";
-			String pw="";
+			String pw="lrn7777rui";
 			try{
 				Class.forName("com.mysql.jdbc.Driver");
 			}
@@ -149,6 +150,13 @@ public class VeritasLogin {
     				System.out.println(e);
     			}
             }			//End creating new account
+            
+            else{
+            	
+            	out3.write(serialize(1));
+            	in2.read(ack0);
+            }
+            
             
             /*** send user name and password to server for logging in ***/
             System.out.println("Enter Username: ");         //Input Username
