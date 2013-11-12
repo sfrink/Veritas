@@ -129,6 +129,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES ('','¤ú:ˆ&+¡ŸÜa¹WæûYO°;\0Ö1ëQ‹?ï','NÃ’7'),('ssfrink','¬8NyÚ´ÛŽàDù\ràMä¾Ãj‘–f2’Šz…¼0à»','ý5ÒV'),('sfrink','ñ-	+\n“i>.kžºG°n­&ÏÊý3ÿ€»ìO','ùtÝ—'),('test','áî GIE2,6;Qß ðo`”~—¾Ekÿ´ÎâN%',' ÊAK'),('','¬$äl¤zß¥(@ÿ%€³é]6h`è‹4±j SÙ',''),('','GÓs¼×<séË¶Q´Çj‰Cã_Ã.y*ÿ¿œ´³ó!','SŸ¢È');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -141,4 +142,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-11 14:50:27
+-- Dump completed on 2013-11-12 14:21:08
