@@ -42,7 +42,7 @@ public class VeritasLogin {
             String databaseUsername = "";
             String databasePassword = "";
             
-            System.out.println("Please make your choice:\n");
+            System.out.println("Please input \"A\" to create an account or any other character to login:\n");
         	byte[] ack_supervisor=new byte[4096];
         	byte[] ack_voter=new byte[4096];
         	byte[] ack_voter2=new byte[4096];
