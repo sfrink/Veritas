@@ -49,7 +49,7 @@ public class Admin {
 					File log=new File("log.txt");
 					ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
 					
-				
+					ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
 					
 		            java.util.Date date = new java.util.Date();
 		            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
@@ -67,6 +67,15 @@ public class Admin {
 								byte[] mod=rs.getBytes("modulus");
 								//Send mod
 								out.write(adminpk);
+								byteArray2.write(adminpk.length);
+								byteArray2.write(adminpk);
+								byteArray2.write(mod.length);
+								byteArray2.write(mod);
+						        //Scanner sc = new Scanner(System.in);
+					
+								out.write(byteArray2.toByteArray());
+								
+								
 								
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 2; j++) {
