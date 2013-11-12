@@ -44,7 +44,7 @@ public class Setup {
 				try{
 					String url="jdbc:mysql://localhost:3306/Server";
 			    	String user="root";
-			    	String pw="";
+			    	String pw="lrn7777rui";
 		    		Connection conn = DriverManager.getConnection(url, user, pw);
 		            Statement stmt = conn.createStatement();
 		            PreparedStatement pstmt=null;
@@ -114,12 +114,15 @@ public class Setup {
 						//pstmt.execute();
 						out.write(serialize(1));
 					}
-					
+					else{
+						out.write(serialize(1));
+						
+					}
 					
 					/*** check if this user should be authenticated      ***/
 						/***  function for supervisor       ***/
 						in.read(receiveBuf4);
-						ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf);
+						ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf4);
 						for (int j = 0; j <=1; j++) {
 							int tmp = byteArray4.read();
 							byte[] tmpArray = new byte[tmp];
@@ -129,6 +132,7 @@ public class Setup {
 						
 						String username= new String(bufArray3.get(0));
 						String pwd= new String(bufArray3.get(1));
+					//	System.out.println(username);
 						String query = "SELECT * FROM users WHERE username='"+username+"'";
 					
 						ResultSet rs = stmt.executeQuery(query);
