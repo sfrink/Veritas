@@ -61,6 +61,7 @@ public class Setup {
 					byte[] receiveBuf5 = new byte[4096];
 					byte[] receiveBuf6 = new byte[4096];
 					byte[] receiveBuf7 = new byte[4096];
+					byte[] receiveBuf8 = new byte[4096];
 					InputStream in = clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
 					// get the username and candidate
@@ -209,17 +210,15 @@ public class Setup {
 					        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
 					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
 					    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
-					    			RSAKeyParameters pkAdmin=(RSAKeyParameters)keys.getPublic();
-					    			RSAKeyParameters skAdmin=(RSAKeyParameters)keys.getPrivate();
-					    			byte[] pk=pkAdmin.getExponent().toByteArray();
-					    			byte[] sk=skAdmin.getExponent().toByteArray();
-					    			byte[] mod=pkAdmin.getModulus().toByteArray();
+					    			AsymmetricKeyParameter pkAdmin=keys.getPublic();
+					    			AsymmetricKeyParameter skAdmin=keys.getPrivate();
+					    			byte[] pk=serialize(pkAdmin);
+					    			byte[] sk=serialize(skAdmin);
 					    			System.out.println("generated keys");
-					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, modulus, sk, pk) values (?,?,?,?);");
+					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
 					    			pstmt.setString(1, electionname);
-					    			pstmt.setBytes(2, mod);
+					    			pstmt.setBytes(2, pk);
 					    			pstmt.setBytes(3, sk);
-					    			pstmt.setBytes(4, pk);
 					    			pstmt.execute();
 					    			stmt2.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '"+numVoters+"');");
 					    			
@@ -288,9 +287,10 @@ public class Setup {
 			        				for(int i=3;i<=columnCount;i++){
 			        					if(rs.getString(i).equals("1")){
 			        						System.out.print((i-2)+"."+metadata.getColumnName(i)+" ");
+			        						String el=(i-2)+"."+metadata.getColumnName(i);
 			        						numelections++;
-			        						byteArray5.write(serialize(metadata.getColumnName(i)).length);
-			        						byteArray5.write(metadata.getColumnName(i).getBytes());
+			        						byteArray5.write((el.getBytes()).length);
+			        						byteArray5.write(el.getBytes());
 			        					}
 			        				}
 			        			}
@@ -302,16 +302,19 @@ public class Setup {
 			        				out.write(serialize(numelections));
 			        				in.read(receiveBuf6);
 			        				out.write(byteArray5.toByteArray());
-			        				in.read(receiveBuf6);
-			        				String electionname=new String(receiveBuf6);
+			        				in.read(receiveBuf8);
+			        				String electionname=new String(receiveBuf8);
+			        				System.out.println(electionname);
 			        				rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"'");
 
-			        				String candidates=null;
-			        				if(rs.next()){
+			        				String candidates="abc";
+			        				System.out.println(candidates);
+			        			if(rs.next()){
 			      	
-			        				candidates=rs.getString(1);
-			        		
-			        				}
+			        				candidates=rs.getString("candidateSet");
+			        				System.out.println(candidates);
+			        			}
+			        				System.out.println(candidates);
 			        				out.write(candidates.getBytes());
 			        				in.read(votes);
 			        				String choice=new String(votes);
