@@ -38,7 +38,7 @@ public class VeritasLogin {
             java.util.Date date = new java.util.Date();
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
 			PrintWriter out =new PrintWriter(new BufferedWriter(new FileWriter(log, true)));
-            Scanner sc = new Scanner(System.in);
+           
             String databaseUsername = "";
             String databasePassword = "";
             
@@ -63,8 +63,10 @@ public class VeritasLogin {
 			catch(Exception e){
 				System.out.println(e);
 			}
+			 Scanner sc = new Scanner(System.in);
         	//System.out.println("Do you want to log in or creat your account? enter 1 for log and 0 for creating");
         	String choice1 = sc.next();
+			
         /*	These stuff can be used for future to fully implement the functions 
          * if (choice1=="1"){
         		System.out.println("Do you want to creat an account for supervisor or voter? enter 1 for supervisor and 0 for voter");
@@ -84,18 +86,22 @@ public class VeritasLogin {
         		1.this user is a voter and is eligible to the following elections:
         		2.this user is a supervisor and ask him if he wants to assign credentials
         		
-        	}  */
+        	}  */Socket socket2=new Socket("localhost",8001);
+			InputStream in2=socket2.getInputStream();
+			OutputStream out3=socket2.getOutputStream();
+			System.out.println(choice1);
         	/***   create account                    ***/
-            if(choice1 == "A" || choice1 == "a"){				//Create new account
+            if(choice1.equals( "A") || choice1.equals("a")){	
+            	System.out.println("111");//Create new account
             	/*----Need to connect to the server----*/
             	int request=0;
             	byte[] request_voter=serialize(request);
             	
-    			Socket socket2=new Socket("localhost",8001);
-    			InputStream in2=socket2.getInputStream();
-				OutputStream out3=socket2.getOutputStream();
+    			
             	out3.write(request_voter);
             	in2.read(ack_voter);
+            	int ack_voterInt=(Integer)deserialize(ack_voter);
+            	System.out.println(ack_voterInt);
             	System.out.println("Please set up your username:\n");
             	String c_name = sc.next();
             	System.out.println("Please set up your password:\n");
@@ -144,9 +150,7 @@ public class VeritasLogin {
             String name = sc.next();
             System.out.println("Enter Password: ");         //Input Password
             String password = sc.next();
-            Socket socket2=new Socket("localhost",8001);
-            OutputStream out3=socket2.getOutputStream();
-            InputStream in2=socket2.getInputStream();
+        
             byte[] nameByte=name.getBytes();
         	byte[] pwdByte=password.getBytes();
         	ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
@@ -258,14 +262,14 @@ public class VeritasLogin {
         				System.out.println("Please enter the candidate of your choice:");
         				String cand=sc.next();
         				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
-        				Vote voter=new Vote();
-        				voter.vote(cand, name, electionname);
+        			//	Vote voter=new Vote();
+        			//	voter.vote(cand, name, electionname);
         			
         				String choice=sc.next();
         				out3.write(choice.getBytes());
         			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
-        				//Vote voter=new Vote();
-        				//voter.vote(choice, name, election);
+        				Vote voter=new Vote();
+        				voter.vote(choice, name, election);
         			}
             	
             	if(check_identity==1){
