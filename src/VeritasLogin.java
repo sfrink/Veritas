@@ -241,11 +241,10 @@ public class VeritasLogin {
 							byteArray4.read(tmpArray, 0, tmp);
 							bufArray.add(tmpArray);
 						}
-        				String electionname=new String("election_names");
         				System.out.println("You are eligible for the following elections:");
         			}
         				for(int i=0; i<election_num;i++){
-        					String e=new String(deserialize(bufArray.get(i)));
+        					String e=new String(bufArray.get(i));
         					System.out.println(e);
         					
         				}
@@ -254,7 +253,7 @@ public class VeritasLogin {
         				out3.write(electionname.getBytes());
         				in2.read(candidates);
         				System.out.println("Here are the candidates:");
-        				String candidate=new String(deserialize(candidates));
+        				String candidate=new String(candidates);
         				System.out.println(candidate);
         			
         				System.out.println("Please enter the candidate of your choice:");

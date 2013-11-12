@@ -108,10 +108,10 @@ public class Setup {
 						pstmt.setBytes(3, salt);
 						pstmt.execute();
 						
-						//pstmt=conn.prepareStatement("INSERT INTO elections (usernames, usertype) values (?,?)");
-						//pstmt.setString(1,username);
-						//pstmt.setString(2, usertype);
-						//pstmt.execute();
+						pstmt=conn.prepareStatement("INSERT INTO elections (usernames, usertype) values (?,?)");
+						pstmt.setString(1,username);
+						pstmt.setString(2, usertype);
+						pstmt.execute();
 						out.write(serialize(1));
 					}
 					else{
@@ -266,7 +266,7 @@ public class Setup {
 			        						System.out.print((i-2)+"."+metadata.getColumnName(i)+" ");
 			        						numelections++;
 			        						byteArray5.write(serialize(metadata.getColumnName(i)).length);
-			        						byteArray5.write(serialize(metadata.getColumnName(i)));
+			        						byteArray5.write(metadata.getColumnName(i).getBytes());
 			        					}
 			        				}
 			        			}
