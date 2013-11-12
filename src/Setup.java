@@ -87,6 +87,10 @@ public class Setup {
 					
 						String pwd= new String(bufArray4.get(1));	
 						String usertype=new String(bufArray4.get(2));
+						int type=0;
+						if(usertype.equals("v"))
+							type=1;
+						usertype=""+type;
 						/***update the database ***/
 						MessageDigest sha=MessageDigest.getInstance("SHA-256");
 						SecureRandom rand=new SecureRandom();
@@ -179,16 +183,24 @@ public class Setup {
 										bufArray.add(tmpArray);
 									}
 										
-									String electionname=new String(bufArray.get(0), "UTF-8");
-									String cand=new String(bufArray.get(1), "UTF-8");
+									String electionname=new String(bufArray.get(0));
+									String cand=new String(bufArray.get(1));
+									System.out.println("got name and cands");
 									String[] cands=cand.split(",");
 									int numV=cands.length;
-									String numVoters=Integer.parseInt(numV);
+									String numVoters=""+numV;
+									System.out.println(electionname+"\n");
+									System.out.println(cand);
 									//add electionname and cand to database
-									stmt.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
-									stmt.execute("create table "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
-					    			stmt.execute("create table "+electionname+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
-					        		stmt.execute("create table "+electionname+"results (vote varchar(50));");
+									Statement stmt2 = conn.createStatement();
+									stmt2.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
+									System.out.println("stmt0");
+									stmt2.execute("CREATE TABLE "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072))");
+									System.out.println("stmt1");
+					    			stmt2.execute("CREATE TABLE "+electionname+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072))");
+					    			System.out.println("stmt2");
+					        		stmt2.execute("CREATE TABLE "+electionname+"results (vote varchar(50))");
+					        		System.out.println("stmt3");
 					        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
 					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
 					    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
@@ -196,17 +208,18 @@ public class Setup {
 					    			AsymmetricKeyParameter skAdmin=keys.getPrivate();
 					    			byte[] pk=serialize(pkAdmin);
 					    			byte[] sk=serialize(skAdmin);
+					    			System.out.println("generated keys");
 					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
 					    			pstmt.setString(1, electionname);
 					    			pstmt.setBytes(2, pk);
 					    			pstmt.setBytes(3, sk);
 					    			pstmt.execute();
-					    			stmt.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '0');");
+					    			stmt2.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '"+numVoters+"');");
 					    			
 					    			
 									//send usernames to the client
 									 ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
-					        		 ResultSet rs2 = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
+					        		 ResultSet rs2 = stmt2.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
 					        		 int count=0;
 					        		 while (rs2.next()){
 					        			 count++;

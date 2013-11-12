@@ -91,7 +91,6 @@ public class VeritasLogin {
         	
 			InputStream in2=socket2.getInputStream();
 			OutputStream out3=socket2.getOutputStream();
-			System.out.println(choice1);
         	/***   create account                    ***/
             if(choice1.equals( "A") || choice1.equals("a")){	
             	System.out.println("111");//Create new account
@@ -286,14 +285,14 @@ public class VeritasLogin {
             			//If candidates are input in a form other than c1,c2,c3 (for example, as c1, c2, c3) it breaks the code --
             			//either specify the input form and let it break if it doesn't match, or modify how we get candidates
             			String cand=sc.next();
-            			Socket socket=new Socket("localhost",8001);
+            			/*Socket socket=new Socket("localhost",8001);
             			InputStream in=socket.getInputStream();
-        				OutputStream out2=socket.getOutputStream();
+        				OutputStream out2=socket.getOutputStream();*/
         				int request=1;
         				byte[]request_supervisor=serialize(request);
-        				out2.write(request_supervisor);
+        				out3.write(request_supervisor);
         			
-        				in.read(ack_supervisor);			
+        				in2.read(ack_supervisor);			
             			byte[] elecByte=elec.getBytes();
             			byte[] candByte=cand.getBytes();
             			System.out.println("Connected to server of setup");
@@ -302,7 +301,7 @@ public class VeritasLogin {
         				byteArray.write(elecByte);
         				byteArray.write(candByte.length);
         				byteArray.write(candByte);
-        				out2.write(byteArray.toByteArray());
+        				out3.write(byteArray.toByteArray());
             			
 
             			out.println("Time: "+sdf.format(date)+"; Event Type: Election Creation; Username: "+name+"; Description: Election "+elec +"with candidates "+cand+"created.\n");
@@ -351,11 +350,11 @@ public class VeritasLogin {
         				byte[] receiveBuf4 = new byte[4096];
         				ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
         				
-        				in.read(userNumber);
+        				in2.read(userNumber);
         				int user_number=(Integer)deserialize(userNumber);
         				int ack4=1;
-    	  				out2.write(serialize(ack4));
-        				in.read(receiveBuf3);
+    	  				out3.write(serialize(ack4));
+        				in2.read(receiveBuf3);
         				ByteArrayInputStream byteArray2 = new ByteArrayInputStream(receiveBuf3);
         				
         				for (int j = 0; j <user_number; j++) {
@@ -381,12 +380,12 @@ public class VeritasLogin {
             				}
             					
         				}
-        				out2.write(serialize(numVoters));
-        				in.read(receiveBuf4);
+        				out3.write(serialize(numVoters));
+        				in2.read(receiveBuf4);
         				int ack2=(Integer)deserialize(receiveBuf4);
         				if(ack2==1)
         				{
-        				out2.write(byteArray3.toByteArray());
+        				out3.write(byteArray3.toByteArray());
         				}
         				//stmt.execute("create table "+elec+"results (vote varchar(50));");
         				//rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
