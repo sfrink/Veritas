@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.net.*;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -61,6 +62,10 @@ public class Admin {
 								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
 								byte[] adminpk=rs.getBytes("pk");
+								rs=st.executeQuery("SELECT modulus FROM adminkeys WHERE election='"+electionname+"';");
+								rs.next();
+								byte[] mod=rs.getBytes("modulus");
+								//Send mod
 								out.write(adminpk);
 								
 							//receive username, blindbytes, signedBlind and electionname	
@@ -103,7 +108,7 @@ public class Admin {
 								//Still need to check election eligibility
 								if(eligible && goodSig){
 									System.out.println("good sig");
-									byte[] signed=sign(adminsk, blindBytes);
+									byte[] signed=sign(adminsk, mod, blindBytes);
 									out.write(signed);
 									logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 								}
@@ -141,8 +146,10 @@ public class Admin {
 		}
 	}
 	
-	private static byte[] sign(byte[] sk, byte[] message) throws IOException, ClassNotFoundException{
-		RSAKeyParameters adminsk=(RSAKeyParameters)deserialize(sk);
+	private static byte[] sign(byte[] sk,byte[] mod, byte[] message) throws IOException, ClassNotFoundException{
+		BigInteger m=new BigInteger(mod);
+		BigInteger s=new BigInteger(sk);
+		RSAKeyParameters adminsk=new RSAKeyParameters(true, m, s);
 		RSAEngine sign=new RSAEngine();
 		sign.init(true, adminsk);
 		return sign.processBlock(message, 0, message.length);

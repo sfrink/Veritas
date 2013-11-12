@@ -71,6 +71,7 @@ public class Vote {
 			byte[] receiveBuf = new byte[4096];
 			in.read(receiveBuf);
 			byte[] adminkey=receiveBuf;
+			//byte[] modulus=
 			
 			BigInteger blindFactor=getBlindingFactor(adminkey);
 			
@@ -247,34 +248,41 @@ public class Vote {
 			System.out.println(e);
 		}
 	}
-	private static boolean verify(byte[] pk, byte[] message, byte[] sig) throws IOException, ClassNotFoundException{
+	private static boolean verify(byte[] pk, byte[] message, byte[] sig, byte[] mod) throws IOException, ClassNotFoundException{
 		PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
-		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+		BigInteger p=new BigInteger(pk);
+		BigInteger m=new BigInteger(mod);
+		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
 		signer.init(false, adminpk);
 		signer.update(message, 0,message.length);
 		return signer.verifySignature(sig);
 	}
 	
-	private static byte[] unblind(byte[] blindedMessage, BigInteger blindFactor, byte[] pk) throws IOException, ClassNotFoundException{
+	private static byte[] unblind(byte[] blindedMessage, BigInteger blindFactor, byte[] pk, byte[] mod) throws IOException, ClassNotFoundException{
 		RSABlindingEngine eng=new RSABlindingEngine();
-		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+		BigInteger p=new BigInteger(pk);
+		BigInteger m=new BigInteger(mod);
+		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
 
 		RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindFactor);
 		eng.init(false, blindParams);
 		return eng.processBlock(blindedMessage, 0, blindedMessage.length);
 	}
 	
-	private static BigInteger getBlindingFactor(byte[] pk) throws IOException, ClassNotFoundException{
-		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
+	private static BigInteger getBlindingFactor(byte[] pk, byte[] mod) throws IOException, ClassNotFoundException{
+		BigInteger p=new BigInteger(pk);
+		BigInteger m=new BigInteger(mod);
+		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
 		
 		RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
 		genBlind.init(adminpk);
 		return genBlind.generateBlindingFactor();
 	}
 	
-	private static byte[] blind(byte[] message, byte[] pk, BigInteger blindFactor) throws IOException, ClassNotFoundException, DataLengthException, CryptoException{
-		RSAKeyParameters adminpk = (RSAKeyParameters)deserialize(pk);
-		
+	private static byte[] blind(byte[] message, byte[] pk, byte[] mod, BigInteger blindFactor) throws IOException, ClassNotFoundException, DataLengthException, CryptoException{
+		BigInteger p=new BigInteger(pk);
+		BigInteger m=new BigInteger(mod);
+		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
 		RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindFactor);
 		RSABlindingEngine eng=new RSABlindingEngine();
 		PSSSigner blinder=new PSSSigner(eng, new SHA1Digest(), 20);

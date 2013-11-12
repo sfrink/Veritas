@@ -209,15 +209,17 @@ public class Setup {
 					        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
 					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
 					    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
-					    			AsymmetricKeyParameter pkAdmin=keys.getPublic();
-					    			AsymmetricKeyParameter skAdmin=keys.getPrivate();
-					    			byte[] pk=serialize(pkAdmin);
-					    			byte[] sk=serialize(skAdmin);
+					    			RSAKeyParameters pkAdmin=(RSAKeyParameters)keys.getPublic();
+					    			RSAKeyParameters skAdmin=(RSAKeyParameters)keys.getPrivate();
+					    			byte[] pk=pkAdmin.getExponent().toByteArray();
+					    			byte[] sk=skAdmin.getExponent().toByteArray();
+					    			byte[] mod=pkAdmin.getModulus().toByteArray();
 					    			System.out.println("generated keys");
-					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
+					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, modulus, sk, pk) values (?,?,?,?);");
 					    			pstmt.setString(1, electionname);
-					    			pstmt.setBytes(2, pk);
+					    			pstmt.setBytes(2, mod);
 					    			pstmt.setBytes(3, sk);
+					    			pstmt.setBytes(4, pk);
 					    			pstmt.execute();
 					    			stmt2.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '"+numVoters+"');");
 					    			
