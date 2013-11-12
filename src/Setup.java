@@ -83,10 +83,6 @@ public class Setup {
 						}
 						System.out.println("in setup");
 						String username= new String(bufArray4.get(0));
-						pstmt=conn.prepareStatement("INSERT INTO users (username) values ( username )");
-					
-
-						pstmt.execute();
 					
 						String pwd= new String(bufArray4.get(1));	
 						/***update the database ***/
@@ -94,9 +90,7 @@ public class Setup {
 						SecureRandom rand=new SecureRandom();
 						byte[] salt=new byte[4];
 						rand.nextBytes(salt);
-						pstmt=conn.prepareStatement("INSERT INTO users (salt) values (?)");
-						pstmt.setBytes(1, salt);
-						pstmt.execute();
+
 						byte[] password=pwd.getBytes();
 						byte[] toHash=new byte[password.length+4];
 						toHash[0]=salt[0];
@@ -107,8 +101,10 @@ public class Setup {
 							toHash[i+4]=password[i];
 						}
 						byte[] hash=sha.digest(toHash);
-						pstmt=conn.prepareStatement("INSERT INTO users (password) values (?)");
-						pstmt.setBytes(1, hash);
+						pstmt=conn.prepareStatement("INSERT INTO users (username, password, salt) values (?,?,?)");
+						pstmt.setString(1, username);
+						pstmt.setString(2, hash);
+						pstmt.setBytes(3, salt);
 						pstmt.execute();
 						out.write(serialize(1));
 					}
