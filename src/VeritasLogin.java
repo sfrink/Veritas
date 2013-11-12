@@ -57,7 +57,7 @@ public class VeritasLogin {
         	ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
         	String url="jdbc:mysql://localhost:3306/Client";
 			String user="root";
-			String pw="lrn7777rui";
+			String pw="";
 			try{
 				Class.forName("com.mysql.jdbc.Driver");
 			}
@@ -214,7 +214,7 @@ public class VeritasLogin {
             in2.read(receiveBuf);
             int check_identity=(Integer)deserialize(receiveBuf);
           
-            	if(check_identity==0){
+            	if(check_identity==1){
         			
         			//rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
         			//Need to get these election names from server
@@ -245,16 +245,17 @@ public class VeritasLogin {
         				System.out.println("You are eligible for the following elections:");
         			}
         				for(int i=0; i<election_num;i++){
-        					System.out.println(bufArray.get(i));
+        					String e=new String(deserialize(bufArray.get(i)));
+        					System.out.println(e);
         					
         				}
-        				System.out.print("Please type the election name you would like to vote in");
+        				System.out.println("Please type the election name you would like to vote in:");
         				String electionname = sc.next();
         				out3.write(electionname.getBytes());
         				in2.read(candidates);
-        					System.out.println("Here are the candidates:");
-        					String candidate=new String(candidates);
-        					System.out.println(candidate);
+        				System.out.println("Here are the candidates:");
+        				String candidate=new String(deserialize(candidates));
+        				System.out.println(candidate);
         			
         				System.out.println("Please enter the candidate of your choice:");
         				String cand=sc.next();
@@ -269,7 +270,7 @@ public class VeritasLogin {
         				voter.vote(choice, name, electionname);
         			}
             	
-            	if(check_identity==1){
+            	if(check_identity==0){
         			Connection con2=DriverManager.getConnection(url, user, pw);
         			Statement st2=con2.createStatement();
         			

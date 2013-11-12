@@ -44,14 +44,14 @@ public class Setup {
 				try{
 					String url="jdbc:mysql://localhost:3306/Server";
 			    	String user="root";
-			    	String pw="lrn7777rui";
+			    	String pw="";
 		    		Connection conn = DriverManager.getConnection(url, user, pw);
 		            Statement stmt = conn.createStatement();
 		            PreparedStatement pstmt=null;
 		            byte[] ack=new byte[4096];
 		            byte[] ack2=new byte[4096];
-		            byte[] ack_supervisor=serialize(1);
-		            byte[] ack_voter=serialize(0);
+		            byte[] ack_supervisor=serialize(0);
+		            byte[] ack_voter=serialize(1);
 		            byte[] votes= new byte[4096];
 		            byte[] request = new byte[4096];
 					byte[] receiveBuf = new byte[4096];
@@ -132,9 +132,7 @@ public class Setup {
 						
 						String username= new String(bufArray3.get(0));
 						String pwd= new String(bufArray3.get(1));
-					//	System.out.println(username);
 						String query = "SELECT * FROM users WHERE username='"+username+"'";
-					
 						ResultSet rs = stmt.executeQuery(query);
 						String databaseUsername = "";
 						byte[] databasePassword=null;
@@ -145,7 +143,7 @@ public class Setup {
 			            	databasePassword = rs.getBytes("password");
 			            	databaseSalt = rs.getBytes("salt");		//Get salt from database to hash the input password
 			            }
-			            
+			            System.out.println("test");
 			            byte[] input_password=pwd.getBytes();		//Hash the input password & compare with the hash value in database
 						byte[] input=new byte[input_password.length+4];
 						input[0]=databaseSalt[0];
@@ -161,111 +159,114 @@ public class Setup {
 						String databasePasswordString=new String(databasePassword);
 					
 			            if (username.equals(databaseUsername) && hashed_input.equals(databasePasswordString)) { //check username & password
-			            	
+			            	System.out.println("authenticated");
 			            	out.write(serialize(1));
 			            	in.read(ack2);
 			            	/*** check if this user is a supervisor or a voter  or go to different functions  ***/
 			            	query = "SELECT * from elections WHERE usernames='"+username+"'";
 							 rs = stmt.executeQuery(query);
-			            	 while(rs.next()){
-			                 	if(rs.getString("usertype").equals("1")){
-										out.write(ack_supervisor);
-										in.read(receiveBuf);
-										ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
-										for (int j = 0; j <= 1; j++) {
-											int tmp = byteArray.read();
-											byte[] tmpArray = new byte[tmp];
-											byteArray.read(tmpArray, 0, tmp);
-											bufArray.add(tmpArray);
-										}
-										
-										String electionname=new String(bufArray.get(0), "UTF-8");
-										String cand=new String(bufArray.get(1), "UTF-8");
-										//add electionname and cand to database
-										stmt.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
-										stmt.execute("create table "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
-						    			stmt.execute("create table "+electionname+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
-						        		stmt.execute("create table "+electionname+"results (vote varchar(50));");
-						        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
-						    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
-						    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
-						    			AsymmetricKeyParameter pkAdmin=keys.getPublic();
-						    			AsymmetricKeyParameter skAdmin=keys.getPrivate();
-						    			byte[] pk=serialize(pkAdmin);
-						    			byte[] sk=serialize(skAdmin);
-						    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
-						    			pstmt.setString(1, electionname);
-						    			pstmt.setBytes(2, pk);
-						    			pstmt.setBytes(3, sk);
-						    			pstmt.execute();
-						    			stmt.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '0');");
-						    			
-						    			
-										//send usernames to the client
-										 ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
-						        		 ResultSet rs2 = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
-						        		 int count=0;
-						        		 while (rs2.next()){
-						        			 count++;
-						        		 }
-						        		 out.write(serialize(count));
-						        		
-						        	
-						    			 while(rs2.next()) { 
-						    				 String userName = rs.getString("usernames");
-						    				 byte[] userNamebyte=userName.getBytes();
-						    				 byteArray2.write(userNamebyte.length);
-						    				 byteArray2.write(userNamebyte);
-						  				  
-						    			 }
-						    			 	
-											in.read(ack);
-											int Ack= (Integer)deserialize(ack);	 
-											if (Ack==1){
-												out.write(byteArray2.toByteArray());
-											}
-						  				 
-						  				 // get the authorized users from the client:
-						  				 
-						  				in.read(receiveBuf2);
-						  				int voteNumbers=(Integer)deserialize(receiveBuf2);
-						  				int ack3=1;
-						  				out.write(serialize(ack3));
-										in.read(receiveBuf3);
-										ByteArrayInputStream byteArray3 = new ByteArrayInputStream(receiveBuf3);
-										for (int j = 0; j <voteNumbers; j++) {
-											int tmp = byteArray.read();
-											byte[] tmpArray = new byte[tmp];
-											byteArray3.read(tmpArray, 0, tmp);
-											bufArray2.add(tmpArray);
-										}
-										
-						 				 // update the database using the authorized list:  
-										for(int i=0;i<voteNumbers;i++){
-											String authuser=new String (bufArray2.get(i));
-											stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE usernames='"+authuser+"'");
-											
-										}
+			            	 if(rs.next()){
+			                 	if(rs.getString("usertype").equals("0")){
+			                 		System.out.println("supervisor type");
+									out.write(ack_supervisor);
+									in.read(receiveBuf);
+									ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
+									for (int j = 0; j <= 1; j++) {
+										int tmp = byteArray.read();
+										byte[] tmpArray = new byte[tmp];
+										byteArray.read(tmpArray, 0, tmp);
+										bufArray.add(tmpArray);
 									}
+										
+									String electionname=new String(bufArray.get(0), "UTF-8");
+									String cand=new String(bufArray.get(1), "UTF-8");
+									//add electionname and cand to database
+									stmt.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
+									stmt.execute("create table "+electionname+" (username varchar(50), encVote varbinary(3072), signedVote varbinary(3072));");
+					    			stmt.execute("create table "+electionname+"votes (nonce varbinary(100), encVote varbinary(3072), signedVote varbinary(3072));");
+					        		stmt.execute("create table "+electionname+"results (vote varchar(50));");
+					        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
+					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
+					    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
+					    			AsymmetricKeyParameter pkAdmin=keys.getPublic();
+					    			AsymmetricKeyParameter skAdmin=keys.getPrivate();
+					    			byte[] pk=serialize(pkAdmin);
+					    			byte[] sk=serialize(skAdmin);
+					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
+					    			pstmt.setString(1, electionname);
+					    			pstmt.setBytes(2, pk);
+					    			pstmt.setBytes(3, sk);
+					    			pstmt.execute();
+					    			stmt.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '0');");
+					    			
+					    			
+									//send usernames to the client
+									 ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
+					        		 ResultSet rs2 = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
+					        		 int count=0;
+					        		 while (rs2.next()){
+					        			 count++;
+					        		 }
+					        		 out.write(serialize(count));
+					        		
+					        	
+					    			 while(rs2.next()) { 
+					    				 String userName = rs.getString("usernames");
+					    				 byte[] userNamebyte=userName.getBytes();
+					    				 byteArray2.write(userNamebyte.length);
+					    				 byteArray2.write(userNamebyte);
+					  				  
+					    			 }
+					    			 	
+									in.read(ack);
+									int Ack= (Integer)deserialize(ack);	 
+									if (Ack==1){
+										out.write(byteArray2.toByteArray());
+									}
+					  				 
+					  				 // get the authorized users from the client:
+					  				 
+					  				in.read(receiveBuf2);
+					  				int voteNumbers=(Integer)deserialize(receiveBuf2);
+					  				int ack3=1;
+					  				out.write(serialize(ack3));
+									in.read(receiveBuf3);
+									ByteArrayInputStream byteArray3 = new ByteArrayInputStream(receiveBuf3);
+									for (int j = 0; j <voteNumbers; j++) {
+										int tmp = byteArray.read();
+										byte[] tmpArray = new byte[tmp];
+										byteArray3.read(tmpArray, 0, tmp);
+										bufArray2.add(tmpArray);
+									}
+									
+					 				 // update the database using the authorized list:  
+									for(int i=0;i<voteNumbers;i++){
+										String authuser=new String (bufArray2.get(i));
+										stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE usernames='"+authuser+"'");
+										
+									}
+								}
 									
 									
 			            	 }
 			                 	/***  function for voter       ***/
-			            	if(rs.getString("usertype").equals("0")){
+			            	if(rs.getString("usertype").equals("1")){
+			            		System.out.println("Got to voter type");
 			            		out.write(ack_voter);
 			            		in.read(receiveBuf);
 			            		int numelections=0;
 			            		ByteArrayOutputStream byteArray5 = new ByteArrayOutputStream();
 			            		rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+username+"'");
 			            		while(rs.next()){
+			            			System.out.println("voter type");
 			        				ResultSetMetaData metadata = rs.getMetaData();
 			        				int columnCount = metadata.getColumnCount();
 			        				for(int i=3;i<=columnCount;i++){
 			        					if(rs.getString(i).equals("1")){
 			        						System.out.print((i-2)+"."+metadata.getColumnName(i)+" ");
-			        							numelections++;
-			        							byteArray5.write(serialize(metadata.getColumnName(i)).length);
-			        							byteArray5.write(serialize(metadata.getColumnName(i)));
+			        						numelections++;
+			        						byteArray5.write(serialize(metadata.getColumnName(i)).length);
+			        						byteArray5.write(serialize(metadata.getColumnName(i)));
 			        					}
 			        				}
 			        			}
@@ -276,9 +277,9 @@ public class Setup {
 			        				in.read( receiveBuf6 );
 			        				out.write(serialize(numelections));
 			        				in.read(receiveBuf6);
-			        				String electionname=new String(receiveBuf6);
 			        				out.write(byteArray5.toByteArray());
 			        				in.read(receiveBuf6);
+			        				String electionname=new String(receiveBuf6);
 			        				rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"'");
 
 			        				String candidates=null;
@@ -287,7 +288,7 @@ public class Setup {
 			        				candidates=rs.getString(1);
 			        		
 			        				}
-			        				out.write(serialize(candidates));
+			        				out.write(candidates.getBytes());
 			        				in.read(votes);
 			        				String choice=new String(votes);
 			        				Vote voter=new Vote();
