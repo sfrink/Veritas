@@ -132,14 +132,28 @@ public class Setup {
 						ResultSet rs = stmt.executeQuery(query);
 						String databaseUsername = "";
 						String databasePassword = "";
+						String databasesalt = "";
 			            while(rs.next()){  
 			            	
 		                databaseUsername = rs.getString("username");
 		                databasePassword = rs.getString("password");
+		                databaseSalt = rs.getString("salt");		//Get salt from database to hash the input password
 			            }
+			            
+			            byte[] input_password=pwd.getBytes();		//Hash the input password & compare with the hash value in database
+						byte[] input=new byte[password.length+4];
+						input[0]=databaseSalt[0];
+						input[1]=databaseSalt[1];
+						input[2]=databaseSalt[2];
+						input[3]=databaseSalt[3];
+						for(int i=0;i<input_password.length;i++){
+							input[i+4]=input_password[i];
+						}
+						byte[] input_hash=sha.digest(input);
+						String hashed_input= new String(input_hash);
 
 					
-			            if (username.equals(databaseUsername) && pwd.equals(databasePassword )) {           //check username & password
+			            if (username.equals(databaseUsername) && hashed_input.equals(databasePassword )) {           //check username & password
 			            	out.write(serialize(1));
 			            	in.read(ack2);
 			            	/*** check if this user is a supervisor or a voter  or go to different functions  ***/
