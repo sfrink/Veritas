@@ -57,7 +57,7 @@ public class VeritasLogin {
         	ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
         	String url="jdbc:mysql://localhost:3306/Client";
 			String user="root";
-			String pw="lrn7777rui";
+			String pw="";
 			try{
 				Class.forName("com.mysql.jdbc.Driver");
 			}

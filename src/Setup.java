@@ -44,7 +44,7 @@ public class Setup {
 				try{
 					String url="jdbc:mysql://localhost:3306/Server";
 			    	String user="root";
-			    	String pw="lrn7777rui";
+			    	String pw="";
 		    		Connection conn = DriverManager.getConnection(url, user, pw);
 		            Statement stmt = conn.createStatement();
 		            PreparedStatement pstmt=null;
@@ -191,11 +191,6 @@ public class Setup {
 									System.out.println("got name and cands");
 									
 									
-									String[] cands=cand.split(",");
-									int numV=cands.length;
-									String numVoters=""+numV;
-									
-									
 									//add electionname and cand to database
 									Statement stmt2 = conn.createStatement();
 									stmt2.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
@@ -266,9 +261,11 @@ public class Setup {
 					 				 // update the database using the authorized list:  
 									for(int i=0;i<voteNumbers;i++){
 										String authuser=new String (bufArray2.get(i));
-										stmt.execute("INSERT INTO elections ("+electionname+") VALUES '1' WHERE usernames='"+authuser+"'");
+										stmt.execute("UPDATE elections SET "+electionname+"='1' WHERE usernames='"+authuser+"'");
 										
 									}
+									String numVoters=""+voteNumbers;
+									stmt.execute("UPDATE candidates SET numVoters='"+numVoters+"' WHERE election='"+electionname+"'");
 								}
 									
 									
