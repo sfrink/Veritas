@@ -44,7 +44,7 @@ public class Setup {
 				try{
 					String url="jdbc:mysql://localhost:3306/Server";
 			    	String user="root";
-			    	String pw="";
+			    	String pw="lrn7777rui";
 		    		Connection conn = DriverManager.getConnection(url, user, pw);
 		            Statement stmt = conn.createStatement();
 		            PreparedStatement pstmt=null;
@@ -60,6 +60,7 @@ public class Setup {
 					byte[] receiveBuf4 = new byte[4096];
 					byte[] receiveBuf5 = new byte[4096];
 					byte[] receiveBuf6 = new byte[4096];
+					byte[] receiveBuf7 = new byte[4096];
 					InputStream in = clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
 					// get the username and candidate
@@ -174,8 +175,8 @@ public class Setup {
 			                 	if(rs.getString("usertype").equals("0")){
 			                 		System.out.println("supervisor type");
 									out.write(ack_supervisor);
-									in.read(receiveBuf);
-									ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
+									in.read(receiveBuf7);
+									ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf7);
 									for (int j = 0; j <= 1; j++) {
 										int tmp = byteArray.read();
 										byte[] tmpArray = new byte[tmp];
@@ -185,12 +186,16 @@ public class Setup {
 										
 									String electionname=new String(bufArray.get(0));
 									String cand=new String(bufArray.get(1));
+								
+									//System.out.println(electionname+"\n");
 									System.out.println("got name and cands");
+									
+									
 									String[] cands=cand.split(",");
 									int numV=cands.length;
 									String numVoters=""+numV;
-									System.out.println(electionname+"\n");
-									System.out.println(cand);
+									
+									
 									//add electionname and cand to database
 									Statement stmt2 = conn.createStatement();
 									stmt2.execute("ALTER TABLE elections ADD "+electionname+" varchar(1)");
