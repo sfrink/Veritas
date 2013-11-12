@@ -118,6 +118,8 @@ public class VeritasLogin {
 				byteArray2.write(c_nameByte);
 				byteArray2.write(c_pwdByte.length);
 				byteArray2.write(c_pwdByte);
+				byteArray2.write((type.getBytes()).length);
+				byteArray2.write(type.getBytes());
 				out3.write(byteArray2.toByteArray());
             	
             	
