@@ -205,17 +205,22 @@ public class Setup {
 					        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
 					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
 					    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
-					    			AsymmetricKeyParameter pkAdmin=keys.getPublic();
-					    			AsymmetricKeyParameter skAdmin=keys.getPrivate();
-					    			byte[] pk=serialize(pkAdmin);
-					    			byte[] sk=serialize(skAdmin);
+					    			RSAKeyParameters pkAdmin=(RSAKeyParameters)keys.getPublic();
+					    			RSAKeyParameters skAdmin=(RSAKeyParameters)keys.getPrivate();
+					    			BigInteger pk=pkAdmin.getExponent();
+					    			byte[] pkByte=pk.toByteArray();
+					    			BigInteger sk=skAdmin.getExponent();
+					    			byte[] skByte=sk.toByteArray();
+					    			BigInteger mod=pkAdmin.getModulus();
+					    			byte[] modByte=mod.toByteArray();
 					    			System.out.println("generated keys");
-					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, pk, sk) values (?,?,?);");
+					    			pstmt=conn.prepareStatement("INSERT INTO adminkeys (election, modulus, sk, pk) values (?,?,?,?);");
 					    			pstmt.setString(1, electionname);
-					    			pstmt.setBytes(2, pk);
-					    			pstmt.setBytes(3, sk);
+					    			pstmt.setBytes(2, modByte);
+					    			pstmt.setBytes(3, skByte);
+					    			pstmt.setBytes(4, pkByte);
 					    			pstmt.execute();
-					    			stmt2.execute("INSERT INTO candidates (election, candidateSet, numVoters) VALUES ('"+electionname+"', '"+cand+"', '"+numVoters+"');");
+					    			stmt2.execute("INSERT INTO candidates (election, candidateSet) VALUES ('"+electionname+"', '"+cand+"');");
 					    			
 					    			
 									//send usernames to the client
@@ -227,9 +232,10 @@ public class Setup {
 					        		 }
 					        		 out.write(serialize(count));
 					        		
-					        	
+					        		 rs2 = stmt2.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
 					    			 while(rs2.next()) { 
-					    				 String userName = rs.getString("usernames");
+					    				 String userName = rs2.getString("usernames");
+					    				 System.out.println(userName);
 					    				 byte[] userNamebyte=userName.getBytes();
 					    				 byteArray2.write(userNamebyte.length);
 					    				 byteArray2.write(userNamebyte);
@@ -259,9 +265,9 @@ public class Setup {
 									
 					 				 // update the database using the authorized list:  
 									for(int i=0;i<voteNumbers;i++){
-										String authuser=new String (bufArray2.get(i));
+										String authuser=new String(bufArray2.get(i));
 										stmt.execute("UPDATE elections SET "+electionname+"='1' WHERE usernames='"+authuser+"'");
-										
+										System.out.println("authorizing "+authuser);
 									}
 									String numVoters=""+voteNumbers;
 									stmt.execute("UPDATE candidates SET numVoters='"+numVoters+"' WHERE election='"+electionname+"'");

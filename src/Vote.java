@@ -70,23 +70,22 @@ public class Vote {
 		
 			byte[] receiveBuf = new byte[4096];
 			in.read(receiveBuf);
-			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
+			ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
 			ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
 			for (int j = 0; j <=1; j++) {
 					int tmp = byteArray.read();
 					byte[] tmpArray = new byte[tmp];
 					byteArray.read(tmpArray, 0, tmp);
-					bufArray.add(tmpArray);
+					bufArray2.add(tmpArray);
 				}  
 	
-			byte[] adminkey=bufArray.get(0);
-			byte[] mod=bufArray.get(1);
-			//byte[] modulus=
+			byte[] adminkey=bufArray2.get(0);
+			byte[] modulus=bufArray2.get(1);
 			
-			BigInteger blindFactor=getBlindingFactor(adminkey);
+			BigInteger blindFactor=getBlindingFactor(adminkey, modulus);
 			
 			//Blind encrypted vote:
-			byte[] blindBytes=blind(c, adminkey, blindFactor);
+			byte[] blindBytes=blind(c, adminkey, modulus, blindFactor);
 			
 			
 			//Sign blind
@@ -133,10 +132,10 @@ public class Vote {
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Username: "+username+"; Description: Voter received signed blind from Admin\n");
 			
 			//unblind
-			byte[] signedVote=unblind(blindedSignedVote, blindFactor, adminkey);
+			byte[] signedVote=unblind(blindedSignedVote, blindFactor, adminkey, modulus);
 			
 			//verify
-			boolean good=verify(adminkey, c, signedVote);
+			boolean good=verify(adminkey, c, signedVote, modulus);
 			
 			if(good){
 				
@@ -308,12 +307,6 @@ public class Vote {
 		sign.initSign(SK);
 		sign.update(blind);
 		return 	sign.sign();
-	}
-	
-	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
-		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
-        ObjectInputStream o = new ObjectInputStream(b);
-        return o.readObject();
 	}
 
 }
