@@ -66,12 +66,12 @@ public class Counter2 {
 						}		
 					
 				
-				
 				byte[] nonce=bufArray.get(0);
 				byte[] key=bufArray.get(1);
 				String electionname = new String(bufArray.get(2), "UTF-8");
+				electionname=electionname.trim();
 				byte[] iv=bufArray.get(3);
-				
+				System.out.println("got stuff");
                 logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");        
                 SecretKeySpec sk=new SecretKeySpec(key, "AES");
 				Cipher dec=Cipher.getInstance("AES/CBC/PKCS5PADDING");
@@ -104,54 +104,39 @@ public class Counter2 {
 						count++;
 					}
 					if(count==numVoters){
+						System.out.println("got all votes");
 						rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
-						while(rs.next()){
-							for(int i=0;i<candidates.length;i++){
-								if(rs.getString("vote").equals(candidates[i]))
-									tally[i]++;
-							}
-						}
-						int maxindex=0;
-						int max=0;
-						//String tie=""; We'll want to check for ties somehow
-						for(int i=0;i<tally.length;i++){
-							if(tally[i]>max){
-								maxindex=i;
-								max=tally[i];
-							}
-						}
-						/*****Send candidates[maxindex] to all Vote clients****/
-						byte[] maxindexByte=serialize(maxindex);
-						out.write(maxindexByte);
-						
-						st.execute("DROP TABLE "+electionname);
-						st.execute("DROP TABLE "+electionname+"votes");
-						st.execute("DROP TABLE "+electionname+"results");
-						System.exit(0);
+						break;
 					}
 				}
+				while(rs.next()){
+					for(int i=0;i<candidates.length;i++){
+						if(rs.getString("vote").equals(candidates[i]))
+							tally[i]++;
+					}
+				}
+				int maxindex=0;
+				int max=0;
+				//String tie=""; We'll want to check for ties somehow
+				for(int i=0;i<tally.length;i++){
+					if(tally[i]>max){
+						maxindex=i;
+						max=tally[i];
+					}
+				}
+				/*****Send candidates[maxindex] to all Vote clients****/
+				byte[] maxindexByte=candidates[maxindex].getBytes();
+				System.out.println(candidates[maxindex]);
+				out.write(maxindexByte);
+				
+				st.execute("DROP TABLE "+electionname);
+				st.execute("DROP TABLE "+electionname+"votes");
+				st.execute("DROP TABLE "+electionname+"results");
+				st.execute("ALTER TABLE elections DROP "+electionname);
+				st.execute("DELETE FROM candidates WHERE election='"+electionname+"'");
 
 				}
 					catch (Exception e){}
-				}
-				
-				private  byte[] serialize(int n) throws IOException {
-		
-					ByteArrayOutputStream b = new ByteArrayOutputStream();
-       
-					ObjectOutputStream o = null;
-		
-					try {
-			
-						o = new ObjectOutputStream(b);
-			
-						o.writeObject(n);
-		
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					return b.toByteArray();
 				}
 				}).start();
 			}

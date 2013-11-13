@@ -160,12 +160,4 @@ public class Counter {
 
 	}
 	
-	
-	
-	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
-		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
-        ObjectInputStream o = new ObjectInputStream(b);
-        return o.readObject();
-	}
-	
 }

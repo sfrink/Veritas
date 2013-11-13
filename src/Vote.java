@@ -252,12 +252,20 @@ public class Vote {
 			ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
 			byteArray3.write(nonce.length);
 			byteArray3.write(nonce);
+			System.out.println("sent nonce");
 			byteArray3.write(key.length);
 			byteArray3.write(key);
+			System.out.println("sent key");
+			byteArray3.write((electionname.getBytes()).length);
+			byteArray3.write(electionname.getBytes());
+			System.out.println("sent elecname");
 			byteArray3.write(iv.length);
 			byteArray3.write(iv);
+			System.out.println("sent iv");
 			out3.write(byteArray3.toByteArray());
-			byte[] recevBuff=null;
+			System.out.println("sent all");
+			
+			byte[] recevBuff=new byte[10000];
 			in3.read(recevBuff);
 			String results=new String(recevBuff);
 			System.out.println("The winner was "+results+".");
