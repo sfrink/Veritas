@@ -41,6 +41,7 @@ public class Counter2 {
 			while(true){
 				final Socket clntSock=servSock.accept();
 				SocketAddress clientAddress=clntSock.getRemoteSocketAddress();
+				System.out.println(clientAddress.toString());
 				System.out.println("receiving requests from client at "+clientAddress);
 				
 				new Thread(new Runnable() {
@@ -90,10 +91,10 @@ public class Counter2 {
 				rs=st.executeQuery("SELECT numVoters FROM candidates WHERE election='"+electionname+"';");
 				rs.next();
 				int numVoters=Integer.parseInt(rs.getString("numVoters"));
-				System.out.println("testing8");
+				//System.out.println("testing8");
 				rs=st.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"';");
 				rs.next();
-				System.out.println("testing9");
+				//System.out.println("testing9");
 				String cand=rs.getString("candidateSet");
 				String[] candidates=cand.split(",");
 				int[] tally=new int[candidates.length];
