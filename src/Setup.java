@@ -209,6 +209,8 @@ public class Setup {
 					    			RSAKeyParameters skAdmin=(RSAKeyParameters)keys.getPrivate();
 					    			BigInteger pk=pkAdmin.getExponent();
 					    			byte[] pkByte=pk.toByteArray();
+					    			System.out.println("length: "+pkByte.length);
+					    			System.out.println(pk.toString());
 					    			BigInteger sk=skAdmin.getExponent();
 					    			byte[] skByte=sk.toByteArray();
 					    			BigInteger mod=pkAdmin.getModulus();

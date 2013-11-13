@@ -134,22 +134,29 @@ public class Counter2 {
 				}
 					catch (Exception e){}
 				}
+				
 				private  byte[] serialize(int n) throws IOException {
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-        ObjectOutputStream o = null;
-		try {
-			o = new ObjectOutputStream(b);
-			o.writeObject(n);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return b.toByteArray();
-	}
-		}).start();
-	}
+		
+					ByteArrayOutputStream b = new ByteArrayOutputStream();
+       
+					ObjectOutputStream o = null;
+		
+					try {
+			
+						o = new ObjectOutputStream(b);
+			
+						o.writeObject(n);
+		
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return b.toByteArray();
+				}
+				}).start();
+			}
 	
-}
+		}
 		catch(Exception e){
 			System.out.println(e);
 		}

@@ -105,7 +105,8 @@ public class Vote {
 			rs.next();
 			byte[] votersk=rs.getBytes("sk");
 			byte[] signedBlind=signBlind(blindBytes, votersk);
-
+			byte[] nonce = null;
+			byte[] key = null;
 			
 			//Send username, signedBlind and blindBytes, and electionname to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
@@ -186,19 +187,33 @@ public class Vote {
 			System.out.println("verify ran");
 			if(good){
 				System.out.println("sig verified");
-				Socket socket2=new Socket("localhost",8000);
+				Socket socket2=new Socket("localhost",8000);	
+				InputStream in2=socket2.getInputStream();
+				OutputStream out2=socket2.getOutputStream();
 				System.out.println("Connected to server of the counter");
 				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
-				byteArray3.write(c.length);
-				byteArray3.write(c);
-				byteArray3.write(signedVote.length);
-				byteArray3.write(signedVote);
-				
-				byteArray3.write(electionnameBytes.length);
-				byteArray3.write(electionnameBytes);
-				out.write(byteArray3.toByteArray());
+				DataOutputStream dataOut2 =new DataOutputStream(byteArray3);
+			
+				dataOut2.writeInt(c.length);
+				dataOut2.write(c);
+				dataOut2.writeInt(signedVote.length);
+				dataOut2.write(signedVote);
+				dataOut2.writeInt(electionnameBytes.length);
+				dataOut2.write(electionnameBytes);
+		
+		
+				out2.write(byteArray3.toByteArray());
+				in2.read(receiveBuf);
+				ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf);
+				for (int j = 0; j <= 2; j++) {
+					int tmp = byteArray4.read();
+					byte[] tmpArray = new byte[tmp];
+					byteArray4.read(tmpArray, 0, tmp);
+					bufArray.add(tmpArray);
+				}
+				nonce= bufArray.get(0);
+				key=k.getEncoded();
 				socket2.close();
-
 				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
 				//System.out.println("testing5 sig verified");
 				/*Send signedVote along with c to Counting Principal.*/
@@ -216,15 +231,7 @@ public class Vote {
 			}
 			/***List of (nonce,encVote,signedVote) needs to be sent from Counter to Vote***/
 			
-			in.read(receiveBuf);
-			ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf);
-			for (int j = 0; j <= 2; j++) {
-				int tmp = byteArray4.read();
-				byte[] tmpArray = new byte[tmp];
-				byteArray4.read(tmpArray, 0, tmp);
-				bufArray.add(tmpArray);
-			}
-			byte[] nonce= bufArray.get(0);
+			
 			//byte[] encVote= bufArray.get(1);	
 			//byte[] signedVote2= bufArray.get(2);	
 			/*
@@ -235,11 +242,13 @@ public class Vote {
 			rs.next();*/
 			//byte[] nonce=rs.getBytes("nonce");
 			//System.out.println("testing6");
-			byte[] key=k.getEncoded();
-			
+		
+		
+
 			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter2");
 			OutputStream out3=socket3.getOutputStream();
+			InputStream in3=socket3.getInputStream();
 			ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
 			byteArray3.write(nonce.length);
 			byteArray3.write(nonce);
@@ -249,7 +258,7 @@ public class Vote {
 			byteArray3.write(iv);
 			out3.write(byteArray3.toByteArray());
 			byte[] recevBuff=null;
-			in.read(recevBuff);
+			in3.read(recevBuff);
 			String results=new String(recevBuff);
 			System.out.println("The winner was "+results+".");
 			socket3.close();

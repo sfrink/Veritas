@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.net.*;
 import java.security.*;
 import java.sql.Connection;
@@ -50,7 +51,7 @@ public class Counter {
 					ResultSet rs=null;
 					InputStream in=clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
-					byte [] receiveBuf=new byte[1280];
+					byte [] receiveBuf=new byte[12800];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 			
 				
@@ -60,12 +61,19 @@ public class Counter {
 							in.read(receiveBuf);
 							ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
 							ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
+							
+							
+							DataInputStream inputData=new DataInputStream(byteArray);
+							
 							for (int j = 0; j <= 2; j++) {
-								int tmp = byteArray.read();
+								int tmp = inputData.readInt();
 								byte[] tmpArray = new byte[tmp];
-								byteArray.read(tmpArray, 0, tmp);
+								///for(int i=0;i<tmp;i++){
+									//tmpArray[i]=(byte)byteArray.read();
+								inputData.read(tmpArray,0,tmp);
 								bufArray.add(tmpArray);
 							}
+							
 							
 			
 							// get the value of encVote, signedVote and electionname 
@@ -73,16 +81,20 @@ public class Counter {
 							byte[] encVote=bufArray.get(0);
 							byte[] signedVote=bufArray.get(1);
 							String electionname = new String(bufArray.get(2), "UTF-8");
+							electionname=electionname.trim();
 							logwrite.println("Time: "+sdf.format(date)+"; Event Type: Counter Receive Info; Electionname: "+electionname+"; Description: Counter received signed vote from "+electionname+"\n");
 				
-			                System.out.println("testing2");
+			                System.out.println(electionname);
 							//Check signature
 							rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"'");
 							rs.next();
 							byte[] adminpk=rs.getBytes("pk");
-							
+							rs=st.executeQuery("SELECT modulus FROM adminkeys WHERE election='"+electionname+"'");
+							rs.next();
+							byte[] mod=rs.getBytes("modulus");
+							System.out.println(adminpk.length);
 							//verify
-							boolean goodSign=verify(adminpk, encVote, signedVote);
+							boolean goodSign=verify(adminpk, mod, encVote, signedVote);
 							
 							
 							System.out.println("testing3");
@@ -137,12 +149,14 @@ public class Counter {
 	
 	
 	
-	private static boolean verify(byte[] pk, byte[] message, byte[] sig) throws IOException, ClassNotFoundException{
-		RSAKeyParameters adminpk=(RSAKeyParameters)deserialize(pk);
+	private static boolean verify(byte[] pk, byte[] mod, byte[] message, byte[] sig){
 		PSSSigner signer=new PSSSigner(new RSAEngine(), new SHA1Digest(), 20);
+		BigInteger p=new BigInteger(pk);
+		BigInteger m=new BigInteger(mod);
+		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
 		signer.init(false, adminpk);
 		signer.update(message, 0,message.length);
-		return signer.verifySignature(sig); 
+		return signer.verifySignature(sig);
 
 	}
 	
