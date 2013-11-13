@@ -1,7 +1,6 @@
 import java.math.BigInteger;
 import java.net.*;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -41,8 +40,8 @@ public class Admin {
 				System.out.println("receiving requests from client at "+clientAddress);
 				new Thread(new Runnable() {
 					ResultSet rs=null;
-					byte [] receiveBuf=new byte[8000];
-					byte [] receiveBuf2=new byte[8000];
+					byte [] receiveBuf=new byte[12800];
+					byte [] receiveBuf2=new byte[12800];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				  	InputStream in=clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
@@ -91,23 +90,48 @@ public class Admin {
 								out.write(byteArray2.toByteArray());
 								System.out.println("Sent key");
 								
-								in.read(receiveBuf2);
+								/*in.read(receiveBuf2);
 								System.out.println("Sent key2");
 								ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 4; j++) {
 									int tmp = byteArray.read();
 									byte[] tmpArray = new byte[tmp];
-									byteArray.read(tmpArray, 0, tmp);
+									for(int i=0;i<tmp;i++){
+										tmpArray[i]=(byte)byteArray.read();
+									}
+									//byteArray.read(tmpArray, 0, tmp);
 									bufArray.add(tmpArray);
 								}
-		
+								
+		*/						in.read(receiveBuf2);
+								ByteArrayInputStream byteArrayin= new  ByteArrayInputStream(receiveBuf2);
+								DataInputStream inputData=new DataInputStream(byteArrayin);
+								
+								for (int j = 0; j <= 3; j++) {
+									int tmp = inputData.readInt();
+									byte[] tmpArray = new byte[tmp];
+									///for(int i=0;i<tmp;i++){
+										//tmpArray[i]=(byte)byteArray.read();
+									inputData.read(tmpArray,0,tmp);
+									bufArray.add(tmpArray);
+								}
+								//byteArray.read(tmpArray, 0, tmp);
+							
+							
+								
+								
+								
+								
 								System.out.println("stuff");
 							    //get the value of username, blindBytes and signedBlind --- also need to get election name
 								String username = new String(bufArray.get(0), "UTF-8");
 								byte[] blindBytes=bufArray.get(1);
 								byte[] signedBlind=bufArray.get(2);
 								byte[] voterpk=bufArray.get(3);
+								System.out.println("Blind: "+blindBytes.length);
+								System.out.println("sign: "+signedBlind.length);
+								System.out.println("pk:"+voterpk.length);
 								System.out.println("got info from voter");
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 								//RSAPrivateKey skAdmin;

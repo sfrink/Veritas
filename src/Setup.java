@@ -127,7 +127,7 @@ public class Setup {
 					}
 					
 					/*** check if this user should be authenticated      ***/
-						/***  function for supervisor       ***/
+						/***  function for supervisor***/
 						in.read(receiveBuf4);
 						ByteArrayInputStream byteArray4 = new ByteArrayInputStream(receiveBuf4);
 						for (int j = 0; j <=1; j++) {

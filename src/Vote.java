@@ -68,7 +68,7 @@ public class Vote {
 			byte[] electionnameByte=electionname.getBytes();
 			out.write(electionnameByte);
 		
-			byte[] receiveBuf = new byte[4096];
+			byte[] receiveBuf = new byte[12800];
 			in.read(receiveBuf);
 			ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
 			ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
@@ -101,23 +101,45 @@ public class Vote {
 			rs=st.executeQuery("SELECT pk FROM voterkey WHERE username='"+username+"'");
 			rs.next();
 			byte[] voterpk=rs.getBytes("pk");			
-
-		
+			PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
+			Signature ver=Signature.getInstance("SHA256WITHRSA");
+			ver.initVerify(PK);
+			ver.update(blindBytes);
+			System.out.println(ver.verify(signedBlind));
 			ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
-			byteArray2.write(usernameBytes.length);
-			byteArray2.write(usernameBytes);
-			byteArray2.write(blindBytes.length);
-			byteArray2.write(blindBytes);
+			DataOutputStream dataOut =new DataOutputStream(byteArray2);
+			System.out.println("Blind: "+blindBytes.length);
+			System.out.println("sign: "+signedBlind.length);
+			System.out.println("pk:"+voterpk.length);
+			dataOut.writeInt(usernameBytes.length);
+			dataOut.write(usernameBytes);
+			dataOut.writeInt(blindBytes.length);
+			dataOut.write(blindBytes);
+			dataOut.writeInt(signedBlind.length);
+			dataOut.write(signedBlind);
+			dataOut.writeInt(voterpk.length);
+			dataOut.write(voterpk);
+		/*	for(int i=0;i<blindBytes.length;i++){
+				byte[] seg=new byte[1];
+				seg[0]=blindBytes[i];
+				byteArray2.write(seg);
+			}
+			//byteArray2.write(blindBytes);
 			byteArray2.write(signedBlind.length);
-			byteArray2.write(signedBlind);
+			for(int i=0;i<signedBlind.length;i++){
+				byte[] seg=new byte[1];
+				seg[0]=signedBlind[i];
+				byteArray2.write(seg);
+			}
+			//byteArray2.write(signedBlind);
 			byteArray2.write(voterpk.length);
-			byteArray2.write(voterpk);
-			byte[] stuff=new byte[1];
-			stuff[0]=(byte)1;
-			byteArray2.write(stuff.length);
-			byteArray2.write(stuff);
+			for(int i=0;i<voterpk.length;i++){
+				byte[] seg=new byte[1];
+				seg[0]=voterpk[i];
+				byteArray2.write(seg);
+			}
+			//byteArray2.write(voterpk);*/
 			out.write(byteArray2.toByteArray());
-			System.out.println("got info from voter");
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			//System.out.println("testing3");
 			
