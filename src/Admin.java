@@ -160,6 +160,7 @@ public class Admin {
 								if(eligible && goodSig){
 									System.out.println("good sig");
 									byte[] signed=sign(adminsk, mod, blindBytes);
+									System.out.println(signed.length);
 									out.write(signed);
 									logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Send Info; Election: "+electionname+"; Description: Admin sent signed blind to "+username+"\n");
 								}
@@ -200,10 +201,13 @@ public class Admin {
 	private static byte[] sign(byte[] sk,byte[] mod, byte[] message) throws IOException, ClassNotFoundException{
 		BigInteger m=new BigInteger(mod);
 		BigInteger s=new BigInteger(sk);
-		RSAKeyParameters adminsk=new RSAKeyParameters(true, m, s);
+		/*RSAKeyParameters adminsk=new RSAKeyParameters(true, m, s);
 		RSAEngine sign=new RSAEngine();
 		sign.init(true, adminsk);
-		return sign.processBlock(message, 0, message.length);
+		return sign.processBlock(message, 0, message.length);*/
+		BigInteger mess=new BigInteger(message);
+		BigInteger sig=mess.modPow(s, m);
+		return sig.toByteArray();
 
 	}
 	

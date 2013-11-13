@@ -56,6 +56,8 @@ public class Vote {
 			byte[] vote=b.getBytes();
 			//Encrypt vote (essentially the commit from FOO92)
 			byte[] c=enc.doFinal(vote);
+			System.out.println(c.length);
+			
 			//Blinding key setup
 			
 			//System.out.println("testing1");			
@@ -81,7 +83,7 @@ public class Vote {
 	
 			byte[] adminkey=bufArray2.get(0);
 			byte[] modulus=bufArray2.get(1);
-			
+			System.out.println("got stuff from admin");
 			BigInteger blindFactor=getBlindingFactor(adminkey, modulus);
 			
 			//Blind encrypted vote:
@@ -100,7 +102,8 @@ public class Vote {
 			byte[] electionnameBytes=electionname.getBytes();
 			rs=st.executeQuery("SELECT pk FROM voterkey WHERE username='"+username+"'");
 			rs.next();
-			byte[] voterpk=rs.getBytes("pk");			
+			byte[] voterpk=rs.getBytes("pk");
+			System.out.println("got stuff altogether");
 			PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
 			Signature ver=Signature.getInstance("SHA256WITHRSA");
 			ver.initVerify(PK);
@@ -145,7 +148,7 @@ public class Vote {
 			
 			// receive the signedVote from the admin
 			
-			byte [] receiveBuf2=new byte[128000];
+			byte [] receiveBuf2=new byte[1280];
 			in.read(receiveBuf2);
 			byte[] blindedSignedVote= receiveBuf2;
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
@@ -162,12 +165,12 @@ public class Vote {
 			
 			//unblind
 			byte[] signedVote=unblind(blindedSignedVote, blindFactor, adminkey, modulus);
-			
+			System.out.println("unblinded");
 			//verify
 			boolean good=verify(adminkey, c, signedVote, modulus);
-			
+			System.out.println("verify ran");
 			if(good){
-				
+				System.out.println("sig verified");
 				Socket socket2=new Socket("localhost",8000);
 				System.out.println("Connected to server of the counter");
 				ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
@@ -295,6 +298,13 @@ public class Vote {
 		signer.init(false, adminpk);
 		signer.update(message, 0,message.length);
 		return signer.verifySignature(sig);
+		//BigInteger sign=new BigInteger(sig);
+		//BigInteger mess=new BigInteger(message);
+		//BigInteger orig=sign.modPow(p,m);
+		//if(orig.compareTo(mess)==0)
+		//	return true;
+		//else
+		//	return false;
 	}
 	
 	private static byte[] unblind(byte[] blindedMessage, BigInteger blindFactor, byte[] pk, byte[] mod) throws IOException, ClassNotFoundException{
@@ -302,23 +312,41 @@ public class Vote {
 		BigInteger p=new BigInteger(pk);
 		BigInteger m=new BigInteger(mod);
 		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
-
 		RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindFactor);
 		eng.init(false, blindParams);
+		System.out.println(eng.getInputBlockSize());
+		System.out.println(blindedMessage.length);
 		return eng.processBlock(blindedMessage, 0, blindedMessage.length);
+		//BigInteger sig=new BigInteger(blindedMessage);
+		//BigInteger unblinded=blindFactor.modInverse(m).multiply(sig).mod(m);
+		//return unblinded.toByteArray();
 	}
 	
 	private static BigInteger getBlindingFactor(byte[] pk, byte[] mod) throws IOException, ClassNotFoundException{
+		System.out.println("in blinding factor");
 		BigInteger p=new BigInteger(pk);
 		BigInteger m=new BigInteger(mod);
+		//System.out.println(m.toString());
 		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
-		
 		RSABlindingFactorGenerator genBlind=new RSABlindingFactorGenerator();
 		genBlind.init(adminpk);
 		return genBlind.generateBlindingFactor();
+		/*SecureRandom rand=new SecureRandom();
+		byte[] random=new byte[10];
+		BigInteger r=null;
+		BigInteger gcd=null;
+		BigInteger one=new BigInteger("1");
+		do{
+			rand.nextBytes(random);
+			r=new BigInteger(1,random);
+			gcd=r.gcd(m);
+		}
+		while(!gcd.equals(one) || r.compareTo(m)>=0 || r.compareTo(one)<=0);
+		return r;*/
 	}
 	
 	private static byte[] blind(byte[] message, byte[] pk, byte[] mod, BigInteger blindFactor) throws IOException, ClassNotFoundException, DataLengthException, CryptoException{
+		System.out.println("in blind");
 		BigInteger p=new BigInteger(pk);
 		BigInteger m=new BigInteger(mod);
 		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
@@ -329,6 +357,10 @@ public class Vote {
 		blinder.init(true, blindParams);
 		blinder.update(message, 0, message.length);
 		return blinder.generateSignature();
+		//BigInteger mess=new BigInteger(message);
+		//BigInteger b=mess.multiply(blindFactor).mod(m);
+		//return b.toByteArray();
+		
 	}
 	
 	private static byte[] signBlind(byte[] blind, byte[] sk) throws InvalidKeySpecException, NoSuchAlgorithmException, InvalidKeyException, SignatureException{
