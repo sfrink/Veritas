@@ -72,7 +72,7 @@ public class Vote {
 			in.read(receiveBuf);
 			ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
 			ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf);
-			for (int j = 0; j <=1; j++) {
+			for (int j = 0; j <=2; j++) {
 					int tmp = byteArray.read();
 					byte[] tmpArray = new byte[tmp];
 					byteArray.read(tmpArray, 0, tmp);
@@ -98,8 +98,9 @@ public class Vote {
 			//Send username, signedBlind and blindBytes, and electionname to Administrator to be signed
 			byte[] usernameBytes=username.getBytes();
 			byte[] electionnameBytes=electionname.getBytes();
-		
-			
+			rs=st.executeQuery("SELECT pk FROM voterkey WHERE username='"+username+"'");
+			rs.next();
+			byte[] voterpk=rs.getBytes("pk");			
 
 		
 			ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
@@ -109,8 +110,14 @@ public class Vote {
 			byteArray2.write(blindBytes);
 			byteArray2.write(signedBlind.length);
 			byteArray2.write(signedBlind);
+			byteArray2.write(voterpk.length);
+			byteArray2.write(voterpk);
+			byte[] stuff=new byte[1];
+			stuff[0]=(byte)1;
+			byteArray2.write(stuff.length);
+			byteArray2.write(stuff);
 			out.write(byteArray2.toByteArray());
-			
+			System.out.println("got info from voter");
 			logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Username: "+username+"; Description: Voter sent blind and signed blind to Admin\n");
 			//System.out.println("testing3");
 			

@@ -41,8 +41,8 @@ public class Admin {
 				System.out.println("receiving requests from client at "+clientAddress);
 				new Thread(new Runnable() {
 					ResultSet rs=null;
-					byte [] receiveBuf=new byte[1280];
-					byte [] receiveBuf2=new byte[1280];
+					byte [] receiveBuf=new byte[8000];
+					byte [] receiveBuf2=new byte[8000];
 					ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
 				  	InputStream in=clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
@@ -82,26 +82,33 @@ public class Admin {
 								byteArray2.write(adminpk);
 								byteArray2.write(mod.length);
 								byteArray2.write(mod);
+								byte[] stuff=new byte[1];
+								stuff[0]=(byte)1;
+								byteArray2.write(stuff.length);
+								byteArray2.write(stuff);
 						        //Scanner sc = new Scanner(System.in);
 					
 								out.write(byteArray2.toByteArray());
 								System.out.println("Sent key");
 								
 								in.read(receiveBuf2);
+								System.out.println("Sent key2");
 								ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
 							//receive username, blindbytes, signedBlind and electionname	
-								for (int j = 0; j <= 2; j++) {
+								for (int j = 0; j <= 4; j++) {
 									int tmp = byteArray.read();
 									byte[] tmpArray = new byte[tmp];
 									byteArray.read(tmpArray, 0, tmp);
 									bufArray.add(tmpArray);
 								}
 		
-			
+								System.out.println("stuff");
 							    //get the value of username, blindBytes and signedBlind --- also need to get election name
 								String username = new String(bufArray.get(0), "UTF-8");
 								byte[] blindBytes=bufArray.get(1);
 								byte[] signedBlind=bufArray.get(2);
+								byte[] voterpk=bufArray.get(3);
+								System.out.println("got info from voter");
 								logwrite.println("Time: "+sdf.format(date)+"; Event Type: Admin Receive Info; Election Name: "+electionname+"; Description: Admin received blind and signed blind from "+username+"\n");
 								//RSAPrivateKey skAdmin;
 								//System.out.println("testing2");
@@ -112,21 +119,20 @@ public class Admin {
 								byte[] adminsk=rs.getBytes("sk");
 								System.out.println("retrieved admin key");
 								
-								/*****Vote client sends voter pk to Admin****/
 								
-								rs=st.executeQuery("SELECT pk FROM voterkey WHERE username='"+username+"'");
-								rs.next();
-								byte[] voterpk=rs.getBytes("pk");
 								boolean goodSig=verify(voterpk, blindBytes, signedBlind);
-								
+								System.out.println("after verify");
 								
 								boolean eligible=false;
-								rs=st.executeQuery("SELECT "+electionname+" FROM elections WHERE usernames='"+username+"';");
-								rs.next();
-								//System.out.println("testing4");
-								if(rs.getString(electionname).equals("1"))
+								username=username.trim();
+								rs=st.executeQuery("SELECT "+electionname+" FROM elections WHERE usernames='"+username+"'");
+								System.out.println("after query");
+								if(rs.next()){
+									System.out.println("testingstuff");
+									if(rs.getString(electionname).equals("1"))
 									eligible=true;
-								//Still need to check election eligibility
+								}
+								
 								if(eligible && goodSig){
 									System.out.println("good sig");
 									byte[] signed=sign(adminsk, mod, blindBytes);
@@ -177,12 +183,19 @@ public class Admin {
 
 	}
 	
-	private static boolean verify(byte[] pk, byte[] message, byte[] sig) throws SignatureException, NoSuchAlgorithmException, InvalidKeyException, InvalidKeySpecException{
-		PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(pk));
-		Signature ver=Signature.getInstance("SHA256WITHRSA");
-		ver.initVerify(PK);
-		ver.update(message);
-		return ver.verify(sig);
+	private static boolean verify(byte[] pk, byte[] message, byte[] sig){
+		try{
+			System.out.println("in verify");
+			PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(pk));
+			Signature ver=Signature.getInstance("SHA256WITHRSA");
+			ver.initVerify(PK);
+			ver.update(message);
+			return ver.verify(sig);
+		}
+		catch(Exception e){
+			System.out.println(e);
+			return false;
+		}
 	}
 	
 }
