@@ -9,6 +9,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.RSABlindingEngine;
 import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.RSABlindingFactorGenerator;
+import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSABlindingParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
@@ -83,12 +84,21 @@ public class Vote {
 	
 			byte[] adminkey=bufArray2.get(0);
 			byte[] modulus=bufArray2.get(1);
-			System.out.println("got stuff from admin");
+			//System.out.println("got stuff from admin");
 			BigInteger blindFactor=getBlindingFactor(adminkey, modulus);
-			
+
 			//Blind encrypted vote:
 			byte[] blindBytes=blind(c, adminkey, modulus, blindFactor);
-			
+			/*BigInteger a=new BigInteger(adminkey);
+			/BigInteger m=new BigInteger(modulus);
+			RSAKeyParameters adminpk=new RSAKeyParameters(false,m,a);
+			RSABlindingParameters bParams=new RSABlindingParameters(adminpk, bf);
+			ParametersWithRandom pwr=new ParametersWithRandom(bParams);
+			RSABlindingEngine eng= new RSABlindingEngine();
+			eng.init(true, pwr);
+			System.out.println("output size:"+eng.getOutputBlockSize());
+			System.out.println("input size:"+eng.getInputBlockSize());
+			byte[] blindBytes=eng.processBlock(c, 0, c.length);*/
 			
 			//Sign blind
 			rs=st.executeQuery("SELECT sk FROM voterkey WHERE username='"+username+"'");
@@ -104,7 +114,10 @@ public class Vote {
 			rs.next();
 			byte[] voterpk=rs.getBytes("pk");
 			System.out.println("got stuff altogether");
+			
+			
 			PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
+			
 			Signature ver=Signature.getInstance("SHA256WITHRSA");
 			ver.initVerify(PK);
 			ver.update(blindBytes);
@@ -148,7 +161,7 @@ public class Vote {
 			
 			// receive the signedVote from the admin
 			
-			byte [] receiveBuf2=new byte[1280];
+			byte [] receiveBuf2=new byte[128];
 			in.read(receiveBuf2);
 			byte[] blindedSignedVote= receiveBuf2;
 			ArrayList<byte[]> bufArray = new ArrayList<byte[]>();
@@ -165,6 +178,8 @@ public class Vote {
 			
 			//unblind
 			byte[] signedVote=unblind(blindedSignedVote, blindFactor, adminkey, modulus);
+			//eng.init(false, pwr);
+			//byte[] signedVote=eng.processBlock(blindedSignedVote, 0, blindedSignedVote.length);
 			System.out.println("unblinded");
 			//verify
 			boolean good=verify(adminkey, c, signedVote, modulus);
@@ -317,9 +332,6 @@ public class Vote {
 		System.out.println(eng.getInputBlockSize());
 		System.out.println(blindedMessage.length);
 		return eng.processBlock(blindedMessage, 0, blindedMessage.length);
-		//BigInteger sig=new BigInteger(blindedMessage);
-		//BigInteger unblinded=blindFactor.modInverse(m).multiply(sig).mod(m);
-		//return unblinded.toByteArray();
 	}
 	
 	private static BigInteger getBlindingFactor(byte[] pk, byte[] mod) throws IOException, ClassNotFoundException{
@@ -345,6 +357,15 @@ public class Vote {
 		return r;*/
 	}
 	
+	/*private static RSABlindingEngine getEng(byte[] pk, byte[] mod){
+		BigInteger p=new BigInteger(pk);
+		BigInteger m=new BigInteger(mod);
+		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
+		RSABlindingEngine eng= new RSABlindingEngine();
+		eng.init(true, adminpk);
+		return eng;
+	}*/
+	
 	private static byte[] blind(byte[] message, byte[] pk, byte[] mod, BigInteger blindFactor) throws IOException, ClassNotFoundException, DataLengthException, CryptoException{
 		System.out.println("in blind");
 		BigInteger p=new BigInteger(pk);
@@ -352,14 +373,13 @@ public class Vote {
 		RSAKeyParameters adminpk=new RSAKeyParameters(false, m, p);
 		RSABlindingParameters blindParams=new RSABlindingParameters(adminpk, blindFactor);
 		RSABlindingEngine eng=new RSABlindingEngine();
+		//eng.init(true, blindParams);
+				
 		PSSSigner blinder=new PSSSigner(eng, new SHA1Digest(), 20);
 		
 		blinder.init(true, blindParams);
 		blinder.update(message, 0, message.length);
 		return blinder.generateSignature();
-		//BigInteger mess=new BigInteger(message);
-		//BigInteger b=mess.multiply(blindFactor).mod(m);
-		//return b.toByteArray();
 		
 	}
 	

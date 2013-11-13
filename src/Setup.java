@@ -203,7 +203,7 @@ public class Setup {
 					        		stmt2.execute("CREATE TABLE "+electionname+"results (vote varchar(50))");
 					        		System.out.println("stmt3");
 					        		RSAKeyPairGenerator r=new RSAKeyPairGenerator();
-					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),3072,80));
+					    			r.init(new RSAKeyGenerationParameters(new BigInteger("10001",16),new SecureRandom(),1024,80));
 					    			AsymmetricCipherKeyPair keys=r.generateKeyPair();
 					    			RSAKeyParameters pkAdmin=(RSAKeyParameters)keys.getPublic();
 					    			RSAKeyParameters skAdmin=(RSAKeyParameters)keys.getPrivate();
