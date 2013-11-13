@@ -27,7 +27,7 @@ public class Vote {
 		Connection con=null;
 		Statement st=null;
 		ResultSet rs=null;
-		String url="jdbc:mysql://localhost:3306/elections";
+		String url="jdbc:mysql://localhost:3306/Client";
 		String user="root";
 		String pw="";
 		try{
@@ -89,7 +89,7 @@ public class Vote {
 			
 			
 			//Sign blind
-			rs=st.executeQuery("SELECT sk FROM voterkeys WHERE username='"+username+"'");
+			rs=st.executeQuery("SELECT sk FROM voterkey WHERE username='"+username+"'");
 			rs.next();
 			byte[] votersk=rs.getBytes("sk");
 			byte[] signedBlind=signBlind(blindBytes, votersk);
@@ -164,6 +164,7 @@ public class Vote {
 			}
 			else{
 				System.out.println("did not verify");
+				System.exit(0);
 				//if not valid then need to raise some alarms, but don't need that implemented yet
 			}
 			/***List of (nonce,encVote,signedVote) needs to be sent from Counter to Vote***/
@@ -177,8 +178,8 @@ public class Vote {
 				bufArray.add(tmpArray);
 			}
 			byte[] nonce= bufArray.get(0);
-			byte[] encVote= bufArray.get(1);	
-			byte[] signedVote2= bufArray.get(2);	
+			//byte[] encVote= bufArray.get(1);	
+			//byte[] signedVote2= bufArray.get(2);	
 			/*
 			 * Needs to be redone with list sent from Counter--find your nonce, send over with key
 			 * pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote= (?)");

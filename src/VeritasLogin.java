@@ -264,7 +264,6 @@ public class VeritasLogin {
         			
        
         				String choice=sc.next();
-        				out3.write(choice.getBytes());
         			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				Vote voter=new Vote();
         				voter.vote(choice, name, electionname);
@@ -385,11 +384,8 @@ public class VeritasLogin {
         				}
         				out3.write(serialize(numVoters));
         				in2.read(receiveBuf4);
-        				int ack2=(Integer)deserialize(receiveBuf4);
-        				if(ack2==1)
-        				{
-        				out3.write(byteArray3.toByteArray());
-        				}
+        				out3.write(byteArray4.toByteArray());
+        				
         				//stmt.execute("create table "+elec+"results (vote varchar(50));");
         				//rs = stmt.executeQuery("SELECT usernames FROM elections WHERE usertype ='1'");
         	

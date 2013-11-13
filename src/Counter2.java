@@ -20,7 +20,7 @@ public class Counter2 {
 	public static void main(String[] args){
 
 
-		String url="jdbc:mysql://localhost:3306/elections";
+		String url="jdbc:mysql://localhost:3306/Server";
 		String user="root";
 		String pw="";
 		try{

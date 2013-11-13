@@ -257,7 +257,7 @@ public class Setup {
 									in.read(receiveBuf3);
 									ByteArrayInputStream byteArray3 = new ByteArrayInputStream(receiveBuf3);
 									for (int j = 0; j <voteNumbers; j++) {
-										int tmp = byteArray.read();
+										int tmp = byteArray3.read();
 										byte[] tmpArray = new byte[tmp];
 										byteArray3.read(tmpArray, 0, tmp);
 										bufArray2.add(tmpArray);
@@ -289,7 +289,7 @@ public class Setup {
 			        				int columnCount = metadata.getColumnCount();
 			        				for(int i=3;i<=columnCount;i++){
 			        					if(rs.getString(i).equals("1")){
-			        						System.out.print((i-2)+"."+metadata.getColumnName(i)+" ");
+			        						System.out.println((i-2)+"."+metadata.getColumnName(i)+" ");
 			        						String el=(i-2)+"."+metadata.getColumnName(i);
 			        						numelections++;
 			        						byteArray5.write((el.getBytes()).length);
@@ -307,22 +307,14 @@ public class Setup {
 			        				out.write(byteArray5.toByteArray());
 			        				in.read(receiveBuf8);
 			        				String electionname=new String(receiveBuf8);
-			        				System.out.println(electionname);
+			        				electionname=electionname.trim();
 			        				rs=stmt.executeQuery("SELECT candidateSet FROM candidates WHERE election='"+electionname+"'");
-
-			        				String candidates="abc";
-			        				System.out.println(candidates);
+			        				String candidates=null;
 			        			if(rs.next()){
-			      	
 			        				candidates=rs.getString("candidateSet");
-			        				System.out.println(candidates);
 			        			}
-			        				System.out.println(candidates);
 			        				out.write(candidates.getBytes());
-			        				in.read(votes);
-			        				String choice=new String(votes);
-			        				Vote voter=new Vote();
-			        				voter.vote(choice, username, electionname);
+
 			            	}
 			            	
 			            	

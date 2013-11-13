@@ -19,15 +19,15 @@ public class Admin {
 	
 	public static void main(String[] args){
 	
-		String url="jdbc:mysql://localhost:3306/elections";
+		String url="jdbc:mysql://localhost:3306/Server";
 		String user="root";
 		String pw="";
-		try{
+		/*try{
 			Class.forName("com.mysql.jdbc.Driver");
 		}
 		catch(Exception e){
 			System.out.println(e);
-		}
+		}*/
 		try{
 		    final Connection con=DriverManager.getConnection(url, user, pw);
 			final Statement st=con.createStatement();
@@ -47,7 +47,7 @@ public class Admin {
 				  	InputStream in=clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
 					File log=new File("log.txt");
-					ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
+				
 					
 					ByteArrayOutputStream byteArray2 = new ByteArrayOutputStream();
 					
@@ -57,16 +57,27 @@ public class Admin {
 						public void run(){
 							try{
 								// send adminkey
+								System.out.println("testing1");
 								in.read(receiveBuf);
+								System.out.println("testing2");
+
 								String electionname=new String(receiveBuf, "UTF-8");
+								electionname=electionname.trim();
 								rs=st.executeQuery("SELECT pk FROM adminkeys WHERE election='"+electionname+"';");
-								rs.next();
-								byte[] adminpk=rs.getBytes("pk");
+								System.out.println("testing");
+								byte[] adminpk=null;
+								if(rs.next()){
+									System.out.println("testing");
+									adminpk=rs.getBytes("pk");
+								}
+								System.out.println("testing3");
+
 								rs=st.executeQuery("SELECT modulus FROM adminkeys WHERE election='"+electionname+"';");
-								rs.next();
-								byte[] mod=rs.getBytes("modulus");
-								//Send mod
-								out.write(adminpk);
+								byte[] mod=null;
+								if(rs.next()){
+									mod=rs.getBytes("modulus");
+									System.out.println("testing4");							
+								}
 								byteArray2.write(adminpk.length);
 								byteArray2.write(adminpk);
 								byteArray2.write(mod.length);
@@ -74,9 +85,10 @@ public class Admin {
 						        //Scanner sc = new Scanner(System.in);
 					
 								out.write(byteArray2.toByteArray());
+								System.out.println("Sent key");
 								
-								
-								
+								in.read(receiveBuf2);
+								ByteArrayInputStream byteArray = new ByteArrayInputStream(receiveBuf2);
 							//receive username, blindbytes, signedBlind and electionname	
 								for (int j = 0; j <= 2; j++) {
 									int tmp = byteArray.read();
@@ -98,11 +110,11 @@ public class Admin {
 								rs=st.executeQuery("SELECT sk FROM adminkeys WHERE election='"+electionname+"';");
 								rs.next();
 								byte[] adminsk=rs.getBytes("sk");
-								
+								System.out.println("retrieved admin key");
 								
 								/*****Vote client sends voter pk to Admin****/
 								
-								rs=st.executeQuery("SELECT pk FROM voterkeys WHERE username='"+username+"'");
+								rs=st.executeQuery("SELECT pk FROM voterkey WHERE username='"+username+"'");
 								rs.next();
 								byte[] voterpk=rs.getBytes("pk");
 								boolean goodSig=verify(voterpk, blindBytes, signedBlind);
@@ -171,12 +183,6 @@ public class Admin {
 		ver.initVerify(PK);
 		ver.update(message);
 		return ver.verify(sig);
-	}
-	
-	private static Object deserialize(byte[] encVote) throws IOException, ClassNotFoundException {
-		ByteArrayInputStream b = new ByteArrayInputStream(encVote);
-        ObjectInputStream o = new ObjectInputStream(b);
-        return o.readObject();
 	}
 	
 }
