@@ -104,12 +104,16 @@ public class Counter2 {
 					while(rs.next()){
 						count++;
 					}
+					System.out.println(count);
 					if(count==numVoters){
 						System.out.println("got all votes");
 						rs=st.executeQuery("SELECT * FROM "+electionname+"results;");
 						break;
 					}
 				}
+				long threadID=Thread.currentThread().getId();
+				System.out.println(threadID);
+				
 				while(rs.next()){
 					for(int i=0;i<candidates.length;i++){
 						if(rs.getString("vote").equals(candidates[i]))
