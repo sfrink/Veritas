@@ -57,14 +57,14 @@ public class Vote {
 			byte[] vote=b.getBytes();
 			//Encrypt vote (essentially the commit from FOO92)
 			byte[] c=enc.doFinal(vote);
-			System.out.println(c.length);
+			//System.out.println(c.length);
 			
 			//Blinding key setup
 			
 			//System.out.println("testing1");			
 			
 			//Some network stuff to get pk:
-			Socket socket=new Socket("localhost",33333);
+			Socket socket=new Socket("161.253.127.82",33333);
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
 			OutputStream out=socket.getOutputStream();
@@ -114,7 +114,7 @@ public class Vote {
 			rs=st.executeQuery("SELECT pk FROM voterkey WHERE username='"+username+"'");
 			rs.next();
 			byte[] voterpk=rs.getBytes("pk");
-			System.out.println("got stuff altogether");
+			//System.out.println("got stuff altogether");
 			
 			
 			PublicKey PK=KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(voterpk));
@@ -187,7 +187,7 @@ public class Vote {
 			System.out.println("verify ran");
 			if(good){
 				System.out.println("sig verified");
-				Socket socket2=new Socket("localhost",8000);	
+				Socket socket2=new Socket("161.253.127.82",8000);	
 				InputStream in2=socket2.getInputStream();
 				OutputStream out2=socket2.getOutputStream();
 				System.out.println("Connected to server of the counter");
@@ -245,7 +245,7 @@ public class Vote {
 		
 		
 
-			Socket socket3=new Socket("localhost",7000);
+			Socket socket3=new Socket("161.253.127.82",7000);
 			System.out.println("Connected to server of the counter2");
 			OutputStream out3=socket3.getOutputStream();
 			InputStream in3=socket3.getInputStream();

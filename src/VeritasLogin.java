@@ -87,7 +87,7 @@ public class VeritasLogin {
         		1.this user is a voter and is eligible to the following elections:
         		2.this user is a supervisor and ask him if he wants to assign credentials
         		
-        	}  */Socket socket2=new Socket("localhost",8001);
+        	}  */Socket socket2=new Socket("161.253.127.82",8001);
         	
 			InputStream in2=socket2.getInputStream();
 			OutputStream out3=socket2.getOutputStream();
@@ -264,7 +264,7 @@ public class VeritasLogin {
         			
        
         				String choice=sc.next();
-        			//	out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
+        				out.println("Time: "+sdf.format(date)+"; Event Type: Vote; UserName: "+name+"; Description: Vote cast by user\n");
         				Vote voter=new Vote();
         				voter.vote(choice, name, electionname);
         			}
