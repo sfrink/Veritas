@@ -9,7 +9,6 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.RSABlindingEngine;
 import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.RSABlindingFactorGenerator;
-import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSABlindingParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
@@ -64,7 +63,7 @@ public class Vote {
 			//System.out.println("testing1");			
 			
 			//Some network stuff to get pk:
-			Socket socket=new Socket("161.253.127.82",33333);
+			Socket socket=new Socket("localhost",33333);
 			System.out.println("Connected to server");
 			InputStream in=socket.getInputStream();
 			OutputStream out=socket.getOutputStream();
@@ -187,7 +186,7 @@ public class Vote {
 			System.out.println("verify ran");
 			if(good){
 				System.out.println("sig verified");
-				Socket socket2=new Socket("161.253.127.82",8000);	
+				Socket socket2=new Socket("localhost",8000);	
 				InputStream in2=socket2.getInputStream();
 				OutputStream out2=socket2.getOutputStream();
 				System.out.println("Connected to server of the counter");
@@ -245,7 +244,7 @@ public class Vote {
 		
 		
 
-			Socket socket3=new Socket("161.253.127.82",7000);
+			Socket socket3=new Socket("localhost",7000);
 			System.out.println("Connected to server of the counter2");
 			OutputStream out3=socket3.getOutputStream();
 			InputStream in3=socket3.getInputStream();

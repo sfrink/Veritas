@@ -41,6 +41,8 @@ public class VeritasLogin {
            
             String databaseUsername = "";
             String databasePassword = "";
+            Console c;
+            c=System.console();
             
             System.out.println("Please input \"A\" to create an account or any other character to login:\n");
         	byte[] ack_supervisor=new byte[4096];
@@ -87,12 +89,13 @@ public class VeritasLogin {
         		1.this user is a voter and is eligible to the following elections:
         		2.this user is a supervisor and ask him if he wants to assign credentials
         		
-        	}  */Socket socket2=new Socket("161.253.127.82",8001);
+        	}  */
+        	Socket socket2=new Socket("localhost",8001);
         	
 			InputStream in2=socket2.getInputStream();
 			OutputStream out3=socket2.getOutputStream();
         	/***   create account                    ***/
-            if(choice1.equals( "A") || choice1.equals("a")){	
+            if(choice1.equals("A") || choice1.equals("a")){	
             	System.out.println("111");//Create new account
             	/*----Need to connect to the server----*/
             	int request=0;
@@ -105,8 +108,12 @@ public class VeritasLogin {
             	System.out.println(ack_voterInt);
             	System.out.println("Please set up your username:");
             	String c_name = sc.next();
-            	System.out.println("Please set up your password:");
-            	String c_pwd = sc.next();
+            	char[] inputpwd=null;
+            	if(c!=null)
+            		inputpwd = c.readPassword("Please set up your password:");
+            	else
+            		System.out.println("Console error");
+            	String c_pwd=new String(inputpwd);
             	System.out.println("Is this a voter or a supervisor account? (v for voter, s for supervisor):");
             	String type=sc.next();
             	/*----Send c_name and c_pwd and type to the server----*/
@@ -162,9 +169,15 @@ public class VeritasLogin {
             /*** send user name and password to server for logging in ***/
             System.out.println("Enter Username: ");         //Input Username
             String name = sc.next();
-            System.out.println("Enter Password: ");         //Input Password
-            String password = sc.next();
-        
+            //System.out.println("Enter Password: ");         //Input Password
+            char[] loginpwd=null;
+            if(c!=null){
+            	loginpwd = c.readPassword("Enter Password:");
+            }
+            else
+            	System.out.println("Console error");
+        	String password=new String(loginpwd);
+
             byte[] nameByte=name.getBytes();
         	byte[] pwdByte=password.getBytes();
         	ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
