@@ -19,6 +19,8 @@ import java.io.*;
 import java.security.spec.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Vote {
 
@@ -214,6 +216,14 @@ public class Vote {
 				key=k.getEncoded();
 				socket2.close();
 				logwrite.println("Time: "+sdf.format(date)+"; Event Type: Voter Send Info; Electionname: "+electionname+"; Description: Voter sent signed vote to the counter\n");
+				byte[] encVote= bufArray.get(1);	
+				//byte[] signedVote2= bufArray.get(2);	
+				if(!Arrays.equals(encVote,c)){
+					System.out.println("The vote sent back from the counter was not equal to your vote.  Please re-enter your vote to try again:");
+					Scanner scan=new Scanner(System.in);
+					String choice=scan.next();
+					vote(choice, username, electionname);
+				}
 				//System.out.println("testing5 sig verified");
 				/*Send signedVote along with c to Counting Principal.*/
 				
@@ -224,15 +234,16 @@ public class Vote {
 				 */
 			}
 			else{
-				System.out.println("did not verify");
-				System.exit(0);
-				//if not valid then need to raise some alarms, but don't need that implemented yet
+				System.out.println("The Administrator's signature did not verify.  Please re-enter your vote to try again:");
+				Scanner scan=new Scanner(System.in);
+				String choice=scan.next();
+				vote(choice, username, electionname);
+				//System.exit(0);
 			}
 			/***List of (nonce,encVote,signedVote) needs to be sent from Counter to Vote***/
 			
 			
-			//byte[] encVote= bufArray.get(1);	
-			//byte[] signedVote2= bufArray.get(2);	
+			
 			/*
 			 * Needs to be redone with list sent from Counter--find your nonce, send over with key
 			 * pst=con.prepareStatement("SELECT nonce FROM "+electionname+"votes WHERE encVote= (?)");
