@@ -85,10 +85,29 @@ public class Setup {
 						}
 						
 						/**Need to get usertype**/
-						String username= new String(bufArray4.get(0));
+						String username= new String(bufArray4.get(0));			//username sent from client
 					
-						String pwd= new String(bufArray4.get(1));	
-						String usertype=new String(bufArray4.get(2));
+						String pwd= new String(bufArray4.get(1));				//password sent from client
+						String usertype=new String(bufArray4.get(2));			//usertype sent from client
+						
+/*-----------------------check the database if username has already been used------------------------------*/
+						String status = null;
+						String check = "SELECT * from users WHERE usernames='"+username+"'";
+						ResultSet rs=stmt.executeQuery(check);
+						if(rs.getString("username").equals(username)) status=false;		//username already exists
+						else status=true;						//username can be added
+						
+/*--------------------------if username already exists, send notification to client------------------------*/
+						while(status==false){
+							//SEND NOTIFICATION
+							/*--------------------------receive data again--------------------------*/
+							String check = "SELECT * from users WHERE usernames='"+username+"'";
+							ResultSet rs=stmt.executeQuery(check);
+							if(rs.getString("username").equals(username)) status=false;		//username already exists
+							else status=true;						//username can be added
+						}												
+/*--------------------------------------------------------------------------------------------------------------*/						
+						
 						int type=0;
 						if(usertype.equals("v"))
 							type=1;
