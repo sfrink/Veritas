@@ -67,7 +67,7 @@ public class VeritasLogin {
 				System.out.println(e);
 			}
 			 Scanner sc = new Scanner(System.in);
-        	//System.out.println("Do you want to log in or creat your account? enter 1 for log and 0 for creating");
+        	//System.out.println("Do you want to log in or create your account? enter 1 for log and 0 for creating");
         	String choice1 = sc.next();
 			
         /*	These stuff can be used for future to fully implement the functions 
@@ -110,10 +110,47 @@ public class VeritasLogin {
             	String c_name = sc.next();
             	char[] inputpwd=null;
             	if(c!=null)
-            		inputpwd = c.readPassword("Please set up your password:");
+            		inputpwd = c.readPassword("Please set up your password (Hint: At least 8 characters; choose at least three of the following: upper-case letters, lower-case letters, numbers, and symbols):\n");
             	else
             		System.out.println("Console error");
             	String c_pwd=new String(inputpwd);
+            	
+/*--------------------------------------check password entropy------------------------------------------*/            	
+            	int digit=0;
+        		int upper=0;
+        		int lower=0;
+        		int symbol=0;
+
+                for(int i=0; i<c_pwd.length(); i++){
+                            
+                    for(int x=0; x<10; x++){                //check digit
+                        if(c_pwd.charAt(i)==x) digit=1;
+                    }
+                            
+                    char a= 'A';
+                    for(int x=0; x<26; x++){                //check upper-case letter
+                    	if(c_pwd.charAt(i)==a) upper=1;
+                        	a++;
+                    }
+                            
+                    char b= 'a';
+                    for(int x=0; x<26; x++){
+                        if(c_pwd.charAt(i)==b) lower=1;     //check lower-case letter
+                        b++;
+                    }
+                            
+                    String sym = "\"`~!@#$%^&*()-_=+[{]}|;:'\\,<.>/?";        //check symbol
+                    for(int x=0; x<sym.length(); x++){
+                        if(c_pwd.charAt(i)==sym.charAt(x)) symbol=1;
+                    }
+                }
+            	while(digit+upper+lower+symbol<3 || c_pwd.length()<8){
+            		System.out.println("Password too weak. Please check password setup hint above.\n");
+            		inputpwd = c.readPassword("Please set up your password (Hint: At least 8 characters; choose at least three of the following: upper-case letters, lower-case letters, numbers, and symbols):");            		
+            		c_pwd=new String(inputpwd);
+            	}
+/*------------------------------------------------------------------------------------------------------*/            	
+            	
             	System.out.println("Is this a voter or a supervisor account? (v for voter, s for supervisor):");
             	String type=sc.next();
             	/*----Send c_name and c_pwd and type to the server----*/
