@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.sql.*;
 import java.security.MessageDigest;
 
-
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
@@ -22,6 +21,10 @@ import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
 import java.security.SecureRandom;
 import java.math.BigInteger;
+
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 
 
 public class Setup {
@@ -33,10 +36,17 @@ public class Setup {
 			/* Need to make this an if stmt like in veritas login -- should do one thing if its a voter,
 			 * Something else if its a supervisor
 			 */
-			final ServerSocket servSock = new ServerSocket(servPort);
+			
+			 SSLServerSocketFactory sslserversocketfactory =
+	                    (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+	          final  SSLServerSocket sslserversocket =
+	                    (SSLServerSocket) sslserversocketfactory.createServerSocket(servPort);
+	           
+			
+			
 			System.out.print("start");
 			while (true) {
-				final Socket clntSock = servSock.accept();
+				final SSLSocket clntSock = (SSLSocket) sslserversocket.accept();
 				SocketAddress clientAddress = clntSock.getRemoteSocketAddress();
 				System.out.println("receiving requests from client at "+clientAddress);
 				new Thread(new Runnable() {
@@ -52,7 +62,6 @@ public class Setup {
 		            byte[] ack2=new byte[4096];
 		            byte[] ack_supervisor=serialize(0);
 		            byte[] ack_voter=serialize(1);
-		            byte[] votes= new byte[4096];
 		            byte[] request = new byte[4096];
 					byte[] receiveBuf = new byte[4096];
 					byte[] receiveBuf2 = new byte[4096];
@@ -62,6 +71,7 @@ public class Setup {
 					byte[] receiveBuf6 = new byte[4096];
 					byte[] receiveBuf7 = new byte[4096];
 					byte[] receiveBuf8 = new byte[4096];
+					byte[] receiveBuf9 = new byte[4096];
 					InputStream in = clntSock.getInputStream();
 					OutputStream out=clntSock.getOutputStream();
 					// get the username and candidate
@@ -69,6 +79,7 @@ public class Setup {
 					ArrayList<byte[]> bufArray2 = new ArrayList<byte[]>();
 					ArrayList<byte[]> bufArray3 = new ArrayList<byte[]>();
 					ArrayList<byte[]> bufArray4 = new ArrayList<byte[]>();
+					ArrayList<byte[]> bufArray5 = new ArrayList<byte[]>();
 					in.read(request);
 					int requestInt=(Integer)deserialize(request);
 					if(requestInt==0){
@@ -84,14 +95,14 @@ public class Setup {
 							bufArray4.add(tmpArray);
 						}
 						
-						/**Need to get usertype**/
+			
 						String username= new String(bufArray4.get(0));			//username sent from client
 					
 						String pwd= new String(bufArray4.get(1));				//password sent from client
 						String usertype=new String(bufArray4.get(2));			//usertype sent from client
 						
 /*-----------------------check the database if username has already been used------------------------------*/
-						String status = null;
+						Boolean status = null;
 						String check = "SELECT * from users WHERE usernames='"+username+"'";
 						ResultSet rs=stmt.executeQuery(check);
 						if(rs.getString("username").equals(username)) status=false;		//username already exists
@@ -100,9 +111,24 @@ public class Setup {
 /*--------------------------if username already exists, send notification to client------------------------*/
 						while(status==false){
 							//SEND NOTIFICATION
+							out.write(serialize(0));
 							/*--------------------------receive data again--------------------------*/
-							String check = "SELECT * from users WHERE usernames='"+username+"'";
-							ResultSet rs=stmt.executeQuery(check);
+							in.read(receiveBuf9);	
+							
+							ByteArrayInputStream byteArray6 = new ByteArrayInputStream(receiveBuf9);
+							for (int j = 0; j <=2; j++) {
+								int tmp = byteArray6.read();
+								byte[] tmpArray = new byte[tmp];
+								byteArray6.read(tmpArray, 0, tmp);
+								bufArray5.add(tmpArray);
+							}
+							
+							/**Need to get usertype**/
+							username= new String(bufArray5.get(0));			//username sent from client
+							pwd= new String(bufArray5.get(1));				//password sent from client
+							usertype=new String(bufArray5.get(2));			//usertype sent from client
+
+						
 							if(rs.getString("username").equals(username)) status=false;		//username already exists
 							else status=true;						//username can be added
 						}												
