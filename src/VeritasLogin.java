@@ -5,6 +5,8 @@
 import java.security.spec.*;
 
 import javax.crypto.*;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -90,11 +92,14 @@ public class VeritasLogin {
         		2.this user is a supervisor and ask him if he wants to assign credentials
         		
         	}  */
-        	Socket socket2=new Socket("localhost",8001);
+        	  SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+              SSLSocket socket2 = (SSLSocket) sslsocketfactory.createSocket("localhost", 8001);
+       
         	
 			InputStream in2=socket2.getInputStream();
 			OutputStream out3=socket2.getOutputStream();
         	/***   create account                    ***/
+		
             if(choice1.equals("A") || choice1.equals("a")){	
             	System.out.println("111");//Create new account
             	/*----Need to connect to the server----*/
@@ -106,6 +111,9 @@ public class VeritasLogin {
             	in2.read(ack_voter);
             	int ack_voterInt=(Integer)deserialize(ack_voter);
             	System.out.println(ack_voterInt);
+            	
+    
+          
             	System.out.println("Please set up your username:");
             	String c_name = sc.next();
             	char[] inputpwd=null;
@@ -149,6 +157,7 @@ public class VeritasLogin {
             		inputpwd = c.readPassword("Please set up your password (Hint: At least 8 characters; choose at least three of the following: upper-case letters, lower-case letters, numbers, and symbols):");            		
             		c_pwd=new String(inputpwd);
             	}
+            
 /*------------------------------------------------------------------------------------------------------*/            	
             	
             	System.out.println("Is this a voter or a supervisor account? (v for voter, s for supervisor):");
@@ -168,6 +177,76 @@ public class VeritasLogin {
             	
             	/*----Receive notification from the server----*/
 				in2.read(ack_voter2);
+				int check_available=(Integer)deserialize(ack_voter2);
+
+		
+				while(check_available==0){
+					System.out.println("This username already exsits!please choose another one");
+					/*********  input username and password again        ******/
+					
+
+	            	System.out.println("Please set up your username:");
+	            	if(c!=null)
+	            		inputpwd = c.readPassword("Please set up your password (Hint: At least 8 characters; choose at least three of the following: upper-case letters, lower-case letters, numbers, and symbols):\n");
+	            	else
+	            		System.out.println("Console error");
+	            	 c_pwd=new String(inputpwd);
+	            	
+	/*--------------------------------------check password entropy------------------------------------------*/            	
+	           
+
+	                for(int i=0; i<c_pwd.length(); i++){
+	                            
+	                    for(int x=0; x<10; x++){                //check digit
+	                        if(c_pwd.charAt(i)==x) digit=1;
+	                    }
+	                            
+	                    char a= 'A';
+	                    for(int x=0; x<26; x++){                //check upper-case letter
+	                    	if(c_pwd.charAt(i)==a) upper=1;
+	                        	a++;
+	                    }
+	                            
+	                    char b= 'a';
+	                    for(int x=0; x<26; x++){
+	                        if(c_pwd.charAt(i)==b) lower=1;     //check lower-case letter
+	                        b++;
+	                    }
+	                            
+	                    String sym = "\"`~!@#$%^&*()-_=+[{]}|;:'\\,<.>/?";        //check symbol
+	                    for(int x=0; x<sym.length(); x++){
+	                        if(c_pwd.charAt(i)==sym.charAt(x)) symbol=1;
+	                    }
+	                }
+	            	while(digit+upper+lower+symbol<3 || c_pwd.length()<8){
+	            		System.out.println("Password too weak. Please check password setup hint above.\n");
+	            		inputpwd = c.readPassword("Please set up your password (Hint: At least 8 characters; choose at least three of the following: upper-case letters, lower-case letters, numbers, and symbols):");            		
+	            		c_pwd=new String(inputpwd);
+	            	}
+	            
+	/*------------------------------------------------------------------------------------------------------*/            	
+	            	
+	            	System.out.println("Is this a voter or a supervisor account? (v for voter, s for supervisor):");
+	            	 type=sc.next();
+	            	/*----Send c_name and c_pwd and type to the server----*/
+	            	 c_nameByte=c_name.getBytes();
+	            	 c_pwdByte=c_pwd.getBytes();
+	            	ByteArrayOutputStream byteArray7 = new ByteArrayOutputStream();
+					byteArray7.write(c_nameByte.length);
+					byteArray7.write(c_nameByte);
+					byteArray7.write(c_pwdByte.length);
+					byteArray7.write(c_pwdByte);
+					byteArray7.write((type.getBytes()).length);
+					byteArray7.write(type.getBytes());
+					out3.write(byteArray7.toByteArray());
+	            	
+	            	
+	            	/*----Receive notification from the server----*/
+					in2.read(ack_voter2);
+					check_available=(Integer)deserialize(ack_voter2);
+					
+					
+				}		
             	System.out.println("Your account has been successfully created!\n");
             	
         		/*Assign pk, sk to new user*/
@@ -232,35 +311,7 @@ public class VeritasLogin {
             	System.out.println("password or username wrong!");
             }
             
-        /*    String url="jdbc:mysql://localhost:3306/elections";
-    		String user="root";
-    		String pw="";
-            Connection conn = DriverManager.getConnection(url, user, pw);
-            Statement stmt = conn.createStatement();
-            PreparedStatement pstmt=null;
-            ResultSet rs=null;*/
-            //String query = "SELECT * from users WHERE username='"+name+"'";
-            //ResultSet rs = stmt.executeQuery(query);
-            
-            //Send username and password to server, server authenticates, sends back yes or no and also send back usertype
-//            while(rs.next()){                           //Read username & password from database
-//                databaseUsername = rs.getString("username");
-//                databasePassword = rs.getString("password");
-//            }
-
-			
-//			if (name.equals(databaseUsername) && password.equals(databasePassword)) {           //check username & password
-//                System.out.println("Successful Login!\n----");
-//                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Successful Login\n");
-//            } else {
-//                System.out.println("Incorrect Username or Password!\n----");
-//                out.println("Time: "+sdf.format(date)+"; Event Type: Login; UserID: "+name+"; Password: "+password+"; Description: Failed Login\n");
-//                out.close();
-//                System.exit(0);
-//            }
-			
-            //rs=stmt.executeQuery("SELECT usertype FROM elections WHERE usernames='"+name+"'");
-			//Get from server\
+        
             /*** if this user is authorized as a supervisor, he can assign credentials, if he is authorized as a  voter, he can vote   ***/
             in2.read(receiveBuf);
             int check_identity=(Integer)deserialize(receiveBuf);
@@ -270,8 +321,7 @@ public class VeritasLogin {
         			//rs=stmt.executeQuery("SELECT * FROM elections WHERE usernames='"+name+"'");
         			//Need to get these election names from server
         			out3.write(serialize(1));
-        			
-        			int numelections=0;
+        		
         			int election_num=0;
         			in2.read(check_elections);
         			int check_electionsInt=(Integer)deserialize(check_elections);
