@@ -101,7 +101,7 @@ public class VeritasLogin {
         	/***   create account                    ***/
 		
             if(choice1.equals("A") || choice1.equals("a")){	
-            	System.out.println("111");//Create new account
+            	//System.out.println("111");//Create new account
             	/*----Need to connect to the server----*/
             	int request=0;
             	byte[] request_voter=serialize(request);
@@ -110,7 +110,7 @@ public class VeritasLogin {
             	out3.write(request_voter);
             	in2.read(ack_voter);
             	int ack_voterInt=(Integer)deserialize(ack_voter);
-            	System.out.println(ack_voterInt);
+            	//System.out.println(ack_voterInt);
             	
     
           
@@ -181,7 +181,7 @@ public class VeritasLogin {
 
 		
 				while(check_available==0){
-					System.out.println("This username already exsits!please choose another one");
+					System.out.println("This username already exists!please choose another one");
 					/*********  input username and password again        ******/
 					
 
@@ -222,6 +222,33 @@ public class VeritasLogin {
 	            		System.out.println("Password too weak. Please check password setup hint above.\n");
 	            		inputpwd = c.readPassword("Please set up your password (Hint: At least 8 characters; choose at least three of the following: upper-case letters, lower-case letters, numbers, and symbols):");            		
 	            		c_pwd=new String(inputpwd);
+	            		digit=0;
+	            		upper=0;
+	            		lower=0;
+	            		symbol=0;
+	            		for(int i=0; i<c_pwd.length(); i++){
+                            
+		                    for(int x=0; x<10; x++){                //check digit
+		                        if(c_pwd.charAt(i)==x) digit=1;
+		                    }
+		                            
+		                    char a= 'A';
+		                    for(int x=0; x<26; x++){                //check upper-case letter
+		                    	if(c_pwd.charAt(i)==a) upper=1;
+		                        	a++;
+		                    }
+		                            
+		                    char b= 'a';
+		                    for(int x=0; x<26; x++){
+		                        if(c_pwd.charAt(i)==b) lower=1;     //check lower-case letter
+		                        b++;
+		                    }
+		                            
+		                    String sym = "\"`~!@#$%^&*()-_=+[{]}|;:'\\,<.>/?";        //check symbol
+		                    for(int x=0; x<sym.length(); x++){
+		                        if(c_pwd.charAt(i)==sym.charAt(x)) symbol=1;
+		                    }
+		                }
 	            	}
 	            
 	/*------------------------------------------------------------------------------------------------------*/            	
@@ -293,7 +320,7 @@ public class VeritasLogin {
             else
             	System.out.println("Console error");
         	String password=new String(loginpwd);
-
+        	//System.out.println(password);
             byte[] nameByte=name.getBytes();
         	byte[] pwdByte=password.getBytes();
         	ByteArrayOutputStream byteArray3 = new ByteArrayOutputStream();
